@@ -23,6 +23,7 @@ import { ProfilePage } from '@/pages/profile/ProfilePage';
 import { AdminControlCenter } from '@/features/admin';
 import { useAuth } from '@/features/auth/AuthContext';
 import { navItems } from '@/widgets/sidebar/navConfig';
+import { Skeleton } from '@/components/ui/skeleton';
 import { scheduleApi, studentApi, mentorApi, groupApi } from './api';
 
 export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard' }) => {
@@ -148,11 +149,46 @@ export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard
       onOpenAiModal={canManageSchedules ? handleOpenAiModal : undefined}
     >
       {loading && schedules.length === 0 ? (
-        <div className="py-24 text-center">
-          <div className="w-10 h-10 border-3 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-[var(--text-secondary)] font-semibold text-sm">
-            AXM Nexus ma’lumotlari yuklanmoqda...
-          </p>
+        <div className="space-y-6">
+          {/* Banner Skeleton */}
+          <div className="rounded-3xl p-8 bg-[var(--bg-surface)] border border-[var(--border-default)] space-y-4">
+            <Skeleton className="h-6 w-48 rounded-full" />
+            <Skeleton className="h-10 w-96 rounded-xl" />
+            <Skeleton className="h-4 w-full max-w-xl rounded-md" />
+          </div>
+
+          {/* KPI Cards Skeleton */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="p-5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] space-y-3">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-4 w-24 rounded" />
+                  <Skeleton className="h-8 w-8 rounded-xl" />
+                </div>
+                <Skeleton className="h-8 w-20 rounded" />
+                <Skeleton className="h-3 w-32 rounded" />
+              </div>
+            ))}
+          </div>
+
+          {/* Table / Content Skeleton */}
+          <div className="p-6 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-default)] space-y-4">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-6 w-44 rounded-lg" />
+              <Skeleton className="h-8 w-32 rounded-lg" />
+            </div>
+            <div className="space-y-3 pt-2">
+              {[1, 2, 3, 4, 5].map((row) => (
+                <div key={row} className="flex items-center gap-4 py-3 border-b border-[var(--border-subtle)]">
+                  <Skeleton className="h-5 w-12 rounded" />
+                  <Skeleton className="h-5 w-40 rounded" />
+                  <Skeleton className="h-5 w-28 rounded" />
+                  <Skeleton className="h-5 w-24 rounded" />
+                  <Skeleton className="h-5 w-20 rounded ml-auto" />
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       ) : (
         <>

@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button/Button';
 import { Badge } from '@/shared/ui/badge/Badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { assessmentApi, assignmentApi } from '@/api';
@@ -321,9 +322,24 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       {activeSubTab === 'QUIZZES' && (
         <div className="space-y-6">
           {loadingAssessments ? (
-            <div className="py-20 text-center">
-              <div className="w-8 h-8 border-3 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-xs text-[var(--text-muted)]">Testlar ro‘yxati yuklanmoqda...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div
+                  key={i}
+                  className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-3xl p-5 shadow-xs space-y-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-6 w-20 rounded-md" />
+                    <Skeleton className="h-4 w-16 rounded" />
+                  </div>
+                  <Skeleton className="h-5 w-4/5 rounded-md" />
+                  <Skeleton className="h-4 w-full rounded" />
+                  <div className="pt-3 flex items-center justify-between border-t border-[var(--border-subtle)]">
+                    <Skeleton className="h-4 w-20 rounded" />
+                    <Skeleton className="h-8 w-28 rounded-xl" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -384,9 +400,24 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       {activeSubTab === 'ASSIGNMENTS' && (
         <div className="space-y-6">
           {loadingAssignments ? (
-            <div className="py-20 text-center">
-              <div className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-              <p className="text-xs text-[var(--text-muted)]">Topshiriqlar yuklanmoqda...</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              {[1, 2, 3, 4].map((i) => (
+                <div
+                  key={i}
+                  className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-3xl p-5 shadow-xs space-y-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-20 rounded-md" />
+                    <Skeleton className="h-4 w-16 rounded" />
+                  </div>
+                  <Skeleton className="h-6 w-3/4 rounded-md" />
+                  <Skeleton className="h-4 w-full rounded" />
+                  <div className="pt-3 flex items-center justify-between border-t border-[var(--border-subtle)]">
+                    <Skeleton className="h-4 w-28 rounded" />
+                    <Skeleton className="h-8 w-32 rounded-xl" />
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

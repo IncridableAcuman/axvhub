@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button/Button';
 import { Badge } from '@/shared/ui/badge/Badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { resourceApi } from '@/api';
@@ -258,9 +259,24 @@ export const ResourceLibrary: React.FC = () => {
 
       {/* Resources Grid */}
       {loading ? (
-        <div className="py-20 text-center">
-          <div className="w-8 h-8 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-xs text-[var(--text-muted)]">Resurslar yuklanmoqda...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div
+              key={i}
+              className="p-5 rounded-3xl bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-xs space-y-4"
+            >
+              <div className="flex items-center justify-between">
+                <Skeleton className="h-6 w-24 rounded-full" />
+                <Skeleton className="h-4 w-16 rounded" />
+              </div>
+              <Skeleton className="h-5 w-3/4 rounded-md" />
+              <Skeleton className="h-4 w-full rounded" />
+              <div className="pt-2 flex items-center justify-between border-t border-[var(--border-subtle)]">
+                <Skeleton className="h-4 w-24 rounded" />
+                <Skeleton className="h-8 w-24 rounded-xl" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : filteredResources.length === 0 ? (
         <div className="p-12 text-center bg-[var(--bg-surface)] rounded-3xl border border-[var(--border-subtle)]">
