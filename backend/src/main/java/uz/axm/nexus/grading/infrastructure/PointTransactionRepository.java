@@ -22,8 +22,18 @@ public interface PointTransactionRepository extends JpaRepository<PointTransacti
 
     @Query("SELECT p.studentId, SUM(p.amount) as total, MAX(p.amount) as maxSingle, MIN(p.createdAt) as earliest " +
            "FROM PointTransaction p " +
-           "WHERE (:since IS NULL OR p.createdAt >= :since) " +
            "GROUP BY p.studentId " +
            "ORDER BY total DESC, maxSingle DESC, earliest ASC")
-    List<Object[]> getLeaderboardData(@Param("since") LocalDateTime since);
+    List<Object[]> getLeaderboardDataAllTime();
+
+    @Query("SELECT p.studentId, SUM(p.amount) as total, MAX(p.amount) as maxSingle, MIN(p.createdAt) as earliest " +
+           "FROM PointTransaction p " +
+           "WHERE p.createdAt >= :since " +
+           "GROUP BY p.studentId " +
+           "ORDER BY total DESC, maxSingle DESC, earliest ASC")
+    List<Object[]> getLeaderboardDataSince(@Param("since") LocalDateTime since);
+
+    default List<Object[]> getLeaderboardData(LocalDateTime since) {
+        return since == null ? getLeaderboardDataAllTime() : getLeaderboardDataSince(since);
+    }
 }

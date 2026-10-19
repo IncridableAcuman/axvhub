@@ -84,15 +84,33 @@ public class AuditService {
             LocalDateTime to,
             Pageable pageable
     ) {
-        return auditLogRepository.searchAuditLogs(
-                (query != null && !query.isBlank()) ? query.trim() : null,
-                (action != null && !action.isBlank()) ? action.trim() : null,
-                (entityName != null && !entityName.isBlank()) ? entityName.trim() : null,
-                (performedBy != null && !performedBy.isBlank()) ? performedBy.trim() : null,
-                from,
-                to,
-                pageable
-        );
+        org.springframework.data.jpa.domain.Specification<AuditLog> spec = (root, cq, cb) -> {
+            java.util.List<jakarta.persistence.criteria.Predicate> predicates = new java.util.ArrayList<>();
+            if (action != null && !action.isBlank()) {
+                predicates.add(cb.equal(root.get("action"), action.trim()));
+            }
+            if (entityName != null && !entityName.isBlank()) {
+                predicates.add(cb.equal(root.get("entityName"), entityName.trim()));
+            }
+            if (performedBy != null && !performedBy.isBlank()) {
+                predicates.add(cb.like(cb.lower(root.get("performedBy")), "%" + performedBy.trim().toLowerCase() + "%"));
+            }
+            if (query != null && !query.isBlank()) {
+                String q = "%" + query.trim().toLowerCase() + "%";
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("details")), q),
+                        cb.like(cb.lower(root.get("entityId")), q)
+                ));
+            }
+            if (from != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("createdAt"), from));
+            }
+            if (to != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("createdAt"), to));
+            }
+            return cb.and(predicates.toArray(new jakarta.persistence.criteria.Predicate[0]));
+        };
+        return auditLogRepository.findAll(spec, pageable);
     }
 
     /**

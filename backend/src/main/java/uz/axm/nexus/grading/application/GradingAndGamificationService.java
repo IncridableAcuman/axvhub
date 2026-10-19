@@ -232,7 +232,9 @@ public class GradingAndGamificationService {
             since = LocalDateTime.now().minusDays(30);
         }
 
-        List<Object[]> rawData = pointTransactionRepository.getLeaderboardData(since);
+        List<Object[]> rawData = (since == null)
+                ? pointTransactionRepository.getLeaderboardDataAllTime()
+                : pointTransactionRepository.getLeaderboardDataSince(since);
         List<LeaderboardEntry> entries = new ArrayList<>();
 
         Map<Long, Student> studentMap = new HashMap<>();
