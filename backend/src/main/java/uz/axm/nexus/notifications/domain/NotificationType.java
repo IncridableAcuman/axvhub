@@ -1,0 +1,13 @@
+package uz.axm.nexus.notifications.domain;
+
+public enum NotificationType {
+    LESSON_PUBLISHED,
+    LESSON_RESCHEDULED,
+    LESSON_REMINDER,
+    ASSIGNMENT_NEW,
+    ASSIGNMENT_DEADLINE,
+    ASSESSMENT_RESULT,
+    MENTOR_FEEDBACK,
+    ENROLLMENT_UPDATED,
+    ADMIN_ANNOUNCEMENT
+}

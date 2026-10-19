@@ -1,0 +1,20 @@
+spring:
+  jackson:
+    deserialization:
+      fail-on-null-for-primitives: false
+      fail-on-unknown-properties: false
+  main:
+    banner-mode: off
+  mail:
+    host: localhost
+    port: 2525
+    username: test
+    password: test
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+
+app:
+  mail:
+    enabled: false

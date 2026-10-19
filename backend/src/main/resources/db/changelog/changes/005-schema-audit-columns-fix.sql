@@ -1,0 +1,9 @@
+--liquibase formatted sql
+--changeset izzatbek:005-schema-audit-columns-fix
+
+ALTER TABLE attendance_records ADD COLUMN IF NOT EXISTS created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL DEFAULT NOW();
+ALTER TABLE attendance_records ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITHOUT TIME ZONE;
+
+ALTER TABLE mentor_skills ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITHOUT TIME ZONE;
+ALTER TABLE mentor_experiences ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITHOUT TIME ZONE;
+ALTER TABLE mentor_educations ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP WITHOUT TIME ZONE;

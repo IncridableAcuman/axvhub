@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    username: sa
+    password: ""
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  liquibase:
+    enabled: false
+  session:
+    store-type: none
+  rabbitmq:
+    listener:
+      simple:
+        auto-startup: false
+  mail:
+    host: localhost
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  jwt:
+    secret: axm_nexus_test_secret_jwt_key_that_is_at_least_256_bits_long_1234567890
+    expiration-ms: 86400000
+    refresh-expiration-ms: 604800000
+  mail:
+    from: test@axm-nexus.uz
+    sender-name: "AXM Nexus Test"
+    verification-url: http://localhost:5173/auth/verify-email
+    token-expiration-minutes: 1440
+  rabbitmq:
+    email-exchange: axm.nexus.email.exchange
+    email-verification-queue: axm.nexus.email.verification.queue
+    email-verification-routing-key: axm.nexus.email.verification.key
+  ai:
+    gemini:
+      api-key: test-key
+      model: gemini-2.5-flash
+    groq:
+      api-key: test-key
+      model: llama-3.3-70b-versatile

@@ -1,3 +1,35 @@
-.idea
-.vscode
+# Environment & Secrets
 .env
+.env.local
+.env.*.local
+.env.prod
+.env.production
+*.pem
+*.key
+
+# IDE & Editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.DS_Store
+
+# Java / Gradle
+build/
+.gradle/
+out/
+target/
+!gradle/wrapper/gradle-wrapper.jar
+
+# Node / Frontend
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+.npm/
+
+# Logs & Temporary files
+*.log
+logs/
+.system_generated/

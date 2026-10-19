@@ -1,0 +1,83 @@
+package uz.axm.nexus.assignments.presentation;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import uz.axm.nexus.assignments.application.AssignmentService;
+import uz.axm.nexus.assignments.domain.Assignment;
+import uz.axm.nexus.assignments.domain.AssignmentSubmission;
+
+import java.util.List;
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/assignments")
+@RequiredArgsConstructor
+@Tag(name = "Assignments & Homework", description = "Modul 10: Uy vazifalari va mustaqil amaliy topshiriqlar")
+public class AssignmentController {
+
+    private final AssignmentService assignmentService;
+
+    @GetMapping
+    @Operation(summary = "Guruh yoki fan bo'yicha topshiriqlar ro'yxati")
+    public ResponseEntity<List<Assignment>> getAllAssignments(
+            @RequestParam(required = false) Long groupId,
+            @RequestParam(required = false) String subject
+    ) {
+        return ResponseEntity.ok(assignmentService.getAllAssignments(groupId, subject));
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Topshiriq tafsilotlari")
+    public ResponseEntity<Assignment> getAssignmentById(@PathVariable Long id) {
+        return ResponseEntity.ok(assignmentService.getAssignmentById(id));
+    }
+
+    @PostMapping
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'MENTOR', 'ENGLISH_MENTOR')")
+    @Operation(summary = "Yangi uy vazifasi yoki topshiriq e'lon qilish")
+    public ResponseEntity<Assignment> createAssignment(@RequestBody Assignment assignment) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(assignmentService.createAssignment(assignment));
+    }
+
+    @PostMapping("/{id}/submit")
+    @Operation(summary = "O'quvchi tomonidan topshiriq javobini (kod, fayl, matn) yuborish")
+    public ResponseEntity<AssignmentSubmission> submitAssignment(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> payload
+    ) {
+        Long studentId = ((Number) payload.get("studentId")).longValue();
+        String text = (String) payload.get("submissionText");
+        String fileUrl = (String) payload.get("fileUrl");
+        return ResponseEntity.ok(assignmentService.submitAssignment(id, studentId, text, fileUrl));
+    }
+
+    @PostMapping("/submissions/{submissionId}/grade")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'MENTOR', 'ENGLISH_MENTOR')")
+    @Operation(summary = "Topshiriqni baholash va mentor izohini kiritish")
+    public ResponseEntity<AssignmentSubmission> gradeSubmission(
+            @PathVariable Long submissionId,
+            @RequestBody Map<String, Object> payload
+    ) {
+        Long mentorId = ((Number) payload.get("mentorId")).longValue();
+        Integer score = ((Number) payload.get("score")).intValue();
+        String feedback = (String) payload.get("feedback");
+        return ResponseEntity.ok(assignmentService.gradeSubmission(submissionId, mentorId, score, feedback));
+    }
+
+    @GetMapping("/{id}/submissions")
+    @Operation(summary = "Topshiriq bo'yicha barcha yuborilgan ishlar")
+    public ResponseEntity<List<AssignmentSubmission>> getSubmissionsByAssignment(@PathVariable Long id) {
+        return ResponseEntity.ok(assignmentService.getSubmissionsByAssignment(id));
+    }
+
+    @GetMapping("/students/{studentId}/submissions")
+    @Operation(summary = "O'quvchining barcha topshirgan ishlari")
+    public ResponseEntity<List<AssignmentSubmission>> getSubmissionsByStudent(@PathVariable Long studentId) {
+        return ResponseEntity.ok(assignmentService.getSubmissionsByStudent(studentId));
+    }
+}
