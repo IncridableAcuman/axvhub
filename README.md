@@ -1,4 +1,4 @@
-# 🚀 AXV Hub — Al-Xorazmiy Vorislari Ta’lim Ekotizimi
+# 🚀 AXV Nexsus — Al-Xorazmiy Vorislari Ta’lim Ekotizimi
 
 > **Platformaning bosh g‘oyasi:**  
 > *Har bir dars — reja asosida. Har bir natija — o‘lchov asosida. Har bir o‘quvchi — rivojlanish yo‘lida.*
@@ -7,7 +7,7 @@
 
 ## 📌 Loyiha haqida
 
-**AXV Hub** (Al-Xorazmiy Vorislari Hub) — O‘zbekiston Respublikasi Raqamli Texnologiyalar Vazirligi va Raqamli Ta’limni Rivojlantirish Markazi doirasidagi **"Muhammad Al-Xorazmiy Vorislari"** loyihasi uchun maxsus ishlab chiqilgan zamonaviy EdTech platformasi.
+**AXV Nexsus** (Al-Xorazmiy Vorislari Hub) — O‘zbekiston Respublikasi Raqamli Texnologiyalar Vazirligi va Raqamli Ta’limni Rivojlantirish Markazi doirasidagi **"Muhammad Al-Xorazmiy Vorislari"** loyihasi uchun maxsus ishlab chiqilgan zamonaviy EdTech platformasi.
 
 Platforma 8-sinfdan 11-sinfgacha bo‘lgan iqtidorli o‘quvchilar, ularning IT va xorijiy til mentorlari, o‘quv guruhlari hamda haftalik dars jadvallarini yagona markazlashtirilgan tizimda boshqarish imkoniyatini taqdim etadi.
 
