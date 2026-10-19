@@ -23,39 +23,39 @@ export const CurriculumView: React.FC = () => {
   return (
     <div className="space-y-8 animate-fade-in-up">
       {/* Hero Header with Animated Glow */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-6 sm:p-8 lg:p-10 text-white border border-indigo-900/60 shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl bg-[var(--bg-surface)] bg-gradient-to-br from-indigo-500/10 via-cyan-500/10 to-transparent dark:from-slate-950 dark:via-indigo-950 dark:to-slate-900 p-6 sm:p-8 lg:p-10 border border-indigo-200/80 dark:border-indigo-900/60 shadow-xl">
         <div className="absolute -top-24 -left-24 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute top-1/2 -right-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 max-w-3xl space-y-3">
-          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-300 text-xs font-semibold border border-cyan-500/30">
+          <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-cyan-500/10 dark:bg-cyan-500/20 text-cyan-800 dark:text-cyan-300 text-xs font-semibold border border-cyan-500/30">
             <BookOpen className="w-3.5 h-3.5" />
             <span>Muhammad Al-Xorazmiy Vorislari Ta’lim Standarti</span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-[var(--text-primary)] dark:text-white">
             8-Sinfdan 11-Sinfgacha O‘quv Yo‘li —{' '}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-300 to-indigo-300">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-cyan-400 dark:via-blue-300 dark:to-indigo-300">
               Professional IT Roadmap
             </span>
           </h1>
 
-          <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-2xl">
+          <p className="text-[var(--text-secondary)] dark:text-slate-300 text-xs sm:text-sm leading-relaxed max-w-2xl">
             Nazariya emas — haqiqiy mahsulotlar! Mashq emas — real loyiha. 8–11-sinf o‘quvchilari uchun IT poydevoridan tortib xalqaro darajadagi loyihalar portfeligacha bo‘lgan 4 yillik uzluksiz ta’lim xaritasi.
           </p>
 
           {/* Quick stats pills */}
           <div className="flex flex-wrap items-center gap-2.5 pt-2">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs text-slate-200 border border-white/10">
-              <Clock className="w-3.5 h-3.5 text-cyan-300" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-xs text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
+              <Clock className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-300" />
               <span>80 daqiqalik intensiv darslar</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs text-slate-200 border border-white/10">
-              <Zap className="w-3.5 h-3.5 text-amber-300" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-xs text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
+              <Zap className="w-3.5 h-3.5 text-amber-600 dark:text-amber-300" />
               <span>9 ta IT yo‘nalishi</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 text-xs text-slate-200 border border-white/10">
-              <Briefcase className="w-3.5 h-3.5 text-emerald-300" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 dark:bg-white/10 text-xs text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-white/10">
+              <Briefcase className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-300" />
               <span>Portfolio va stajirovka</span>
             </span>
           </div>

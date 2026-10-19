@@ -187,10 +187,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-blue-900/40 via-indigo-900/40 to-slate-900/40 border border-blue-500/20 backdrop-blur-md relative overflow-hidden shadow-xl">
+      <div className="rounded-3xl p-6 sm:p-8 bg-[var(--bg-surface)] bg-gradient-to-r from-blue-500/10 via-indigo-500/5 to-transparent dark:from-blue-950/40 dark:via-indigo-950/30 dark:to-slate-900/40 border border-blue-500/20 backdrop-blur-md relative overflow-hidden shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/30 text-blue-400 text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/10 dark:bg-blue-500/20 border border-blue-500/30 text-blue-700 dark:text-blue-300 text-xs font-semibold">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Modul 08 — Darslarni Rejalashtirish & O‘tkazish</span>
             </div>
