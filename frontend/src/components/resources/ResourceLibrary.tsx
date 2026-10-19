@@ -16,11 +16,14 @@ import {
 import { Button } from '@/shared/ui/button/Button';
 import { Badge } from '@/shared/ui/badge/Badge';
 import { useToast } from '@/shared/ui/toast/ToastContext';
+import { useAuth } from '@/features/auth/AuthContext';
 import { resourceApi } from '@/api';
 import type { LearningResourceDto } from '@/types';
 
 export const ResourceLibrary: React.FC = () => {
   const toast = useToast();
+  const { isAdmin, isMentor } = useAuth();
+  const canManageResources = isAdmin || isMentor;
   const [resources, setResources] = useState<LearningResourceDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -179,25 +182,27 @@ export const ResourceLibrary: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Button
-              variant="outline"
-              size="md"
-              onClick={() => setIsLinkOpen(true)}
-              leftIcon={<LinkIcon className="w-4 h-4" />}
-            >
-              <span>Havola / Video</span>
-            </Button>
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => setIsUploadOpen(true)}
-              leftIcon={<Upload className="w-4 h-4" />}
-              className="shadow-lg shadow-emerald-500/25"
-            >
-              <span>Fayl Yuklash</span>
-            </Button>
-          </div>
+          {canManageResources && (
+            <div className="flex items-center gap-3 shrink-0">
+              <Button
+                variant="outline"
+                size="md"
+                onClick={() => setIsLinkOpen(true)}
+                leftIcon={<LinkIcon className="w-4 h-4" />}
+              >
+                <span>Havola / Video</span>
+              </Button>
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => setIsUploadOpen(true)}
+                leftIcon={<Upload className="w-4 h-4" />}
+                className="shadow-lg shadow-emerald-500/25"
+              >
+                <span>Fayl Yuklash</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
