@@ -35,7 +35,7 @@ public class AiNotificationService {
     private final UserRepository userRepository;
     private final ObjectMapper objectMapper;
 
-    @Value("${app.ai.groq.model:llama-3.3-70b-versatile}")
+    @Value("${app.ai.groq.model:llama-3.1-8b-instant}")
     private String groqModel;
 
     /**

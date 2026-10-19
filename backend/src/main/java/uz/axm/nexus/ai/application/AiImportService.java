@@ -45,7 +45,7 @@ public class AiImportService {
     @Value("${app.ai.groq.api-key:}")
     private String defaultGroqApiKey;
 
-    @Value("${app.ai.groq.model:qwen/qwen3.8-27b}")
+    @Value("${app.ai.groq.model:llama-3.1-8b-instant}")
     private String groqModel;
 
     @Value("${app.ai.gemini.api-key:}")
@@ -353,36 +353,49 @@ public class AiImportService {
     }
 
     private AiParsedResultDto callGroqAi(String fileContent, String targetMentor, String apiKey) {
+        String effectiveModel = groqModel;
         try {
-            String prompt = buildSystemPrompt(targetMentor);
-            String userPrompt = "Quyidagi fayl matnidan mentorni tahlil qilib dars jadvali va o'quvchilarni JSON formatida ajrating:\n\n"
-                    + (fileContent.length() > 25000 ? fileContent.substring(0, 25000) : fileContent);
-
-            Map<String, Object> reqBody = new HashMap<>();
-            reqBody.put("model", groqModel);
-            reqBody.put("temperature", 0.1);
-            reqBody.put("response_format", Map.of("type", "json_object"));
-            reqBody.put("messages", List.of(
-                    Map.of("role", "system", "content", prompt),
-                    Map.of("role", "user", "content", userPrompt)
-            ));
-
-            String responseStr = restClient.post()
-                    .uri("https://api.groq.com/openai/v1/chat/completions")
-                    .header("Authorization", "Bearer " + apiKey)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(reqBody)
-                    .retrieve()
-                    .body(String.class);
-
-            JsonNode root = objectMapper.readTree(responseStr);
-            String content = root.path("choices").get(0).path("message").path("content").asText();
-            return parseAiJsonResponse(content, "groq", targetMentor);
-
+            return executeGroqCompletion(fileContent, targetMentor, apiKey, effectiveModel);
         } catch (Exception e) {
+            if (e.getMessage() != null && e.getMessage().contains("model_not_found") && !"llama-3.1-8b-instant".equals(effectiveModel)) {
+                log.warn("Groq model '{}' topilmadi. 'llama-3.1-8b-instant' modeliga qayta urinilmoqda.", effectiveModel);
+                try {
+                    return executeGroqCompletion(fileContent, targetMentor, apiKey, "llama-3.1-8b-instant");
+                } catch (Exception fallbackEx) {
+                    log.error("Groq fallback call failed: {}", fallbackEx.getMessage());
+                    throw new RuntimeException("Groq AI xatosi: " + fallbackEx.getMessage(), fallbackEx);
+                }
+            }
             log.error("Groq AI call failed: {}", e.getMessage());
             throw new RuntimeException("Groq AI xatosi: " + e.getMessage(), e);
         }
+    }
+
+    private AiParsedResultDto executeGroqCompletion(String fileContent, String targetMentor, String apiKey, String modelToUse) throws Exception {
+        String prompt = buildSystemPrompt(targetMentor);
+        String userPrompt = "Quyidagi fayl matnidan mentorni tahlil qilib dars jadvali va o'quvchilarni JSON formatida ajrating:\n\n"
+                + (fileContent.length() > 25000 ? fileContent.substring(0, 25000) : fileContent);
+
+        Map<String, Object> reqBody = new HashMap<>();
+        reqBody.put("model", modelToUse);
+        reqBody.put("temperature", 0.1);
+        reqBody.put("response_format", Map.of("type", "json_object"));
+        reqBody.put("messages", List.of(
+                Map.of("role", "system", "content", prompt),
+                Map.of("role", "user", "content", userPrompt)
+        ));
+
+        String responseStr = restClient.post()
+                .uri("https://api.groq.com/openai/v1/chat/completions")
+                .header("Authorization", "Bearer " + apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(reqBody)
+                .retrieve()
+                .body(String.class);
+
+        JsonNode root = objectMapper.readTree(responseStr);
+        String content = root.path("choices").get(0).path("message").path("content").asText();
+        return parseAiJsonResponse(content, "groq", targetMentor);
     }
 
     private AiParsedResultDto callGeminiAi(String fileContent, String targetMentor, String apiKey) {

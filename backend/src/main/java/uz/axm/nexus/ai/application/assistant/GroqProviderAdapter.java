@@ -20,7 +20,7 @@ public class GroqProviderAdapter implements AiProviderAdapter {
     @Value("${app.ai.groq.api-key:}")
     private String defaultApiKey;
 
-    @Value("${app.ai.groq.model:llama-3.3-70b-versatile}")
+    @Value("${app.ai.groq.model:llama-3.1-8b-instant}")
     private String groqModel;
 
     @Value("${app.ai.groq.base-url:https://api.groq.com/openai/v1}")
@@ -54,12 +54,14 @@ public class GroqProviderAdapter implements AiProviderAdapter {
             return mockFallbackAdapter.complete(request, systemPrompt);
         }
 
+        String effectiveModel = groqModel;
+
         // Bounded retries (3 attempts on rate limits or transient errors)
         int maxRetries = 3;
         for (int attempt = 1; attempt <= maxRetries; attempt++) {
             try {
                 Map<String, Object> body = new HashMap<>();
-                body.put("model", groqModel);
+                body.put("model", effectiveModel);
                 body.put("temperature", 0.6);
                 body.put("max_tokens", 2048);
 
@@ -90,14 +92,22 @@ public class GroqProviderAdapter implements AiProviderAdapter {
                         .role(request.getRole())
                         .intent(request.getIntent())
                         .provider("groq")
-                        .model(groqModel)
+                        .model(effectiveModel)
                         .tokensUsed(totalTokens > 0 ? totalTokens : 450)
                         .generatedQuizQuestions(questions)
                         .generatedLessonPlan(lessonPlan)
                         .build();
 
             } catch (Exception e) {
-                log.warn("Groq API call attempt {} failed: {}", attempt, e.getMessage());
+                log.warn("Groq API call attempt {} failed with model {}: {}", attempt, effectiveModel, e.getMessage());
+
+                // Agar model mavjud bo'lmasa yoki ruxsat berilmagan bo'lsa (404 model_not_found), barqaror llama-3.1-8b-instant ga o'tish
+                if (e.getMessage() != null && e.getMessage().contains("model_not_found") && !"llama-3.1-8b-instant".equals(effectiveModel)) {
+                    log.warn("Groq model '{}' topilmadi yoki ruxsat yo'q. 'llama-3.1-8b-instant' modeliga avtomatik o'tilmoqda.", effectiveModel);
+                    effectiveModel = "llama-3.1-8b-instant";
+                    continue;
+                }
+
                 if (attempt == maxRetries) {
                     log.error("Groq provider exhausted retries: {}", e.getMessage());
                     throw new RuntimeException("Groq AI xizmatiga ulanishda xatolik: " + e.getMessage(), e);

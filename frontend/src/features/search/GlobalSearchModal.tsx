@@ -354,7 +354,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             }}
             onKeyDown={handleKeyDown}
             placeholder="AXM Nexus bo‘yicha qidirish (o‘quvchi, guruh, mentor, sahifa)..."
-            className="w-full text-sm sm:text-base bg-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none font-medium"
+            className="w-full text-sm sm:text-base bg-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none font-medium p-1.5"
           />
 
           {query && (
