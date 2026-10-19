@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button/Button';
 import { useToast } from '@/shared/ui/toast/ToastContext';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { gradingApi } from '@/api';
 import type {
   LeaderboardEntryDto,
@@ -23,7 +23,9 @@ export interface GamificationDashboardProps {
 
 export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ students }) => {
   const toast = useToast();
-  const { isAdmin, isMentor } = useAuth();
+  const auth = useOptionalAuth();
+  const isAdmin = auth ? auth.isAdmin : true;
+  const isMentor = auth ? auth.isMentor : true;
   const canAwardPoints = isAdmin || isMentor;
   const [period, setPeriod] = useState<'ALL_TIME' | 'MONTHLY' | 'WEEKLY'>('ALL_TIME');
   const [isGroupView, setIsGroupView] = useState(false);

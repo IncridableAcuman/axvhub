@@ -16,13 +16,15 @@ import {
 import { Button } from '@/shared/ui/button/Button';
 import { Badge } from '@/shared/ui/badge/Badge';
 import { useToast } from '@/shared/ui/toast/ToastContext';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { resourceApi } from '@/api';
 import type { LearningResourceDto } from '@/types';
 
 export const ResourceLibrary: React.FC = () => {
   const toast = useToast();
-  const { isAdmin, isMentor } = useAuth();
+  const auth = useOptionalAuth();
+  const isAdmin = auth ? auth.isAdmin : true;
+  const isMentor = auth ? auth.isMentor : true;
   const canManageResources = isAdmin || isMentor;
   const [resources, setResources] = useState<LearningResourceDto[]>([]);
   const [loading, setLoading] = useState(true);

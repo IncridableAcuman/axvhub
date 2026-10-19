@@ -24,7 +24,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { useTheme } from '@/shared/theme/ThemeContext';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useOptionalAuth } from '@/features/auth/AuthContext';
 
 export interface SearchItem {
   id: string;
@@ -52,7 +52,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   onOpenManualModal,
   onOpenAiModal,
 }) => {
-  const { user } = useAuth();
+  const auth = useOptionalAuth();
+  const user = auth ? auth.user : null;
   const [query, setQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'pages' | 'actions' | 'courses'>('all');
   const [selectedIndex, setSelectedIndex] = useState(0);

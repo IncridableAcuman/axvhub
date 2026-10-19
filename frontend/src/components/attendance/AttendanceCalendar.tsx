@@ -14,7 +14,7 @@ import {
 import { Button } from '@/shared/ui/button/Button';
 import { attendanceApi } from '@/api';
 import { useTranslation } from '@/shared/i18n';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { AttendanceSheetModal } from './AttendanceSheetModal';
 import { CreateLessonModal } from './CreateLessonModal';
 import { RescheduleLessonModal } from './RescheduleLessonModal';
@@ -30,7 +30,9 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
   mentors,
 }) => {
   const { t, locale, formatDate } = useTranslation();
-  const { isAdmin, isMentor } = useAuth();
+  const auth = useOptionalAuth();
+  const isAdmin = auth ? auth.isAdmin : true;
+  const isMentor = auth ? auth.isMentor : true;
   const canManageAttendance = isAdmin || isMentor;
   const [sessions, setSessions] = useState<LessonSessionDto[]>([]);
   const [todaySessions, setTodaySessions] = useState<LessonSessionDto[]>([]);

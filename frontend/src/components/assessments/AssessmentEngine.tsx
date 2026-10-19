@@ -14,7 +14,7 @@ import {
 import { Button } from '@/shared/ui/button/Button';
 import { Badge } from '@/shared/ui/badge/Badge';
 import { useToast } from '@/shared/ui/toast/ToastContext';
-import { useAuth } from '@/features/auth/AuthContext';
+import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { assessmentApi, assignmentApi } from '@/api';
 import type {
   AssessmentDto,
@@ -38,7 +38,9 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
   students: _students = [],
 }) => {
   const toast = useToast();
-  const { isAdmin, isMentor } = useAuth();
+  const auth = useOptionalAuth();
+  const isAdmin = auth ? auth.isAdmin : true;
+  const isMentor = auth ? auth.isMentor : true;
   const canCreateQuiz = isAdmin || isMentor;
   const [activeSubTab, setActiveSubTab] = useState<'QUIZZES' | 'ASSIGNMENTS'>('QUIZZES');
 

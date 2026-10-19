@@ -26,7 +26,7 @@ import { navItems } from '@/widgets/sidebar/navConfig';
 import { scheduleApi, studentApi, mentorApi, groupApi } from './api';
 
 export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard' }) => {
-  const { user, isAdmin, isMentor, isStudent } = useAuth();
+  const { user, isAdmin, isMentor } = useAuth();
   const canManageSchedules = isAdmin || isMentor;
   const userRoles = React.useMemo(() => user?.roles || [], [user?.roles]);
 
