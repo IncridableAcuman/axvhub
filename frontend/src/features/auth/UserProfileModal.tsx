@@ -4,21 +4,17 @@ import { Dialog } from '@/shared/ui/dialog/Dialog';
 import { Button } from '@/shared/ui/button/Button';
 import { Badge } from '@/shared/ui/badge/Badge';
 import { useAuth } from './AuthContext';
-import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useTranslation } from '@/shared/i18n';
 
 export const UserProfileModal: React.FC = () => {
   const { user, isProfileModalOpen, closeProfileModal, logout } = useAuth();
   const { t } = useTranslation();
-  const toast = useToast();
 
   if (!user) return null;
 
   const handleLogout = () => {
-    logout();
     closeProfileModal();
-    toast.info(t('auth.loggedOutToastTitle'), t('auth.sessionEnded'));
-    window.location.href = '/';
+    logout();
   };
 
   const getRoleBadgeVariant = (roles: string[]) => {

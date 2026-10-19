@@ -43,6 +43,7 @@ public class AuthService {
     private final EmailProducerService emailProducerService;
     private final EmailRateLimiterService emailRateLimiterService;
     private final JwtTokenProvider jwtTokenProvider;
+    private final CaptchaService captchaService;
 
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
@@ -52,8 +53,18 @@ public class AuthService {
     @Value("${app.mail.token-expiration-minutes:1440}")
     private int tokenExpirationMinutes;
 
+    @Value("${app.security.allow-public-registration:false}")
+    private boolean allowPublicRegistration;
+
+    @Value("${app.security.captcha-required:false}")
+    private boolean captchaRequired;
+
     @Transactional
     public AuthResponse register(RegisterRequest request) {
+        if (!allowPublicRegistration) {
+            throw new BusinessException("Muhammad Al-Xorazmiy Vorislari ta'lim tizimida ochiq ommaviy ro'yxatdan o'tish yopiq. Mentorlar hisobi Admin tomonidan, o'quvchilar hisobi esa biriktirilgan Mentor tomonidan maxsus HEMIS ID va parol asosida ochiladi.");
+        }
+
         String email = request.getEmail().trim().toLowerCase();
 
         if (userRepository.existsByEmailIgnoreCase(email)) {
@@ -123,12 +134,21 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
+        // Botlardan himoyalanish: agar captchaId yuborilgan bo'lsa yoki tizimda talab qilinsa, tekshiriladi
+        if (request.getCaptchaId() != null && !request.getCaptchaId().trim().isBlank()) {
+            if (!captchaService.validateCaptcha(request.getCaptchaId(), request.getCaptchaCode())) {
+                throw new BusinessException("Xavfsizlik kodi (CAPTCHA) noto'g'ri kiritildi yoki eskirgan. Qaytadan urinib ko'ring.");
+            }
+        } else if (captchaRequired) {
+            throw new BusinessException("Xavfsizlik kodi (CAPTCHA) kiritilishi shart");
+        }
+
         String identifier = request.getUsername().trim();
         User user = userRepository.findByUsernameIgnoreCaseOrEmailIgnoreCase(identifier, identifier)
-                .orElseThrow(() -> new BusinessException("Login/email yoki parol noto'g'ri kiritildi"));
+                .orElseThrow(() -> new BusinessException("Login/ID raqam yoki parol noto'g'ri kiritildi"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-            throw new BusinessException("Login/email yoki parol noto'g'ri kiritildi");
+            throw new BusinessException("Login/ID raqam yoki parol noto'g'ri kiritildi");
         }
 
         if (!user.isEnabled()) {

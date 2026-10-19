@@ -112,6 +112,22 @@ export const studentApi = {
     return api.post<Student>('/students', student);
   },
 
+  provision: (data: import('./types').CreateStudentRequest) => {
+    return api.post<{
+      success: boolean;
+      message: string;
+      data: import('./types').StudentProvisionDto;
+    }>('/students/provision', data);
+  },
+
+  resetPassword: (id: number) => {
+    return api.post<{
+      success: boolean;
+      message: string;
+      data: import('./types').ResetPasswordResultDto;
+    }>(`/students/${id}/reset-password`);
+  },
+
   delete: (id: number) => {
     return api.delete(`/students/${id}`);
   },
@@ -120,6 +136,20 @@ export const studentApi = {
 export const mentorApi = {
   getAll: () => api.get<Mentor[]>('/mentors'),
   create: (mentor: Partial<Mentor>) => api.post<Mentor>('/mentors', mentor),
+  provision: (data: import('./types').CreateMentorRequest) => {
+    return api.post<{
+      success: boolean;
+      message: string;
+      data: import('./types').MentorProvisionDto;
+    }>('/mentors/provision', data);
+  },
+  resetPassword: (id: number) => {
+    return api.post<{
+      success: boolean;
+      message: string;
+      data: import('./types').ResetPasswordResultDto;
+    }>(`/mentors/${id}/reset-password`);
+  },
 };
 
 export const groupApi = {
@@ -163,6 +193,14 @@ export const aiApi = {
 };
 
 export const authApi = {
+  getCaptcha: () => {
+    return api.get<{
+      success: boolean;
+      message: string;
+      data: import('./types').CaptchaResponse;
+    }>('/auth/captcha');
+  },
+
   register: (data: RegisterRequest) => {
     return api.post<{
       success: boolean;

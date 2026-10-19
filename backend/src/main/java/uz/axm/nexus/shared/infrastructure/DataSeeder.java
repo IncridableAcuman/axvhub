@@ -752,42 +752,117 @@ public class DataSeeder implements CommandLineRunner {
             userRepository.save(admin);
         }
 
-        // 2. Default Mentor user for testing/auth
-        if (userRepository.findByUsername("mentor").isEmpty()) {
-            Set<Role> roles = new HashSet<>();
-            if (mentorRole != null) roles.add(mentorRole);
+        // Clean up legacy mock data accounts (mentor/student) if present
+        userRepository.findByUsername("mentor").ifPresent(userRepository::delete);
+        userRepository.findByUsername("student").ifPresent(userRepository::delete);
+        userRepository.findByEmailIgnoreCase("mentor@axm-nexus.uz").ifPresent(userRepository::delete);
+        userRepository.findByEmailIgnoreCase("student@axm-nexus.uz").ifPresent(userRepository::delete);
 
+        // 2. Real Mentor accounts with HEMIS ID (e.g. 32600001, 32600002)
+        Set<Role> mentorRoles = new HashSet<>();
+        if (mentorRole != null) mentorRoles.add(mentorRole);
+
+        User mentor1 = userRepository.findByUsername("32600001")
+                .or(() -> userRepository.findByEmailIgnoreCase("abdusharipovizzat03@gmail.com"))
+                .orElse(null);
+
+        if (mentor1 == null) {
             userRepository.save(User.builder()
-                    .username("mentor")
-                    .password(passwordEncoder.encode("mentor123"))
-                    .fullName("Namuna Mentor")
-                    .email("mentor@axm-nexus.uz")
-                    .phone("+998 90 111 22 33")
+                    .username("32600001")
+                    .password(passwordEncoder.encode("AxmMentor2026!"))
+                    .fullName("Abdusharipov Izzatbek quranboy o'g'li")
+                    .email("abdusharipovizzat03@gmail.com")
+                    .phone("+998 90 123 45 67")
                     .role("ROLE_MENTOR")
-                    .roles(roles)
+                    .roles(mentorRoles)
                     .enabled(true)
                     .emailVerified(true)
                     .build());
-            log.info("Default mentor user created with MENTOR role: mentor / mentor123");
+            log.info("Real Mentor user created with HEMIS ID: 32600001 / AxmMentor2026!");
+        } else {
+            mentor1.setUsername("32600001");
+            mentor1.setEmail("abdusharipovizzat03@gmail.com");
+            mentor1.setPassword(passwordEncoder.encode("AxmMentor2026!"));
+            mentor1.setFullName("Abdusharipov Izzatbek quranboy o'g'li");
+            mentor1.setRole("ROLE_MENTOR");
+            mentor1.setRoles(mentorRoles);
+            mentor1.setEnabled(true);
+            mentor1.setEmailVerified(true);
+            userRepository.save(mentor1);
+            log.info("Existing Mentor user updated to HEMIS ID: 32600001");
         }
 
-        // 3. Default Student user for testing/auth
-        if (userRepository.findByUsername("student").isEmpty()) {
+        User mentor2 = userRepository.findByUsername("32600002")
+                .or(() -> userRepository.findByEmailIgnoreCase("dilnoza.eng@gmail.com"))
+                .orElse(null);
+
+        if (mentor2 == null) {
+            userRepository.save(User.builder()
+                    .username("32600002")
+                    .password(passwordEncoder.encode("AxmEnglish2026!"))
+                    .fullName("Raximova Dilnoza Sanjarbek qizi")
+                    .email("dilnoza.eng@gmail.com")
+                    .phone("+998 91 987 65 43")
+                    .role("ROLE_ENGLISH_MENTOR")
+                    .roles(mentorRoles)
+                    .enabled(true)
+                    .emailVerified(true)
+                    .build());
+            log.info("Real English Mentor user created with HEMIS ID: 32600002 / AxmEnglish2026!");
+        } else {
+            mentor2.setUsername("32600002");
+            mentor2.setEmail("dilnoza.eng@gmail.com");
+            mentor2.setPassword(passwordEncoder.encode("AxmEnglish2026!"));
+            mentor2.setFullName("Raximova Dilnoza Sanjarbek qizi");
+            mentor2.setRole("ROLE_ENGLISH_MENTOR");
+            mentor2.setRoles(mentorRoles);
+            mentor2.setEnabled(true);
+            mentor2.setEmailVerified(true);
+            userRepository.save(mentor2);
+            log.info("Existing English Mentor user updated to HEMIS ID: 32600002");
+        }
+
+        // 3. Real Student accounts with HEMIS ID (42600001+)
+        List<Student> allStudents = studentRepository.findAll();
+        int seq = 1;
+        for (Student s : allStudents) {
+            String studentHemisId = String.format("426%05d", seq);
+            if (s.getStudentIdNumber() == null || s.getStudentIdNumber().startsWith("I-HR")) {
+                s.setStudentIdNumber(studentHemisId);
+                studentRepository.save(s);
+            } else {
+                studentHemisId = s.getStudentIdNumber();
+            }
+
+            final String hemisIdToSearch = studentHemisId;
+            User studentUser = userRepository.findByUsername(hemisIdToSearch)
+                    .or(() -> userRepository.findByEmailIgnoreCase(hemisIdToSearch + "@student.axm-nexus.uz"))
+                    .orElse(null);
+
             Set<Role> roles = new HashSet<>();
             if (studentRole != null) roles.add(studentRole);
 
-            userRepository.save(User.builder()
-                    .username("student")
-                    .password(passwordEncoder.encode("student123"))
-                    .fullName("Namuna O'quvchi")
-                    .email("student@axm-nexus.uz")
-                    .phone("+998 90 444 55 66")
-                    .role("ROLE_STUDENT")
-                    .roles(roles)
-                    .enabled(true)
-                    .emailVerified(true)
-                    .build());
-            log.info("Default student user created with STUDENT role: student / student123");
+            if (studentUser == null) {
+                userRepository.save(User.builder()
+                        .username(hemisIdToSearch)
+                        .password(passwordEncoder.encode("Student2026!"))
+                        .fullName(s.getFullName())
+                        .phone(s.getPhone())
+                        .email(hemisIdToSearch + "@student.axm-nexus.uz")
+                        .role("ROLE_STUDENT")
+                        .roles(roles)
+                        .enabled(true)
+                        .emailVerified(true)
+                        .build());
+            } else {
+                studentUser.setUsername(hemisIdToSearch);
+                studentUser.setFullName(s.getFullName());
+                studentUser.setRoles(roles);
+                studentUser.setEnabled(true);
+                studentUser.setEmailVerified(true);
+                userRepository.save(studentUser);
+            }
+            seq++;
         }
     }
 

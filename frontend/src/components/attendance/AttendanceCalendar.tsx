@@ -14,6 +14,7 @@ import {
 import { Button } from '@/shared/ui/button/Button';
 import { attendanceApi } from '@/api';
 import { useTranslation } from '@/shared/i18n';
+import { useAuth } from '@/features/auth/AuthContext';
 import { AttendanceSheetModal } from './AttendanceSheetModal';
 import { CreateLessonModal } from './CreateLessonModal';
 import { RescheduleLessonModal } from './RescheduleLessonModal';
@@ -29,6 +30,8 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
   mentors,
 }) => {
   const { t, locale, formatDate } = useTranslation();
+  const { isAdmin, isMentor } = useAuth();
+  const canManageAttendance = isAdmin || isMentor;
   const [sessions, setSessions] = useState<LessonSessionDto[]>([]);
   const [todaySessions, setTodaySessions] = useState<LessonSessionDto[]>([]);
   const [loading, setLoading] = useState(false);
@@ -196,15 +199,17 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
           <Button variant="outline" size="sm" onClick={loadData} disabled={loading} title={t('common.refresh')}>
             <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </Button>
-          <Button
-            variant="primary"
-            size="sm"
-            onClick={() => setIsCreateOpen(true)}
-            className="btn-shimmer flex items-center space-x-1.5 shadow-md shadow-[var(--brand-primary)]/20"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{t('schedule.planNewLesson')}</span>
-          </Button>
+          {canManageAttendance && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsCreateOpen(true)}
+              className="btn-shimmer flex items-center space-x-1.5 shadow-md shadow-[var(--brand-primary)]/20"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t('schedule.planNewLesson')}</span>
+            </Button>
+          )}
         </div>
       </div>
 

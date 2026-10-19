@@ -20,8 +20,11 @@ import {
   FolderGit2,
   CheckSquare,
   Trophy,
+  BarChart3,
+  ShieldAlert,
 } from 'lucide-react';
 import { useTheme } from '@/shared/theme/ThemeContext';
+import { useAuth } from '@/features/auth/AuthContext';
 
 export interface SearchItem {
   id: string;
@@ -31,6 +34,7 @@ export interface SearchItem {
   icon: React.ReactNode;
   onSelect: () => void;
   badge?: string;
+  allowedRoles?: string[];
 }
 
 export interface GlobalSearchModalProps {
@@ -48,6 +52,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   onOpenManualModal,
   onOpenAiModal,
 }) => {
+  const { user } = useAuth();
   const [query, setQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<'all' | 'pages' | 'actions' | 'courses'>('all');
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -113,6 +118,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'pages',
         icon: <BookMarked className="w-4 h-4 text-blue-500" />,
         badge: 'Metodika',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('lessons'),
       },
       {
@@ -149,6 +155,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'pages',
         icon: <Users className="w-4 h-4 text-emerald-500" />,
         badge: 'Guruhlar',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('groups'),
       },
       {
@@ -158,6 +165,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'pages',
         icon: <GraduationCap className="w-4 h-4 text-amber-500" />,
         badge: 'O‘quvchilar',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('students'),
       },
       {
@@ -167,7 +175,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'pages',
         icon: <Award className="w-4 h-4 text-purple-500" />,
         badge: 'Mentorlar',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('mentors'),
+      },
+      {
+        id: 'nav-analytics',
+        title: 'Ta’lim Analitikasi (Modul 12)',
+        subtitle: 'Guruhlar va o‘quvchilar akademik o‘zlashtirish ko‘rsatkichlari',
+        category: 'pages',
+        icon: <BarChart3 className="w-4 h-4 text-teal-500" />,
+        badge: 'Analitika',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
+        onSelect: () => onNavigateTab('analytics'),
       },
       {
         id: 'nav-users',
@@ -176,7 +195,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'pages',
         icon: <Shield className="w-4 h-4 text-rose-500" />,
         badge: 'Xavfsizlik',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
         onSelect: () => onNavigateTab('users'),
+      },
+      {
+        id: 'nav-admin',
+        title: 'Admin Markazi & Audit',
+        subtitle: 'Tizim jurnallari, RBAC ruxsatlar va operatsion audit',
+        category: 'pages',
+        icon: <ShieldAlert className="w-4 h-4 text-red-500" />,
+        badge: 'Admin',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
+        onSelect: () => onNavigateTab('admin'),
       },
       {
         id: 'nav-curriculum',
@@ -203,6 +233,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'pages',
         icon: <Palette className="w-4 h-4 text-pink-500" />,
         badge: 'Dizayn',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
         onSelect: () => onNavigateTab('design-system'),
       },
 
@@ -214,6 +245,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'actions',
         icon: <Plus className="w-4 h-4 text-emerald-500" />,
         badge: 'Tezkor amal',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => {
           if (onOpenManualModal) onOpenManualModal();
           else onNavigateTab('timetable');
@@ -226,6 +258,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         category: 'actions',
         icon: <Sparkles className="w-4 h-4 text-indigo-500" />,
         badge: 'AI Smart',
+        allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => {
           if (onOpenAiModal) onOpenAiModal();
           else onNavigateTab('timetable');
@@ -283,10 +316,30 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     ];
   }, [onNavigateTab, onOpenManualModal, onOpenAiModal, resolvedTheme, setTheme]);
 
-  // Filter items based on query and category
+  // User roles normalized
+  const userNormRoles = useMemo(() => {
+    if (!user || !user.roles) return [];
+    return user.roles.map((r) => {
+      const clean = r.trim().toUpperCase();
+      return clean.startsWith('ROLE_') ? clean.substring(5) : clean;
+    });
+  }, [user]);
+
+  const isItemAllowed = (item: SearchItem) => {
+    if (!item.allowedRoles || item.allowedRoles.length === 0) return true;
+    if (userNormRoles.length === 0) return false;
+    return item.allowedRoles.some((role) => {
+      const clean = role.trim().toUpperCase();
+      const target = clean.startsWith('ROLE_') ? clean.substring(5) : clean;
+      return userNormRoles.includes(target);
+    });
+  };
+
+  // Filter items based on query, category, and role access
   const filteredItems = useMemo(() => {
     const q = query.trim().toLowerCase();
     return searchItems.filter((item) => {
+      if (!isItemAllowed(item)) return false;
       const matchesCategory = selectedCategory === 'all' || item.category === selectedCategory;
       if (!matchesCategory) return false;
       if (!q) return true;
@@ -296,7 +349,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         (item.badge && item.badge.toLowerCase().includes(q))
       );
     });
-  }, [searchItems, query, selectedCategory]);
+  }, [searchItems, query, selectedCategory, userNormRoles]);
 
   // Keyboard navigation inside list
   const handleKeyDown = (e: React.KeyboardEvent) => {

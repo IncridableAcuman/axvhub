@@ -134,9 +134,75 @@ export interface RegisterRequest {
   phone?: string;
 }
 
+export interface CaptchaResponse {
+  captchaId: string;
+  captchaSvg: string;
+}
+
 export interface LoginRequest {
   username: string;
   password: string;
+  captchaId?: string;
+  captchaCode?: string;
+}
+
+export interface CreateMentorRequest {
+  fullName: string;
+  role: string;
+  phone?: string;
+  email?: string;
+  branchLocation?: string;
+  bio?: string;
+}
+
+export interface MentorProvisionDto {
+  id: number;
+  fullName: string;
+  role: string;
+  phone?: string;
+  email?: string;
+  branchLocation?: string;
+  bio?: string;
+  hemisId: string;
+  temporaryPassword: string;
+  accountCreated: boolean;
+  createdAt?: string;
+}
+
+export interface CreateStudentRequest {
+  fullName: string;
+  gradeLevel: string;
+  studyGroupId?: number;
+  direction?: string;
+  phone?: string;
+  pinfl?: string;
+  district?: string;
+  branchLocation?: string;
+}
+
+export interface StudentProvisionDto {
+  id: number;
+  fullName: string;
+  studentIdNumber: string;
+  temporaryPassword: string;
+  gradeLevel: string;
+  studyGroupId?: number;
+  groupCode?: string;
+  mentorName?: string;
+  branchLocation?: string;
+  phone?: string;
+  pinfl?: string;
+  direction?: string;
+  status: string;
+  accountCreated: boolean;
+  createdAt?: string;
+}
+
+export interface ResetPasswordResultDto {
+  targetId: number;
+  identifier: string;
+  fullName: string;
+  newPassword: string;
 }
 
 export interface AuthResponse {

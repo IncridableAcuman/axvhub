@@ -409,7 +409,7 @@ export const LandingPage: React.FC = () => {
 
             {/* Call To Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2">
-              <Link to="/register" className="w-full sm:w-auto shrink-0">
+              <Link to="/login" className="w-full sm:w-auto shrink-0">
                 <Button
                   variant="primary"
                   size="lg"
@@ -417,24 +417,14 @@ export const LandingPage: React.FC = () => {
                   rightIcon={<ArrowRight className="w-5 h-5 text-cyan-200 shrink-0" />}
                 >
                   <span className="whitespace-nowrap">{t('landing.hero.startCta')}</span>
-                  <span className="sr-only"> {t('landing.hero.registerSr')}</span>
-                </Button>
-              </Link>
-              <Link to="/login" className="w-full sm:w-auto">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full sm:w-auto px-8 py-4 text-base font-semibold hover:border-[var(--brand-primary)] hover:bg-[var(--bg-subtle)] transition-all"
-                  leftIcon={<LogIn className="w-5 h-5" />}
-                >
-                  <span>{t('landing.hero.loginCta')}</span>
+                  <span className="sr-only"> / Tizimga kirish</span>
                 </Button>
               </Link>
               <a href="#decree" className="w-full sm:w-auto">
                 <Button
-                  variant="ghost"
+                  variant="outline"
                   size="lg"
-                  className="w-full sm:w-auto px-6 py-4 text-base font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                  className="w-full sm:w-auto px-6 py-4 text-base font-semibold text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:border-[var(--brand-primary)] hover:bg-[var(--bg-subtle)] transition-all"
                   leftIcon={<FileText className="w-5 h-5 text-amber-500" />}
                 >
                   <span>{t('landing.hero.decreeCta')}</span>

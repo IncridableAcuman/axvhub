@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { AuthUser, LoginRequest, RegisterRequest, AuthResponse, VerifyEmailRequest } from '@/types';
 import { authApi } from '@/api';
+import { ConfirmDialog } from '@/shared/ui/dialog/ConfirmDialog';
 
 const STORAGE_KEY = 'axm_nexus_user';
 
@@ -10,10 +11,14 @@ interface AuthContextType {
   isAuthModalOpen: boolean;
   authModalTab: 'register' | 'login';
   isProfileModalOpen: boolean;
+  isLogoutConfirmOpen: boolean;
   openAuthModal: (tab?: 'register' | 'login') => void;
   closeAuthModal: () => void;
   openProfileModal: () => void;
   closeProfileModal: () => void;
+  requestLogout: () => void;
+  cancelLogout: () => void;
+  confirmLogout: () => void;
   login: (data: LoginRequest) => Promise<AuthResponse>;
   register: (data: RegisterRequest) => Promise<AuthResponse>;
   verifyEmail: (data: VerifyEmailRequest) => Promise<AuthResponse>;
@@ -21,6 +26,7 @@ interface AuthContextType {
   forgotPassword: (email: string) => Promise<string>;
   resetPassword: (data: import('@/types').ResetPasswordRequest) => Promise<void>;
   logout: () => void;
+  forceLogout: () => void;
   hasRole: (role: string) => boolean;
   hasAnyRole: (roles: string[]) => boolean;
   hasPermission: (permission: string) => boolean;
@@ -44,6 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authModalTab, setAuthModalTab] = useState<'register' | 'login'>('register');
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [isLogoutConfirmOpen, setIsLogoutConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -136,9 +143,30 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     await authApi.resetPassword(data);
   };
 
-  const logout = () => {
+  const requestLogout = () => {
+    setIsLogoutConfirmOpen(true);
+  };
+
+  const cancelLogout = () => {
+    setIsLogoutConfirmOpen(false);
+  };
+
+  const confirmLogout = () => {
     setUser(null);
     localStorage.removeItem(STORAGE_KEY);
+    setIsLogoutConfirmOpen(false);
+    setIsProfileModalOpen(false);
+  };
+
+  const forceLogout = () => {
+    setUser(null);
+    localStorage.removeItem(STORAGE_KEY);
+    setIsLogoutConfirmOpen(false);
+    setIsProfileModalOpen(false);
+  };
+
+  const logout = () => {
+    setIsLogoutConfirmOpen(true);
   };
 
   const normalizeRole = (r: string) => {
@@ -178,10 +206,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isAuthModalOpen,
         authModalTab,
         isProfileModalOpen,
+        isLogoutConfirmOpen,
         openAuthModal,
         closeAuthModal,
         openProfileModal,
         closeProfileModal,
+        requestLogout,
+        cancelLogout,
+        confirmLogout,
         login,
         register,
         verifyEmail,
@@ -189,6 +221,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         forgotPassword,
         resetPassword,
         logout,
+        forceLogout,
         hasRole,
         hasAnyRole,
         hasPermission,
@@ -198,6 +231,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }}
     >
       {children}
+
+      <ConfirmDialog
+        isOpen={isLogoutConfirmOpen}
+        onClose={cancelLogout}
+        onConfirm={confirmLogout}
+        title="Tizimdan chiqishni tasdiqlaysizmi?"
+        description="Haqiqatan ham o‘z hisobingizdan chiqmoqchimisiz? Qayta kirish uchun HEMIS ID raqamingiz va parolingiz talab qilinadi."
+        confirmText="Ha, chiqish"
+        cancelText="Bekor qilish"
+        variant="destructive"
+      />
     </AuthContext.Provider>
   );
 };

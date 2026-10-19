@@ -45,3 +45,6 @@ app:
     groq:
       api-key: test-key
       model: llama-3.1-8b-instant
+  security:
+    allow-public-registration: true
+    captcha-required: false

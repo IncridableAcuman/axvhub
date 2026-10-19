@@ -18,7 +18,6 @@ import { Button } from '@/shared/ui/button/Button'
 import { DropdownMenu } from '@/shared/ui/dropdown/DropdownMenu'
 import { HealthBadge } from '@/widgets/health-badge/HealthBadge'
 import { useAuth } from '@/features/auth/AuthContext'
-import { useToast } from '@/shared/ui/toast/ToastContext'
 import { GlobalSearchModal } from '@/features/search/GlobalSearchModal'
 import { LanguageSwitcher, useTranslation } from '@/shared/i18n'
 import { NotificationDropdown } from '@/features/notifications'
@@ -38,10 +37,10 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
   onOpenAiModal,
   onNavigateTab,
 }) => {
-  const { user, isAuthenticated, logout } = useAuth()
+  const { user, isAuthenticated, logout, isAdmin, isMentor } = useAuth()
+  const canManageSchedules = isAdmin || isMentor
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const toast = useToast()
   const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   // Listen for Ctrl+K or Cmd+K globally
@@ -153,8 +152,6 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       destructive: true,
       onClick: () => {
         logout()
-        toast.info(t('auth.loggedOutToastTitle'), t('auth.sessionEnded'))
-        navigate('/')
       },
     },
   ]
@@ -225,8 +222,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
         {/* Notification Center Dropdown (Modul 14) */}
         <NotificationDropdown onNavigateTab={onNavigateTab} />
 
-        {/* Action Buttons */}
-        {onOpenManualModal && (
+        {/* Action Buttons (Faqat Admin va Mentorlar uchun) */}
+        {canManageSchedules && onOpenManualModal && (
           <Button
             variant="outline"
             size="sm"
@@ -238,7 +235,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           </Button>
         )}
 
-        {onOpenAiModal && (
+        {canManageSchedules && onOpenAiModal && (
           <Button
             variant="primary"
             size="sm"

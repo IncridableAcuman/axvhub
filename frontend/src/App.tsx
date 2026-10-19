@@ -26,7 +26,8 @@ import { navItems } from '@/widgets/sidebar/navConfig';
 import { scheduleApi, studentApi, mentorApi, groupApi } from './api';
 
 export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard' }) => {
-  const { user } = useAuth();
+  const { user, isAdmin, isMentor, isStudent } = useAuth();
+  const canManageSchedules = isAdmin || isMentor;
   const userRoles = React.useMemo(() => user?.roles || [], [user?.roles]);
 
   const normalizeRole = (r: string) => {
@@ -120,12 +121,20 @@ export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard
   }, []);
 
   const handleOpenAiModal = () => {
+    if (!canManageSchedules) return;
     setIsAiModalOpen(true);
+  };
+
+  const handleOpenManualModal = () => {
+    if (!canManageSchedules) return;
+    setIsManualModalOpen(true);
   };
 
   const handleSelectTab = (tab: string) => {
     if (tab === 'ai-import') {
-      setIsAiModalOpen(true);
+      if (canManageSchedules) {
+        setIsAiModalOpen(true);
+      }
     } else if (isTabAllowed(tab)) {
       setActiveTab(tab);
     }
@@ -135,8 +144,8 @@ export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard
     <AppShell
       activeTab={activeTab}
       onSelectTab={handleSelectTab}
-      onOpenManualModal={() => setIsManualModalOpen(true)}
-      onOpenAiModal={handleOpenAiModal}
+      onOpenManualModal={canManageSchedules ? handleOpenManualModal : undefined}
+      onOpenAiModal={canManageSchedules ? handleOpenAiModal : undefined}
     >
       {loading && schedules.length === 0 ? (
         <div className="py-24 text-center">
@@ -219,27 +228,31 @@ export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard
         </>
       )}
 
-      {/* Manual Schedule Modal */}
-      <ManualScheduleModal
-        isOpen={isManualModalOpen}
-        onClose={() => setIsManualModalOpen(false)}
-        mentors={mentors}
-        onSuccess={() => {
-          fetchAllData();
-          setActiveTab('timetable');
-        }}
-      />
+      {/* Manual Schedule Modal (Faqat Admin va Mentorlar uchun) */}
+      {canManageSchedules && (
+        <ManualScheduleModal
+          isOpen={isManualModalOpen}
+          onClose={() => setIsManualModalOpen(false)}
+          mentors={mentors}
+          onSuccess={() => {
+            fetchAllData();
+            setActiveTab('timetable');
+          }}
+        />
+      )}
 
-      {/* AI Timetable & Students Import Modal */}
-      <AiImportModal
-        isOpen={isAiModalOpen}
-        onClose={() => setIsAiModalOpen(false)}
-        mentors={mentors}
-        onSuccess={() => {
-          fetchAllData();
-          setActiveTab('timetable');
-        }}
-      />
+      {/* AI Timetable & Students Import Modal (Faqat Admin va Mentorlar uchun) */}
+      {canManageSchedules && (
+        <AiImportModal
+          isOpen={isAiModalOpen}
+          onClose={() => setIsAiModalOpen(false)}
+          mentors={mentors}
+          onSuccess={() => {
+            fetchAllData();
+            setActiveTab('timetable');
+          }}
+        />
+      )}
 
       {/* User Profile Details Modal */}
       <UserProfileModal />

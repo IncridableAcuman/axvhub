@@ -19,6 +19,15 @@ vi.mock('@/api', () => ({
     resetPassword: vi.fn(),
     verifyEmail: vi.fn(),
     resendVerification: vi.fn(),
+    getCaptcha: vi.fn().mockResolvedValue({
+      data: {
+        success: true,
+        data: {
+          captchaId: 'test-captcha-123',
+          captchaSvg: '<svg>mock-captcha</svg>',
+        },
+      },
+    }),
   },
   default: {
     get: vi.fn(),
@@ -51,7 +60,7 @@ describe('Authentication Pages (Standalone Pages)', () => {
       renderAuthPage(<LoginPage />);
 
       expect(screen.getByRole('heading', { name: /tizimga kirish/i })).toBeInTheDocument();
-      expect(screen.getByLabelText(/email manzili yoki login/i)).toBeInTheDocument();
+      expect(screen.getByLabelText(/HEMIS ID/i)).toBeInTheDocument();
       expect(screen.getByPlaceholderText('••••••••')).toBeInTheDocument();
       expect(screen.getByText(/parolni unutdingizmi\?/i)).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /tizimga kirish/i })).toBeInTheDocument();
@@ -76,18 +85,22 @@ describe('Authentication Pages (Standalone Pages)', () => {
 
       renderAuthPage(<LoginPage />);
 
-      const identInput = screen.getByLabelText(/email manzili yoki login/i);
+      const identInput = screen.getByLabelText(/HEMIS ID/i);
       const pwdInput = screen.getByPlaceholderText('••••••••');
+      const captchaInput = screen.getByPlaceholderText(/5 ta belgi/i);
       const submitBtn = screen.getByRole('button', { name: /tizimga kirish/i });
 
       await user.type(identInput, 'admin');
       await user.type(pwdInput, 'admin123');
+      await user.type(captchaInput, 'ABCDE');
       await user.click(submitBtn);
 
       await waitFor(() => {
         expect(authApi.login).toHaveBeenCalledWith({
           username: 'admin',
           password: 'admin123',
+          captchaId: 'test-captcha-123',
+          captchaCode: 'ABCDE',
         });
       });
     });

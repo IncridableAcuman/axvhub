@@ -25,9 +25,17 @@ import uz.axm.nexus.shared.application.ApiResponse;
 public class AuthController {
 
     private final AuthService authService;
+    private final CaptchaService captchaService;
 
     @Value("${app.mail.verification-url:http://localhost:5173}")
     private String appBaseUrl;
+
+    @GetMapping("/captcha")
+    @Operation(summary = "Botlardan himoyalanish uchun random 5 xonali CAPTCHA kodi va grafik tasvirini olish")
+    public ResponseEntity<ApiResponse<CaptchaResponse>> getCaptcha() {
+        CaptchaResponse response = captchaService.generateCaptcha();
+        return ResponseEntity.ok(ApiResponse.ok("Xavfsizlik kodi muvaffaqiyatli yaratildi", response));
+    }
 
     @PostMapping("/register")
     @Operation(summary = "Email va parol orqali yangi foydalanuvchini ro'yxatdan o'tkazish va tasdiqlash xatini RabbitMQ orqali jo'natish")
@@ -38,7 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "Tizimga kirish va haqiqiy JWT token olish (email yoki username orqali)")
+    @Operation(summary = "Tizimga kirish va haqiqiy JWT token olish (ID raqam, email yoki username orqali)")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(ApiResponse.ok("Muvaffaqiyatli kirildi", response));

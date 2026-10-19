@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import uz.axm.nexus.scheduling.application.ManualScheduleRequest;
 import uz.axm.nexus.scheduling.application.ScheduleService;
@@ -35,12 +36,14 @@ public class ScheduleController {
     }
 
     @PostMapping("/manual")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'MENTOR')")
     @Operation(summary = "Qo'lda dars jadvali va o'quvchilar guruhini yaratish")
     public ResponseEntity<Schedule> createManualSchedule(@RequestBody ManualScheduleRequest request) {
         return ResponseEntity.ok(scheduleService.createManualSchedule(request));
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN', 'MENTOR')")
     @Operation(summary = "Dars jadvalini o'chirish")
     public ResponseEntity<Void> deleteSchedule(@PathVariable Long id) {
         scheduleService.deleteSchedule(id);

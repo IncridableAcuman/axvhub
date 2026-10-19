@@ -91,6 +91,9 @@ springdoc:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
+  security:
+    allow-public-registration: ${ALLOW_PUBLIC_REGISTRATION:false}
+    captcha-required: ${CAPTCHA_REQUIRED:false}
   jwt:
     secret: ${APP_JWT_SECRET:axm_nexus_super_secret_jwt_key_that_is_at_least_256_bits_long_for_security_reasons_12345}
     expiration-ms: 86400000

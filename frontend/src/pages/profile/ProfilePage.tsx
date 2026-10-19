@@ -232,8 +232,6 @@ export const ProfilePage: React.FC = () => {
             <button
               onClick={() => {
                 logout();
-                toast.info('Tizimdan chiqildi', 'Sessiyangiz yakunlandi.');
-                window.location.href = '/';
               }}
               className="px-4 py-2.5 rounded-xl bg-red-500/15 hover:bg-red-500/25 text-red-300 border border-red-500/30 font-semibold text-xs transition flex items-center gap-2 cursor-pointer"
             >

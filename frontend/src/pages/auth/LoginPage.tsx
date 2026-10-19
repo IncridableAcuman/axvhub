@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, LogIn, ArrowLeft, CheckCircle2, Sparkles } from 'lucide-react';
+import {
+  Lock,
+  LogIn,
+  ArrowLeft,
+  CheckCircle2,
+  Sparkles,
+  RefreshCw,
+  ShieldCheck,
+  UserCheck,
+} from 'lucide-react';
 import { FormField } from '@/shared/ui/form/FormField';
 import { Input } from '@/shared/ui/input/Input';
 import { Button } from '@/shared/ui/button/Button';
 import { ThemeToggle } from '@/shared/ui/theme-toggle/ThemeToggle';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useAuth } from '@/features/auth/AuthContext';
+import { authApi } from '@/api';
+import type { CaptchaResponse } from '@/types';
 
 export const LoginPage: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
@@ -18,12 +29,30 @@ export const LoginPage: React.FC = () => {
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [captcha, setCaptcha] = useState<CaptchaResponse | null>(null);
+  const [captchaCode, setCaptchaCode] = useState('');
+  const [isCaptchaLoading, setIsCaptchaLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const loadCaptcha = async () => {
+    try {
+      setIsCaptchaLoading(true);
+      const res = await authApi.getCaptcha();
+      setCaptcha(res.data.data);
+      setCaptchaCode('');
+    } catch (err) {
+      console.error('CAPTCHA yuklashda xatolik:', err);
+    } finally {
+      setIsCaptchaLoading(false);
+    }
+  };
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/app', { replace: true });
+    } else {
+      loadCaptcha();
     }
   }, [isAuthenticated, navigate]);
 
@@ -32,10 +61,15 @@ export const LoginPage: React.FC = () => {
     const newErrors: Record<string, string> = {};
 
     if (!identifier.trim()) {
-      newErrors.identifier = 'Email manzili yoki login kiritilishi shart';
+      newErrors.identifier = 'HEMIS ID raqami yoki login kiritilishi shart';
     }
     if (!password) {
       newErrors.password = 'Parol kiritilishi shart';
+    }
+    if (!captchaCode.trim()) {
+      newErrors.captcha = 'Xavfsizlik kodi (5 belgi) kiritilishi shart';
+    } else if (captchaCode.trim().length !== 5) {
+      newErrors.captcha = 'Xavfsizlik kodi 5 ta belgidan iborat bo‘lishi kerak';
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -50,6 +84,8 @@ export const LoginPage: React.FC = () => {
       const response = await login({
         username: identifier.trim(),
         password,
+        captchaId: captcha?.captchaId,
+        captchaCode: captchaCode.trim(),
       });
 
       toast.success(
@@ -62,9 +98,10 @@ export const LoginPage: React.FC = () => {
       const serverMsg =
         err?.response?.data?.message ||
         err?.message ||
-        'Email/login yoki parol noto‘g‘ri kiritildi';
+        'HEMIS ID yoki parol noto‘g‘ri kiritildi';
       setErrors({ form: serverMsg });
       toast.error('Kirish xatosi', serverMsg);
+      loadCaptcha(); // Bot hujumidan himoya: har bir xatoda kod yangilanadi
     } finally {
       setIsLoading(false);
     }
@@ -115,11 +152,11 @@ export const LoginPage: React.FC = () => {
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>AI asosidagi taqsimot</span>
+              <span>HEMIS integratsiyalashgan ID</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-              <span>Mentorlar faoliyati tahlili</span>
+              <span>Botlardan faol CAPTCHA himoyasi</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -166,7 +203,7 @@ export const LoginPage: React.FC = () => {
               Tizimga kirish
             </h2>
             <p className="text-sm text-[var(--text-secondary)]">
-              AXM Nexus hisobingiz ma’lumotlarini kiriting
+              HEMIS ID raqamingiz va xavfsizlik kodini kiriting
             </p>
           </div>
 
@@ -178,7 +215,7 @@ export const LoginPage: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <FormField
-              label="Email manzili yoki Login"
+              label="HEMIS ID raqami yoki Login"
               htmlFor="login-ident"
               required
               error={errors.identifier}
@@ -186,13 +223,13 @@ export const LoginPage: React.FC = () => {
               <Input
                 id="login-ident"
                 type="text"
-                placeholder="masalan, ism.familiya@axm-nexus.uz yoki login"
+                placeholder="Masalan: 32600001 (Mentor) yoki 42600001 (O'quvchi) yoki admin"
                 value={identifier}
                 onChange={(e) => {
                   setIdentifier(e.target.value);
                   if (errors.identifier) setErrors((prev) => ({ ...prev, identifier: '' }));
                 }}
-                leftIcon={<Mail className="w-4 h-4" />}
+                leftIcon={<UserCheck className="w-4 h-4" />}
                 autoComplete="username"
                 error={Boolean(errors.identifier)}
               />
@@ -232,6 +269,57 @@ export const LoginPage: React.FC = () => {
               )}
             </div>
 
+            {/* Bot Protection / CAPTCHA */}
+            <div className="space-y-1.5 pt-1">
+              <div className="flex items-center justify-between">
+                <label htmlFor="captcha-input" className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  <span>Botlardan himoya (Xavfsizlik kodi)</span> <span className="text-red-500">*</span>
+                </label>
+                <button
+                  type="button"
+                  onClick={loadCaptcha}
+                  disabled={isCaptchaLoading}
+                  className="text-xs font-semibold text-[var(--brand-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  title="Yangi kod olish"
+                >
+                  <RefreshCw className={`w-3 h-3 ${isCaptchaLoading ? 'animate-spin' : ''}`} />
+                  <span>Yangilash</span>
+                </button>
+              </div>
+
+              <div className="flex items-center gap-3">
+                {/* SVG Captcha Box */}
+                <div
+                  className="shrink-0 h-[48px] rounded-xl overflow-hidden border border-slate-700 bg-slate-950 flex items-center justify-center shadow-xs"
+                  dangerouslySetInnerHTML={{
+                    __html: captcha?.captchaSvg || '<div class="w-[170px] h-[48px] flex items-center justify-center text-xs text-slate-500 font-mono">Yuklanmoqda...</div>',
+                  }}
+                />
+
+                {/* Input for Captcha Code */}
+                <div className="flex-1">
+                  <Input
+                    id="captcha-input"
+                    type="text"
+                    maxLength={5}
+                    placeholder="5 ta belgi"
+                    value={captchaCode}
+                    onChange={(e) => {
+                      setCaptchaCode(e.target.value.toUpperCase());
+                      if (errors.captcha) setErrors((prev) => ({ ...prev, captcha: '' }));
+                    }}
+                    className="font-mono text-center tracking-widest text-base font-bold uppercase"
+                    error={Boolean(errors.captcha)}
+                    autoComplete="off"
+                  />
+                </div>
+              </div>
+              {errors.captcha && (
+                <p className="text-xs text-red-500 mt-1">{errors.captcha}</p>
+              )}
+            </div>
+
             <div className="pt-2">
               <Button
                 type="submit"
@@ -246,23 +334,39 @@ export const LoginPage: React.FC = () => {
             </div>
           </form>
 
-          {/* Quick Demo Credentials hint */}
-          <div className="p-3 bg-[var(--bg-subtle)] border border-[var(--border-default)] rounded-xl text-xs text-[var(--text-secondary)] space-y-1">
-            <span className="font-semibold text-[var(--text-primary)] block">Sinov uchun hisoblar:</span>
-            <div className="flex justify-between font-mono text-[11px]">
-              <span>Admin: <strong className="text-[var(--text-primary)]">admin</strong> / <strong>admin123</strong></span>
-              <span>Mentor: <strong className="text-[var(--text-primary)]">mentor@axm-nexus.uz</strong></span>
+          {/* Real Credentials Guide */}
+          <div className="p-3.5 bg-[var(--bg-subtle)] border border-[var(--border-default)] rounded-2xl text-xs space-y-1.5">
+            <div className="flex items-center gap-1.5 font-bold text-[var(--text-primary)]">
+              <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
+              <span>Al-Xorazmiy Vorislari hisoblari:</span>
+            </div>
+            <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">
+              Tizimga kirish Admin va Mentorlar tomonidan berilgan HEMIS ID raqamlari orqali amalga oshiriladi:
+            </p>
+            <div className="grid grid-cols-1 gap-1 font-mono text-[11px] pt-1 border-t border-[var(--border-default)]">
+              <div className="flex justify-between py-0.5">
+                <span className="text-[var(--text-muted)]">Admin hisobi:</span>
+                <span className="font-semibold text-[var(--text-primary)]">admin / admin123</span>
+              </div>
+              <div className="flex justify-between py-0.5">
+                <span className="text-[var(--text-muted)]">IT Mentor ID:</span>
+                <span className="font-semibold text-indigo-500">32600001 / AxmMentor2026!</span>
+              </div>
+              <div className="flex justify-between py-0.5">
+                <span className="text-[var(--text-muted)]">O‘quvchi ID:</span>
+                <span className="font-semibold text-blue-500">42600001 / Student2026!</span>
+              </div>
             </div>
           </div>
 
-          <div className="text-center pt-2">
+          <div className="text-center pt-1">
             <p className="text-xs text-[var(--text-secondary)]">
               Hisobingiz yo‘qmi?{' '}
               <Link
                 to="/register"
                 className="font-bold text-[var(--brand-primary)] hover:underline ml-1"
               >
-                Ro‘yxatdan o‘tish
+                Kirish tartibi bilan tanishish
               </Link>
             </p>
           </div>

@@ -9,10 +9,14 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  KeyRound,
+  Copy,
+  Check,
 } from 'lucide-react';
 import { studentApi } from '../api';
 import { Input, FormField } from '@/shared/ui';
 import { useTranslation } from '@/shared/i18n';
+import { CredentialSlipModal, type CredentialSlipData } from './common/CredentialSlipModal';
 
 interface StudentsListProps {
   students: Student[];
@@ -24,7 +28,7 @@ interface StudentsListProps {
 export const StudentsList: React.FC<StudentsListProps> = ({
   students,
   groups,
-  mentors,
+  mentors: _mentors,
   onRefresh,
 }) => {
   const { t } = useTranslation();
@@ -37,10 +41,15 @@ export const StudentsList: React.FC<StudentsListProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
+  // Credential slip modal state
+  const [credentialData, setCredentialData] = useState<CredentialSlipData | null>(null);
+  const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
   // New student form state
   const [fullName, setFullName] = useState('');
   const [pinfl, setPinfl] = useState('');
-  const [studentIdNumber, setStudentIdNumber] = useState('');
+  const [phone, setPhone] = useState('');
   const [gradeLevel, setGradeLevel] = useState('8-sinf');
   const [district] = useState('Yangiariq tumani');
   const [selectedGroupId, setSelectedGroupId] = useState<number | undefined>(groups[0]?.id);
@@ -84,6 +93,36 @@ export const StudentsList: React.FC<StudentsListProps> = ({
     }
   };
 
+  const handleResetPassword = async (st: Student) => {
+    if (!window.confirm(`${st.fullName} o‘quvchisi uchun yangi tasodifiy parol generatsiya qilinsinmi?`)) {
+      return;
+    }
+    try {
+      const res = await studentApi.resetPassword(st.id);
+      const data = res.data.data;
+      setCredentialData({
+        fullName: data.fullName,
+        role: 'STUDENT',
+        hemisId: data.identifier,
+        password: data.newPassword,
+        groupCode: st.studyGroup?.groupCode,
+        branchLocation: st.branchLocation,
+        isReset: true,
+      });
+      setIsCredentialModalOpen(true);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Parolni yangilashda xatolik yuz berdi';
+      alert(msg);
+    }
+  };
+
+  const handleCopyStudentId = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(id);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
   const handleExportCSV = () => {
     const headers = ['#', 'F.I.Sh', 'PINFL', 'ID Raqami', 'Sinf', 'Guruh', 'Filial', 'Mentor', 'Holat'];
     const rows = filteredStudents.map((s, idx) => [
@@ -117,24 +156,37 @@ export const StudentsList: React.FC<StudentsListProps> = ({
     setSaving(true);
     try {
       const targetGroup = groups.find((g) => g.id === Number(selectedGroupId));
-      await studentApi.save({
+      const res = await studentApi.provision({
         fullName: fullName.trim(),
-        pinfl: pinfl.trim() || undefined,
-        studentIdNumber: studentIdNumber.trim() || undefined,
-        district,
         gradeLevel,
+        studyGroupId: targetGroup?.id,
+        direction: targetGroup?.subject || 'Web Full-Stack',
+        pinfl: pinfl.trim() || undefined,
+        phone: phone.trim() || undefined,
+        district,
         branchLocation: 'IT Park Yangiariq',
-        studyGroup: targetGroup,
-        mentor: targetGroup?.mentor || mentors[0],
-        status: 'Faol',
       });
+
+      const prov = res.data.data;
       setIsAddModalOpen(false);
       setFullName('');
       setPinfl('');
-      setStudentIdNumber('');
+      setPhone('');
       onRefresh();
-    } catch {
-      alert(t('students.createError'));
+
+      // Show generated credentials slip modal
+      setCredentialData({
+        fullName: prov.fullName,
+        role: 'STUDENT',
+        hemisId: prov.studentIdNumber,
+        password: prov.temporaryPassword,
+        groupCode: prov.groupCode,
+        branchLocation: prov.branchLocation,
+      });
+      setIsCredentialModalOpen(true);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || t('students.createError');
+      alert(msg);
     } finally {
       setSaving(false);
     }
@@ -321,7 +373,24 @@ export const StudentsList: React.FC<StudentsListProps> = ({
                         </div>
                       </td>
                       <td className="py-3.5 px-4 font-mono text-[var(--text-secondary)]">{st.pinfl || '—'}</td>
-                      <td className="py-3.5 px-4 font-mono text-[var(--text-secondary)] font-semibold">{st.studentIdNumber || '—'}</td>
+                      <td className="py-3.5 px-4 font-mono text-[var(--text-secondary)] font-semibold">
+                        <div className="flex items-center gap-1.5">
+                          <span>{st.studentIdNumber || '—'}</span>
+                          {st.studentIdNumber && (
+                            <button
+                              onClick={(e) => handleCopyStudentId(st.studentIdNumber!, e)}
+                              className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--brand-primary)] hover:bg-[var(--bg-subtle)] transition cursor-pointer"
+                              title="ID dan nusxa olish"
+                            >
+                              {copiedId === st.studentIdNumber ? (
+                                <Check className="w-3.5 h-3.5 text-emerald-500" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          )}
+                        </div>
+                      </td>
                       <td className="py-3.5 px-4">
                         <span className="px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-[10px] border border-blue-200/50 dark:border-blue-900/50">
                           {st.gradeLevel || '8-sinf'}
@@ -343,14 +412,24 @@ export const StudentsList: React.FC<StudentsListProps> = ({
                         </span>
                       </td>
                       <td className="py-3.5 px-4 text-right">
-                        <button
-                          onClick={() => handleDelete(st.id)}
-                          className="text-[var(--text-muted)] hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
-                          title={t('common.delete')}
-                          aria-label={t('common.delete')}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => handleResetPassword(st)}
+                            className="text-[var(--text-muted)] hover:text-amber-500 p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer"
+                            title="Yangi parol yaratish (HEMIS)"
+                            aria-label="Yangi parol yaratish"
+                          >
+                            <KeyRound className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(st.id)}
+                            className="text-[var(--text-muted)] hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                            title={t('common.delete')}
+                            aria-label={t('common.delete')}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );
@@ -490,14 +569,24 @@ export const StudentsList: React.FC<StudentsListProps> = ({
                     maxLength={14}
                   />
                 </FormField>
-                <FormField label={t('students.studentIdHeader')}>
+                <FormField label={t('students.phoneLabel') || 'Telefon raqam'}>
                   <Input
-                    type="text"
-                    value={studentIdNumber}
-                    onChange={(e) => setStudentIdNumber(e.target.value)}
-                    placeholder="I-HR 025..."
+                    type="tel"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+998 90 123 45 67"
                   />
                 </FormField>
+              </div>
+
+              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-700 dark:text-blue-300 flex items-start gap-2.5">
+                <KeyRound className="w-4 h-4 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold block">HEMIS ID va Parol avtomatik shakllantiriladi</span>
+                  <span className="text-[11px] opacity-80">
+                    O‘quvchiga HEMIS formatidagi unikal raqamli ID (42600001+) va 8 belgili tasodifiy parol generatsiya qilinadi.
+                  </span>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -548,6 +637,13 @@ export const StudentsList: React.FC<StudentsListProps> = ({
           </div>
         </div>
       )}
+
+      {/* HEMIS Credential Slip Modal */}
+      <CredentialSlipModal
+        isOpen={isCredentialModalOpen}
+        onClose={() => setIsCredentialModalOpen(false)}
+        data={credentialData}
+      />
     </div>
   );
 };

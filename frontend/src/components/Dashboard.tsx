@@ -48,28 +48,50 @@ export const Dashboard: React.FC<DashboardProps> = ({
     return `${now.getDate()}-${months[now.getMonth()]}, ${now.getFullYear()}-yil`
   }, [])
 
-  const { user } = useAuth()
-  const userRole =
-    user?.roles?.includes('ROLE_ADMIN') || user?.roles?.includes('ROLE_SUPER_ADMIN')
-      ? 'ROLE_ADMIN'
-      : user?.roles?.includes('ROLE_STUDENT')
-      ? 'ROLE_STUDENT'
-      : 'ROLE_MENTOR'
+  const { user, isAdmin, isMentor, isStudent } = useAuth()
+  const userRole = isAdmin
+    ? 'ROLE_ADMIN'
+    : isMentor
+    ? 'ROLE_MENTOR'
+    : 'ROLE_STUDENT'
 
   const [activeRoleView, setActiveRoleView] = useState<DashboardRoleView>(() => {
-    if (userRole === 'ROLE_STUDENT') return 'student'
-    if (userRole === 'ROLE_ADMIN') return 'admin'
+    if (isStudent && !isAdmin && !isMentor) return 'student'
+    if (isAdmin) return 'admin'
     return 'mentor'
   })
+
+  // Enforce role boundary so student cannot switch into mentor or admin
+  React.useEffect(() => {
+    if (isStudent && !isAdmin && !isMentor && activeRoleView !== 'student') {
+      setActiveRoleView('student')
+    } else if (isMentor && !isAdmin && activeRoleView === 'admin') {
+      setActiveRoleView('mentor')
+    }
+  }, [isStudent, isAdmin, isMentor, activeRoleView])
+
+  const handleSelectRoleView = (view: DashboardRoleView) => {
+    if (isStudent && !isAdmin && !isMentor) {
+      setActiveRoleView('student')
+      return
+    }
+    if (isMentor && !isAdmin && view === 'admin') {
+      return
+    }
+    setActiveRoleView(view)
+  }
 
   return (
     <div className="space-y-6 sm:space-y-8 animate-fade-in-up">
       {/* Role Switcher Toolbar */}
       <DashboardRoleSwitcher
         activeRoleView={activeRoleView}
-        onSelectRoleView={setActiveRoleView}
+        onSelectRoleView={handleSelectRoleView}
         userFullName={user?.fullName}
         userRole={userRole}
+        isAdmin={isAdmin}
+        isMentor={isMentor}
+        isStudent={isStudent}
       />
 
       {/* Role-Specific Dashboard Views */}

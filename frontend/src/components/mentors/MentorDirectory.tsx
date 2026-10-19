@@ -8,10 +8,15 @@ import {
   RefreshCw,
   Lock,
   ArrowRight,
+  UserPlus,
+  KeyRound,
+  X,
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button/Button';
 import { Input } from '@/shared/ui/input/Input';
-import { mentorProfileApi } from '@/api';
+import { FormField } from '@/shared/ui/form/FormField';
+import { mentorProfileApi, mentorApi } from '@/api';
+import { CredentialSlipModal } from '@/components/common/CredentialSlipModal';
 import { MentorProfileModal } from './MentorProfileModal';
 import { MentorEditProfileModal } from './MentorEditProfileModal';
 import { MentorReviewModal } from './MentorReviewModal';
@@ -24,6 +29,27 @@ export const MentorDirectory: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+
+  // Provisioning & Credential State
+  const [isAddMentorModalOpen, setIsAddMentorModalOpen] = useState(false);
+  const [newFullName, setNewFullName] = useState('');
+  const [newRole, setNewRole] = useState('Dasturlash va IT yo‘nalishi mentori');
+  const [newBranchLocation, setNewBranchLocation] = useState('IT Park Yangiariq');
+  const [newPhone, setNewPhone] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [newBio, setNewBio] = useState('');
+  const [savingMentor, setSavingMentor] = useState(false);
+
+  const [isCredentialModalOpen, setIsCredentialModalOpen] = useState(false);
+  const [credentialData, setCredentialData] = useState<{
+    fullName: string;
+    role: 'MENTOR' | 'STUDENT';
+    hemisId: string;
+    password: string;
+    groupCode?: string;
+    branchLocation?: string;
+    isReset?: boolean;
+  } | null>(null);
 
   // Modals state
   const [selectedProfile, setSelectedProfile] = useState<MentorProfileDto | PublicMentorProfileDto | null>(null);
@@ -100,6 +126,66 @@ export const MentorDirectory: React.FC = () => {
     setIsReviewOpen(true);
   };
 
+  const handleCreateMentor = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFullName.trim()) return;
+
+    setSavingMentor(true);
+    try {
+      const res = await mentorApi.provision({
+        fullName: newFullName.trim(),
+        role: newRole.trim() || 'Mentor',
+        branchLocation: newBranchLocation.trim() || 'IT Park Yangiariq',
+        phone: newPhone.trim() || undefined,
+        email: newEmail.trim() || undefined,
+        bio: newBio.trim() || undefined,
+      });
+
+      const prov = res.data.data;
+      setIsAddMentorModalOpen(false);
+      setNewFullName('');
+      setNewPhone('');
+      setNewEmail('');
+      setNewBio('');
+      loadData();
+
+      setCredentialData({
+        fullName: prov.fullName,
+        role: 'MENTOR',
+        hemisId: prov.hemisId,
+        password: prov.temporaryPassword,
+        branchLocation: prov.branchLocation,
+      });
+      setIsCredentialModalOpen(true);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Mentor yaratishda xatolik yuz berdi';
+      alert(msg);
+    } finally {
+      setSavingMentor(false);
+    }
+  };
+
+  const handleResetPassword = async (mentorId: number, mentorName: string) => {
+    if (!window.confirm(`${mentorName} mentori uchun yangi tasodifiy parol generatsiya qilinsinmi?`)) {
+      return;
+    }
+    try {
+      const res = await mentorApi.resetPassword(mentorId);
+      const data = res.data.data;
+      setCredentialData({
+        fullName: data.fullName,
+        role: 'MENTOR',
+        hemisId: data.identifier,
+        password: data.newPassword,
+        isReset: true,
+      });
+      setIsCredentialModalOpen(true);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Parolni yangilashda xatolik yuz berdi';
+      alert(msg);
+    }
+  };
+
   return (
     <div className="space-y-6 animate-fade-in-up">
       {/* Header Banner */}
@@ -123,7 +209,19 @@ export const MentorDirectory: React.FC = () => {
           </div>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {viewMode === 'admin' && (
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setIsAddMentorModalOpen(true)}
+              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm shadow-indigo-500/20"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Yangi mentor qo‘shish</span>
+            </Button>
+          )}
+
           {/* View Mode Toggle */}
           <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
             <button
@@ -364,7 +462,7 @@ export const MentorDirectory: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
                     <div className="flex items-center space-x-1">
                       <button
                         onClick={(e) => handleOpenEdit(mentorId, e)}
@@ -382,6 +480,18 @@ export const MentorDirectory: React.FC = () => {
                       >
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span>Moderatsiya</span>
+                      </button>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleResetPassword(mentorId, p.displayName);
+                        }}
+                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/50 transition flex items-center space-x-1 cursor-pointer"
+                        title="Yangi tasodifiy parol generatsiya qilish"
+                      >
+                        <KeyRound className="w-3.5 h-3.5" />
+                        <span>Parol</span>
                       </button>
                     </div>
 
@@ -433,6 +543,135 @@ export const MentorDirectory: React.FC = () => {
         onSuccess={() => {
           loadData();
         }}
+      />
+
+      {/* Add Mentor Modal */}
+      {isAddMentorModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setIsAddMentorModalOpen(false);
+          }}
+        >
+          <div
+            className="glass-panel bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-[var(--border-default)] animate-scale-in"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-subtle)] mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[var(--text-primary)]">Yangi mentor qo‘shish (HEMIS)</h3>
+                  <p className="text-xs text-[var(--text-muted)]">Faqat admin tomonidan HEMIS ID va tasodifiy parol bilan ta'minlanadi</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setIsAddMentorModalOpen(false)}
+                className="w-8 h-8 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center justify-center transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateMentor} className="space-y-4">
+              <FormField label="Mentor F.I.Sh" required>
+                <Input
+                  type="text"
+                  value={newFullName}
+                  onChange={(e) => setNewFullName(e.target.value)}
+                  placeholder="Masalan: Abdusharipov Izzatbek"
+                  required
+                />
+              </FormField>
+
+              <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-700 dark:text-indigo-300 flex items-start gap-2.5">
+                <KeyRound className="w-4 h-4 shrink-0 mt-0.5" />
+                <div>
+                  <span className="font-semibold block">HEMIS ID va Parol avtomatik shakllantiriladi</span>
+                  <span className="text-[11px] opacity-80">
+                    Mentorga maxsus 8 xonali HEMIS ID (32600001+) va 8 belgili xavfsiz tasodifiy parol beriladi.
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <FormField label="Yo‘nalish / Mutaxassislik" required>
+                  <Input
+                    type="text"
+                    value={newRole}
+                    onChange={(e) => setNewRole(e.target.value)}
+                    placeholder="Masalan: Web Full-Stack mentori"
+                    required
+                  />
+                </FormField>
+                <FormField label="Filial / Hudud" required>
+                  <Input
+                    type="text"
+                    value={newBranchLocation}
+                    onChange={(e) => setNewBranchLocation(e.target.value)}
+                    placeholder="IT Park Yangiariq"
+                    required
+                  />
+                </FormField>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <FormField label="Telefon raqam">
+                  <Input
+                    type="tel"
+                    value={newPhone}
+                    onChange={(e) => setNewPhone(e.target.value)}
+                    placeholder="+998 90 123 45 67"
+                  />
+                </FormField>
+                <FormField label="Email (Ixtiyoriy)">
+                  <Input
+                    type="email"
+                    value={newEmail}
+                    onChange={(e) => setNewEmail(e.target.value)}
+                    placeholder="mentor@axm-nexus.uz"
+                  />
+                </FormField>
+              </div>
+
+              <FormField label="Qisqacha ma'lumot (Bio)">
+                <textarea
+                  value={newBio}
+                  onChange={(e) => setNewBio(e.target.value)}
+                  placeholder="Mentorning ish tajribasi va dars berish uslubi haqida..."
+                  rows={2}
+                  className="w-full px-3.5 py-2.5 text-xs font-medium rounded-xl border border-[var(--border-default)] bg-[var(--bg-canvas)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                />
+              </FormField>
+
+              <div className="pt-3 border-t border-[var(--border-subtle)] flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsAddMentorModalOpen(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-secondary)] transition cursor-pointer"
+                >
+                  Bekor qilish
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingMentor}
+                  className="btn-shimmer px-5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 transition cursor-pointer disabled:opacity-50"
+                >
+                  {savingMentor ? 'Yaratilmoqda...' : 'Mentorni ro‘yxatga olish'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* HEMIS Credential Slip Modal */}
+      <CredentialSlipModal
+        isOpen={isCredentialModalOpen}
+        onClose={() => setIsCredentialModalOpen(false)}
+        data={credentialData}
       />
     </div>
   );

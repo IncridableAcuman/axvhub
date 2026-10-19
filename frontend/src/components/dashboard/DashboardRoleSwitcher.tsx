@@ -9,6 +9,9 @@ interface DashboardRoleSwitcherProps {
   onSelectRoleView: (role: DashboardRoleView) => void
   userFullName?: string
   userRole: string
+  isAdmin?: boolean
+  isMentor?: boolean
+  isStudent?: boolean
 }
 
 export const DashboardRoleSwitcher: React.FC<DashboardRoleSwitcherProps> = ({
@@ -16,10 +19,21 @@ export const DashboardRoleSwitcher: React.FC<DashboardRoleSwitcherProps> = ({
   onSelectRoleView,
   userFullName,
   userRole,
+  isAdmin = false,
+  isMentor = false,
+  isStudent = false,
 }) => {
   const { t } = useTranslation()
 
   const localizedRole = t(`roles.${userRole}`) || userRole
+
+  // Determine which role views this user is allowed to switch into
+  const canViewAdmin = isAdmin
+  const canViewMentor = isAdmin || isMentor
+  const canViewStudent = true // Everyone can view student perspective
+
+  // If user is pure student (not admin, not mentor), no need to show switching tabs for other roles
+  const isPureStudent = isStudent && !isAdmin && !isMentor
 
   return (
     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-xs">
@@ -49,46 +63,54 @@ export const DashboardRoleSwitcher: React.FC<DashboardRoleSwitcherProps> = ({
       </div>
 
       {/* View Selection Segmented Tabs */}
-      <div className="flex items-center gap-1 bg-[var(--bg-subtle)] p-1 rounded-xl self-start sm:self-auto">
-        <button
-          type="button"
-          onClick={() => onSelectRoleView('mentor')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-            activeRoleView === 'mentor'
-              ? 'bg-indigo-600 text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
-          }`}
-        >
-          <Award className="w-3.5 h-3.5" />
-          <span>{t('roles.ROLE_MENTOR')}</span>
-        </button>
+      {!isPureStudent && (
+        <div className="flex items-center gap-1 bg-[var(--bg-subtle)] p-1 rounded-xl self-start sm:self-auto">
+          {canViewMentor && (
+            <button
+              type="button"
+              onClick={() => onSelectRoleView('mentor')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                activeRoleView === 'mentor'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
+              }`}
+            >
+              <Award className="w-3.5 h-3.5" />
+              <span>{t('roles.ROLE_MENTOR')}</span>
+            </button>
+          )}
 
-        <button
-          type="button"
-          onClick={() => onSelectRoleView('student')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-            activeRoleView === 'student'
-              ? 'bg-blue-600 text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
-          }`}
-        >
-          <GraduationCap className="w-3.5 h-3.5" />
-          <span>{t('roles.ROLE_STUDENT')}</span>
-        </button>
+          {canViewStudent && (
+            <button
+              type="button"
+              onClick={() => onSelectRoleView('student')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                activeRoleView === 'student'
+                  ? 'bg-blue-600 text-white shadow-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>{t('roles.ROLE_STUDENT')}</span>
+            </button>
+          )}
 
-        <button
-          type="button"
-          onClick={() => onSelectRoleView('admin')}
-          className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
-            activeRoleView === 'admin'
-              ? 'bg-purple-600 text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
-          }`}
-        >
-          <ShieldCheck className="w-3.5 h-3.5" />
-          <span>{t('roles.ROLE_ADMIN')}</span>
-        </button>
-      </div>
+          {canViewAdmin && (
+            <button
+              type="button"
+              onClick={() => onSelectRoleView('admin')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer flex items-center gap-1.5 ${
+                activeRoleView === 'admin'
+                  ? 'bg-purple-600 text-white shadow-xs'
+                  : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-surface)]'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>{t('roles.ROLE_ADMIN')}</span>
+            </button>
+          )}
+        </div>
+      )}
     </div>
   )
 }

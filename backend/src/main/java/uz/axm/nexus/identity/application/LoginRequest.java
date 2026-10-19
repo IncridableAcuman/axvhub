@@ -16,4 +16,7 @@ public class LoginRequest {
 
     @NotBlank(message = "Parol bo'sh bo'lishi mumkin emas")
     private String password;
+
+    private String captchaId;
+    private String captchaCode;
 }
