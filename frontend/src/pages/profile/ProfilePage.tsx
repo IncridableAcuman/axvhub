@@ -36,14 +36,17 @@ import { MentorEditProfileModal } from '@/components/mentors/MentorEditProfileMo
 import type { MentorProfileDto } from '@/types';
 
 export const ProfilePage: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, isAdmin, isMentor, isStudent } = useAuth();
   const toast = useToast();
 
-  const [activeTab, setActiveTab] = useState<'overview' | 'mentor' | 'security' | 'preferences' | 'sessions'>('overview');
+  const isPureStudent = isStudent && !isAdmin && !isMentor;
+
+  const [activeTab, setActiveTab] = useState<'overview' | 'mentor' | 'student' | 'security' | 'preferences' | 'sessions'>('overview');
   const [mentorProfile, setMentorProfile] = useState<MentorProfileDto | null>(null);
   const [isMentorModalOpen, setIsMentorModalOpen] = useState(false);
 
   const loadMentorProfile = async () => {
+    if (isPureStudent) return;
     try {
       const res = await mentorProfileApi.getProfileByMentorId(1);
       if (res.data?.data) {
@@ -55,8 +58,10 @@ export const ProfilePage: React.FC = () => {
   };
 
   useEffect(() => {
-    loadMentorProfile();
-  }, []);
+    if (!isPureStudent) {
+      loadMentorProfile();
+    }
+  }, [isPureStudent]);
 
   // Edit profile form state
   const [fullName, setFullName] = useState(user?.fullName || 'Izzatbek Abdurasharipov');
@@ -248,8 +253,17 @@ export const ProfilePage: React.FC = () => {
       <div className="glass-panel p-2 rounded-2xl border border-[var(--border-default)] shadow-xs flex items-center gap-2 overflow-x-auto scrollbar-none">
         {[
           { id: 'overview', label: 'Shaxsiy ma’lumotlar', icon: User },
-          { id: 'mentor', label: 'IT Murabbiy Profili (Ommaviy)', icon: Award },
-          { id: 'security', label: 'Xavfsizlik & Tokenlar', icon: Shield },
+          ...(isPureStudent
+            ? [{ id: 'student', label: 'O‘quvchi Profili & Yutuqlar', icon: GraduationCap }]
+            : []),
+          ...((isAdmin || isMentor)
+            ? [{ id: 'mentor', label: 'IT Murabbiy Profili (Ommaviy)', icon: Award }]
+            : []),
+          {
+            id: 'security',
+            label: isAdmin ? 'Xavfsizlik & Tokenlar' : 'Xavfsizlik & Parol',
+            icon: Shield,
+          },
           { id: 'preferences', label: 'Tizim sozlamalari', icon: Globe2 },
           { id: 'sessions', label: 'Faol sessiyalar', icon: Laptop },
         ].map((tab) => {
@@ -382,25 +396,47 @@ export const ProfilePage: React.FC = () => {
               </div>
             </div>
 
-            <div className="glass-panel p-6 rounded-3xl border border-indigo-500/20 bg-indigo-500/5 shadow-xs space-y-3 text-xs">
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-[var(--text-primary)] block">Al-Xorazmiy IT Murabbiyi</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
-                  Ommaviy Profil
-                </span>
+            {isPureStudent ? (
+              <div className="glass-panel p-6 rounded-3xl border border-blue-500/20 bg-blue-500/5 shadow-xs space-y-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[var(--text-primary)] block">Al-Xorazmiy O‘quvchisi</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-500/20 text-blue-600 dark:text-blue-400">
+                    Faol O‘quvchi
+                  </span>
+                </div>
+                <p className="text-[var(--text-muted)] leading-relaxed">
+                  Web Development, Algoritmlar va sun’iy intellekt bo‘yicha shaxsiy ta’lim natijalari va yutuqlaringiz.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('student')}
+                  className="w-full py-2 px-3 rounded-xl bg-[var(--brand-primary)] text-white font-bold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>O‘quvchi Yutuqlarini Ko‘rish</span>
+                </button>
               </div>
-              <p className="text-[var(--text-muted)] leading-relaxed">
-                Texnik ko‘nikmalar, ish tajribasi va ta’lim ma’lumotlaringizni to‘ldiring yoki tahrirlang.
-              </p>
-              <button
-                type="button"
-                onClick={() => setActiveTab('mentor')}
-                className="w-full py-2 px-3 rounded-xl bg-[var(--brand-primary)] text-white font-bold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
-              >
-                <Award className="w-4 h-4" />
-                <span>Murabbiy Profilini To‘ldirish</span>
-              </button>
-            </div>
+            ) : (
+              <div className="glass-panel p-6 rounded-3xl border border-indigo-500/20 bg-indigo-500/5 shadow-xs space-y-3 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-[var(--text-primary)] block">Al-Xorazmiy IT Murabbiyi</span>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                    Ommaviy Profil
+                  </span>
+                </div>
+                <p className="text-[var(--text-muted)] leading-relaxed">
+                  Texnik ko‘nikmalar, ish tajribasi va ta’lim ma’lumotlaringizni to‘ldiring yoki tahrirlang.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('mentor')}
+                  className="w-full py-2 px-3 rounded-xl bg-[var(--brand-primary)] text-white font-bold text-xs transition cursor-pointer shadow-sm flex items-center justify-center gap-1.5"
+                >
+                  <Award className="w-4 h-4" />
+                  <span>Murabbiy Profilini To‘ldirish</span>
+                </button>
+              </div>
+            )}
 
             <div className="glass-panel p-6 rounded-3xl border border-indigo-500/20 bg-indigo-500/5 shadow-xs space-y-2 text-xs">
               <span className="font-bold text-[var(--text-primary)] block">Prezident Dasturi Integratsiyasi</span>
@@ -412,8 +448,110 @@ export const ProfilePage: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: MENTOR PROFILE (OMMAVIY & KASBIY MA'LUMOTLAR) */}
-      {activeTab === 'mentor' && (
+      {/* TAB: STUDENT ACADEMIC PROFILE & ACHIEVEMENTS (Faqat O‘quvchilar uchun) */}
+      {isPureStudent && activeTab === 'student' && (
+        <div className="space-y-6 animate-fade-in">
+          {/* Top Banner */}
+          <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-default)] shadow-xs relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-cyan-500 text-white flex items-center justify-center font-black text-3xl sm:text-4xl shadow-xl shadow-blue-500/20">
+                  {getInitials(user?.fullName)}
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xl sm:text-2xl font-black text-[var(--text-primary)]">
+                      {user?.fullName || 'Iqtidorli O‘quvchi'}
+                    </span>
+                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400 border border-blue-400/30">
+                      8–11-sinf Ixtisoslashtirilgan Dastur
+                    </span>
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)]">
+                    Muhammad Al-Xorazmiy Vorislari ta’lim tarmog‘ining faol o‘quvchi profili
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="p-4 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-subtle)] text-center">
+                  <span className="text-[11px] text-[var(--text-muted)] block">Joriy Gamifikatsiya Darajasi</span>
+                  <span className="text-xl font-black text-amber-500 font-mono">Level 4 • 1,450 XP</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Student Academic Details Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="glass-panel p-6 rounded-3xl border border-[var(--border-default)] shadow-xs space-y-4">
+              <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <GraduationCap className="w-4 h-4 text-blue-500" />
+                <span>Akademik Yo‘nalish</span>
+              </h3>
+              <div className="space-y-3 text-xs">
+                <div className="p-3 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between">
+                  <span className="text-[var(--text-secondary)]">Asosiy fan:</span>
+                  <span className="font-bold text-[var(--text-primary)]">Web Full-Stack & Python</span>
+                </div>
+                <div className="p-3 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between">
+                  <span className="text-[var(--text-secondary)]">Guruh:</span>
+                  <span className="font-bold text-indigo-600 dark:text-indigo-400">YA-26I0804 (8-sinf)</span>
+                </div>
+                <div className="p-3 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between">
+                  <span className="text-[var(--text-secondary)]">Akademik o‘zlashtirish:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">94.8 / 100 (A+)</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass-panel p-6 rounded-3xl border border-[var(--border-default)] shadow-xs space-y-4">
+              <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span>Davomat va Faollik</span>
+              </h3>
+              <div className="space-y-3 text-xs">
+                <div className="p-3 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between">
+                  <span className="text-[var(--text-secondary)]">Darslarda ishtirok:</span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono">100%</span>
+                </div>
+                <div className="p-3 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between">
+                  <span className="text-[var(--text-secondary)]">Qoldirilgan darslar:</span>
+                  <span className="font-bold text-slate-500">0 soat</span>
+                </div>
+                <div className="p-3 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-subtle)] flex items-center justify-between">
+                  <span className="text-[var(--text-secondary)]">Uyga vazifalar:</span>
+                  <span className="font-bold text-blue-600 dark:text-blue-400">12 / 12 topshirilgan</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="glass-panel p-6 rounded-3xl border border-[var(--border-default)] shadow-xs space-y-4">
+              <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
+                <Award className="w-4 h-4 text-amber-500" />
+                <span>Qo‘lga kiritilgan Yutuqlar</span>
+              </h3>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 font-medium">
+                  <Award className="w-4 h-4 shrink-0 text-amber-500" />
+                  <span>Frontend Master — Mukammal HTML & CSS loyiha</span>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300 font-medium">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-500" />
+                  <span>Namunali Davomat — 100% ishtirok nishoni</span>
+                </div>
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-medium">
+                  <ShieldCheck className="w-4 h-4 shrink-0 text-indigo-500" />
+                  <span>Tezkor Algoritmchi — 1-o‘rin test natijasi</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: MENTOR PROFILE (OMMAVIY & KASBIY MA'LUMOTLAR - FAQAT MENTOR VA ADMIN) */}
+      {!isPureStudent && activeTab === 'mentor' && (
         <div className="space-y-6 animate-fade-in">
           {/* Top Mentor Banner with Live Status & Edit Action */}
           <div className="glass-panel p-6 sm:p-8 rounded-3xl border border-[var(--border-default)] shadow-xs relative overflow-hidden">
@@ -725,68 +863,70 @@ export const ProfilePage: React.FC = () => {
 
       {/* TAB 3: SECURITY & TOKENS */}
       {activeTab === 'security' && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in">
-          {/* JWT Token Pair Management */}
-          <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-[var(--border-default)] shadow-xs space-y-5">
-            <div className="border-b border-[var(--border-subtle)] pb-4">
-              <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 mb-1">
-                <KeyRound className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold tracking-wider">Access / Refresh Token</span>
-              </div>
-              <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
-                Autentifikatsiya Tokenlari Boshqaruvi
-              </h2>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                Tizim JWT Access Token (qisqa muddatli) va Refresh Token (uzoq muddatli) standartida ishlaydi
-              </p>
-            </div>
-
-            <div className="space-y-4 text-xs">
-              <div className="p-4 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-default)] space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[var(--text-primary)]">Access Token (Bearer):</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-mono font-bold">
-                    Faol
-                  </span>
+        <div className={`grid grid-cols-1 ${isAdmin ? 'lg:grid-cols-2' : 'max-w-2xl mx-auto'} gap-6 animate-fade-in`}>
+          {/* JWT Token Pair Management (FAQAT ADMIN UCHUN KO‘RINADI) */}
+          {isAdmin && (
+            <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-[var(--border-default)] shadow-xs space-y-5">
+              <div className="border-b border-[var(--border-subtle)] pb-4">
+                <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 mb-1">
+                  <KeyRound className="w-4 h-4" />
+                  <span className="text-[10px] uppercase font-bold tracking-wider">Access / Refresh Token</span>
                 </div>
-                <div className="p-2.5 rounded-xl bg-[var(--bg-subtle)] font-mono text-[11px] text-[var(--text-muted)] truncate select-all">
-                  {user?.accessToken ? `${user.accessToken.slice(0, 36)}...` : 'Token generatsiya qilinmagan'}
-                </div>
-                <div className="flex items-center justify-between pt-1 text-[11px]">
-                  <button
-                    onClick={handleCopyAccessToken}
-                    className="text-[var(--brand-primary)] hover:underline flex items-center gap-1 font-semibold cursor-pointer"
-                  >
-                    {copiedToken ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                    <span>{copiedToken ? 'Nusxalandi!' : 'Tokendan nusxa olish'}</span>
-                  </button>
-                  <span className="text-[var(--text-muted)]">Amal qilish muddati: 24 soat</span>
-                </div>
-              </div>
-
-              <div className="p-4 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-default)] space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-bold text-[var(--text-primary)]">Refresh Token:</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-600 dark:text-blue-400 font-mono font-bold">
-                    Rotatsiya mavjud
-                  </span>
-                </div>
-                <p className="text-[var(--text-secondary)] text-[11px] leading-relaxed">
-                  Har safar access token muddati tugaganda, tizim avtomatik tarzda yangi token oladi.
+                <h2 className="text-base sm:text-lg font-bold text-[var(--text-primary)]">
+                  Autentifikatsiya Tokenlari Boshqaruvi
+                </h2>
+                <p className="text-xs text-[var(--text-muted)] mt-0.5">
+                  Tizim JWT Access Token (qisqa muddatli) va Refresh Token (uzoq muddatli) standartida ishlaydi
                 </p>
-                <div className="pt-2">
-                  <button
-                    onClick={handleRefreshToken}
-                    disabled={isRefreshingToken}
-                    className="w-full py-2 px-3 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-primary)] font-bold text-xs border border-[var(--border-default)] transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                  >
-                    <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isRefreshingToken ? 'animate-spin' : ''}`} />
-                    <span>{isRefreshingToken ? 'Yangilanmoqda...' : 'Tokenni hozir majburiy yangilash'}</span>
-                  </button>
+              </div>
+
+              <div className="space-y-4 text-xs">
+                <div className="p-4 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-default)] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[var(--text-primary)]">Access Token (Bearer):</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 font-mono font-bold">
+                      Faol
+                    </span>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-[var(--bg-subtle)] font-mono text-[11px] text-[var(--text-muted)] truncate select-all">
+                    {user?.accessToken ? `${user.accessToken.slice(0, 36)}...` : 'Token generatsiya qilinmagan'}
+                  </div>
+                  <div className="flex items-center justify-between pt-1 text-[11px]">
+                    <button
+                      onClick={handleCopyAccessToken}
+                      className="text-[var(--brand-primary)] hover:underline flex items-center gap-1 font-semibold cursor-pointer"
+                    >
+                      {copiedToken ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedToken ? 'Nusxalandi!' : 'Tokendan nusxa olish'}</span>
+                    </button>
+                    <span className="text-[var(--text-muted)]">Amal qilish muddati: 24 soat</span>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-[var(--bg-canvas)] border border-[var(--border-default)] space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-[var(--text-primary)]">Refresh Token:</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-500/15 text-blue-600 dark:text-blue-400 font-mono font-bold">
+                      Rotatsiya mavjud
+                    </span>
+                  </div>
+                  <p className="text-[var(--text-secondary)] text-[11px] leading-relaxed">
+                    Har safar access token muddati tugaganda, tizim avtomatik tarzda yangi token oladi.
+                  </p>
+                  <div className="pt-2">
+                    <button
+                      onClick={handleRefreshToken}
+                      disabled={isRefreshingToken}
+                      className="w-full py-2 px-3 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-primary)] font-bold text-xs border border-[var(--border-default)] transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 text-blue-500 ${isRefreshingToken ? 'animate-spin' : ''}`} />
+                      <span>{isRefreshingToken ? 'Yangilanmoqda...' : 'Tokenni hozir majburiy yangilash'}</span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Change Password Form */}
           <div className="glass-panel p-6 sm:p-7 rounded-3xl border border-[var(--border-default)] shadow-xs space-y-5">

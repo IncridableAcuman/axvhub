@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button/Button';
 import { useToast } from '@/shared/ui/toast/ToastContext';
+import { useAuth } from '@/features/auth/AuthContext';
 import { gradingApi } from '@/api';
 import type {
   LeaderboardEntryDto,
@@ -22,6 +23,8 @@ export interface GamificationDashboardProps {
 
 export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ students }) => {
   const toast = useToast();
+  const { isAdmin, isMentor } = useAuth();
+  const canAwardPoints = isAdmin || isMentor;
   const [period, setPeriod] = useState<'ALL_TIME' | 'MONTHLY' | 'WEEKLY'>('ALL_TIME');
   const [isGroupView, setIsGroupView] = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntryDto[]>([]);
@@ -115,17 +118,19 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ st
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => setIsAwardModalOpen(true)}
-              leftIcon={<Plus className="w-4 h-4" />}
-              className="bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 font-bold border-none shadow-lg shadow-amber-500/25"
-            >
-              <span>Ball / XP Taqdim Etish</span>
-            </Button>
-          </div>
+          {canAwardPoints && (
+            <div className="flex items-center gap-3 shrink-0">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => setIsAwardModalOpen(true)}
+                leftIcon={<Plus className="w-4 h-4" />}
+                className="bg-gradient-to-r from-amber-500 to-yellow-600 text-slate-950 font-bold border-none shadow-lg shadow-amber-500/25"
+              >
+                <span>Ball / XP Taqdim Etish</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -332,9 +337,9 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ st
       </div>
 
       {/* ========================================================
-          AWARD POINTS MODAL
+          AWARD POINTS MODAL (Faqat Mentor va Admin)
       ======================================================== */}
-      {isAwardModalOpen && (
+      {canAwardPoints && isAwardModalOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in"
           onClick={(e) => {
