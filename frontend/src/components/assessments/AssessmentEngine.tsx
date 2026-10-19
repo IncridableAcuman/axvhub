@@ -14,6 +14,7 @@ import {
 import { Button } from '@/shared/ui/button/Button';
 import { Badge } from '@/shared/ui/badge/Badge';
 import { useToast } from '@/shared/ui/toast/ToastContext';
+import { useAuth } from '@/features/auth/AuthContext';
 import { assessmentApi, assignmentApi } from '@/api';
 import type {
   AssessmentDto,
@@ -37,6 +38,8 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
   students: _students = [],
 }) => {
   const toast = useToast();
+  const { isAdmin, isMentor } = useAuth();
+  const canCreateQuiz = isAdmin || isMentor;
   const [activeSubTab, setActiveSubTab] = useState<'QUIZZES' | 'ASSIGNMENTS'>('QUIZZES');
 
   // Quizzes State
@@ -267,17 +270,19 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
             </p>
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
-            <Button
-              variant="primary"
-              size="md"
-              onClick={() => setIsCreateQuizOpen(true)}
-              leftIcon={<Plus className="w-4 h-4" />}
-              className="shadow-lg shadow-purple-500/25"
-            >
-              <span>Yangi Test Tuzish</span>
-            </Button>
-          </div>
+          {canCreateQuiz && (
+            <div className="flex items-center gap-3 shrink-0">
+              <Button
+                variant="primary"
+                size="md"
+                onClick={() => setIsCreateQuizOpen(true)}
+                leftIcon={<Plus className="w-4 h-4" />}
+                className="shadow-lg shadow-purple-500/25"
+              >
+                <span>Yangi Test Tuzish</span>
+              </Button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -679,9 +684,9 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       )}
 
       {/* ========================================================
-          CREATE ASSESSMENT MODAL
+          CREATE ASSESSMENT MODAL (Faqat Mentor va Admin)
       ======================================================== */}
-      {isCreateQuizOpen && (
+      {canCreateQuiz && isCreateQuizOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in"
           onClick={(e) => {

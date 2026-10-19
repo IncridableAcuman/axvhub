@@ -329,13 +329,15 @@ export const ResourceLibrary: React.FC = () => {
                     </a>
                   )}
 
-                  <button
-                    onClick={() => handleDelete(res.id)}
-                    className="p-1.5 rounded-xl text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 transition"
-                    title="O‘chirish"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {canManageResources && (
+                    <button
+                      onClick={() => handleDelete(res.id)}
+                      className="p-1.5 rounded-xl text-[var(--text-muted)] hover:text-red-500 hover:bg-red-500/10 transition cursor-pointer"
+                      title="O‘chirish"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -344,9 +346,9 @@ export const ResourceLibrary: React.FC = () => {
       )}
 
       {/* ========================================================
-          MODAL 1: Upload File Modal
+          MODAL 1: Upload File Modal (Faqat Mentor va Admin)
       ======================================================== */}
-      {isUploadOpen && (
+      {canManageResources && isUploadOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in"
           onClick={(e) => {
@@ -455,9 +457,9 @@ export const ResourceLibrary: React.FC = () => {
       )}
 
       {/* ========================================================
-          MODAL 2: External Link / YouTube Video Modal
+          MODAL 2: External Link / YouTube Video Modal (Faqat Mentor va Admin)
       ======================================================== */}
-      {isLinkOpen && (
+      {canManageResources && isLinkOpen && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in"
           onClick={(e) => {
