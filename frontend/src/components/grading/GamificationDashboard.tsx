@@ -105,10 +105,10 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ st
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="rounded-3xl p-6 sm:p-8 bg-gradient-to-r from-amber-900/40 via-yellow-900/30 to-slate-900/40 border border-amber-500/20 backdrop-blur-md relative overflow-hidden shadow-xl">
+      <div className="rounded-3xl p-6 sm:p-8 bg-[var(--bg-surface)] bg-gradient-to-r from-amber-500/10 via-yellow-500/5 to-transparent dark:from-amber-950/40 dark:via-yellow-950/30 dark:to-slate-900/40 border border-amber-500/20 backdrop-blur-md relative overflow-hidden shadow-xl">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 dark:bg-amber-500/20 border border-amber-500/30 text-amber-800 dark:text-amber-300 text-xs font-semibold">
               <Trophy className="w-3.5 h-3.5" />
               <span>Modul 11 — Ballar, Reyting & Gamifikatsiya</span>
             </div>
