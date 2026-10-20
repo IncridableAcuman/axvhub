@@ -17,7 +17,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className, variant = '
         type="button"
         onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
         className={cn(
-          'inline-flex items-center justify-center w-9 h-9 rounded-lg border border-[var(--border-default)]',
+          'inline-flex items-center justify-center w-9 h-9 rounded-xl border border-border/30',
           'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]',
           'focus-visible:ring-2 focus-visible:ring-[var(--ring)] transition-colors',
           className
@@ -39,7 +39,7 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className, variant = '
       role="radiogroup"
       aria-label="Mavzuni tanlash"
       className={cn(
-        'inline-flex items-center p-0.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-subtle)] text-xs font-medium',
+        'inline-flex items-center p-1 rounded-xl bg-[var(--bg-subtle)] text-xs font-medium border-0',
         className
       )}
     >

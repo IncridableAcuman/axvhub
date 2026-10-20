@@ -85,7 +85,7 @@ export const StudentEnrollmentModal: React.FC<StudentEnrollmentModalProps> = ({
               value={selectedStudentId}
               onChange={(e) => setSelectedStudentId(e.target.value)}
               aria-label="O‘quvchini tanlang"
-              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-xl border-0 bg-muted/40 px-3 py-2 text-xs text-foreground shadow-none transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-medium"
             >
               <option value="">O‘quvchini tanlang...</option>
               {allStudents.map((s) => (
@@ -96,14 +96,14 @@ export const StudentEnrollmentModal: React.FC<StudentEnrollmentModalProps> = ({
             </select>
           </div>
 
-          <DialogFooter className="pt-3 gap-2 sm:gap-0">
+          <DialogFooter className="pt-3 gap-2 sm:gap-0 border-0">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={onClose}
               disabled={isLoading}
-              className="rounded-lg text-xs"
+              className="rounded-xl text-xs border-0 bg-muted/60 hover:bg-muted text-foreground"
             >
               Bekor qilish
             </Button>
@@ -113,7 +113,7 @@ export const StudentEnrollmentModal: React.FC<StudentEnrollmentModalProps> = ({
               size="sm"
               isLoading={isLoading}
               disabled={!selectedStudentId || isLoading}
-              className="rounded-lg text-xs"
+              className="rounded-xl text-xs font-semibold border-0"
             >
               Biriktirish
             </Button>

@@ -51,7 +51,7 @@ export const TabList: React.FC<TabListProps> = ({ children, className }) => {
     <div
       role="tablist"
       className={cn(
-        'inline-flex items-center gap-1 p-1 rounded-lg border border-[var(--border-default)] bg-[var(--bg-subtle)] overflow-x-auto max-w-full',
+        'inline-flex items-center gap-1 p-1 rounded-xl bg-[var(--bg-subtle)] overflow-x-auto max-w-full',
         className
       )}
     >

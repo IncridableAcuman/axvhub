@@ -153,7 +153,7 @@ export const AiImportModal: React.FC<AiImportModalProps> = ({
       }}
     >
       <div
-        className="bg-card text-card-foreground rounded-3xl max-w-4xl w-full p-4 sm:p-7 shadow-2xl border-0 my-4 max-h-[92vh] flex flex-col animate-scale-in"
+        className="bg-card text-card-foreground rounded-3xl max-w-4xl w-full p-4 sm:p-7 shadow-2xl border border-border/30 my-4 max-h-[92vh] flex flex-col animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}

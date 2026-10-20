@@ -54,7 +54,7 @@ export const LanguageSwitcher: React.FC<{ compact?: boolean; className?: string 
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-xs font-semibold text-[var(--text-primary)] hover:border-[var(--brand-primary)] transition cursor-pointer select-none shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]/40"
+        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-border/30 bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] text-xs font-semibold text-[var(--text-primary)] hover:border-primary/50 transition cursor-pointer select-none shadow-2xs focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-primary)]/40"
         aria-label={t('preferences.changeLanguage')}
         aria-expanded={isOpen}
         aria-haspopup="true"
@@ -70,7 +70,7 @@ export const LanguageSwitcher: React.FC<{ compact?: boolean; className?: string 
         <div
           role="menu"
           aria-label={t('preferences.language')}
-          className="absolute right-0 mt-1.5 w-36 rounded-xl border border-[var(--border-default)] bg-[var(--bg-surface)] p-1 shadow-lg shadow-black/10 z-50 animate-in fade-in zoom-in-95 duration-100"
+          className="absolute right-0 mt-1.5 w-36 rounded-xl border border-border/40 bg-[var(--bg-surface)] p-1 shadow-xl z-50 animate-in fade-in zoom-in-95 duration-100"
         >
           {LANGUAGES.map((lang) => {
             const isSelected = lang.code === locale;

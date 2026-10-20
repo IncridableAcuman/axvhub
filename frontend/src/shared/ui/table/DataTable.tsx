@@ -192,7 +192,7 @@ export function DataTable<T>({
                   setCurrentPage(1)
                 }}
                 placeholder={resolvedSearchPlaceholder}
-                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/30 focus:border-[var(--brand-primary)] transition"
+                className="w-full pl-9 pr-3 py-2 text-xs sm:text-sm bg-[var(--bg-surface)] border border-border/30 rounded-xl text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/30 focus:border-[var(--brand-primary)] transition"
                 aria-label={resolvedSearchPlaceholder}
               />
             </div>
@@ -205,7 +205,7 @@ export function DataTable<T>({
       )}
 
       {/* Main Table Container */}
-      <div className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl shadow-xs overflow-hidden">
+      <div className="bg-[var(--bg-surface)] border border-border/30 rounded-xl shadow-xs overflow-hidden">
         <Table className={tableClassName} aria-label={resolvedAriaLabel}>
           <TableHeader>
             <TableRow>
@@ -356,7 +356,7 @@ export function DataTable<T>({
                 onClick={() => handlePageChange(1)}
                 disabled={validPage === 1}
                 aria-label={t('common.firstPage')}
-                className="p-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="p-1.5 rounded-lg border border-border/30 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronsLeft className="w-3.5 h-3.5" />
               </button>
@@ -366,7 +366,7 @@ export function DataTable<T>({
                 onClick={() => handlePageChange(validPage - 1)}
                 disabled={validPage === 1}
                 aria-label={t('common.prevPage')}
-                className="p-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="p-1.5 rounded-lg border border-border/30 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
               </button>
@@ -380,7 +380,7 @@ export function DataTable<T>({
                 onClick={() => handlePageChange(validPage + 1)}
                 disabled={validPage === totalPages}
                 aria-label={t('common.nextPage')}
-                className="p-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="p-1.5 rounded-lg border border-border/30 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
@@ -390,7 +390,7 @@ export function DataTable<T>({
                 onClick={() => handlePageChange(totalPages)}
                 disabled={validPage === totalPages}
                 aria-label={t('common.lastPage')}
-                className="p-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
+                className="p-1.5 rounded-lg border border-border/30 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
                 <ChevronsRight className="w-3.5 h-3.5" />
               </button>

@@ -68,7 +68,7 @@ export const AppShell: React.FC<AppShellProps> = ({
           </main>
 
           {/* Footer */}
-          <footer className="border-t border-[var(--border-default)] bg-[var(--bg-surface)]/85 backdrop-blur-md py-4 px-4 sm:px-6 text-xs text-[var(--text-secondary)]">
+          <footer className="border-t border-border/20 bg-[var(--bg-surface)]/85 backdrop-blur-md py-4 px-4 sm:px-6 text-xs text-[var(--text-secondary)]">
             <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-center sm:text-left">
               <div className="flex items-center space-x-2">
                 <span className="font-bold text-[var(--text-primary)]">AXM Nexus</span>

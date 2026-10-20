@@ -86,10 +86,10 @@ export const ManualScheduleModal: React.FC<ManualScheduleModalProps> = ({
       }}
     >
       <div
-        className="glass-panel bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border border-[var(--border-default)] my-8 animate-scale-in"
+        className="glass-panel bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-3xl max-w-xl w-full p-6 sm:p-7 shadow-2xl border-0 my-8 animate-scale-in"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)]">
+        <div className="flex items-center justify-between pb-4 border-b border-border/15">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center">
               <Calendar className="w-5 h-5" />
@@ -122,7 +122,7 @@ export const ManualScheduleModal: React.FC<ManualScheduleModalProps> = ({
               <select
                 value={gradeLevel}
                 onChange={(e) => setGradeLevel(e.target.value)}
-                className="w-full bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded-xl px-3.5 py-2.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/40 focus:border-[var(--brand-primary)] transition"
+                className="w-full bg-[var(--bg-canvas)] border border-border/30 rounded-xl px-3.5 py-2.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/40 focus:border-[var(--brand-primary)] transition"
               >
                 <option value="8-sinf">8-sinf (Computer Science & Full-stack)</option>
                 <option value="9-sinf">9-sinf (9 ta IT yo'nalishi)</option>
@@ -174,7 +174,7 @@ export const ManualScheduleModal: React.FC<ManualScheduleModalProps> = ({
               <select
                 value={mentorRole}
                 onChange={(e) => setMentorRole(e.target.value)}
-                className="w-full bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/40 focus:border-[var(--brand-primary)] transition"
+                className="w-full bg-[var(--bg-canvas)] border border-border/30 rounded-xl px-3 py-2.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/40 focus:border-[var(--brand-primary)] transition"
               >
                 <option value="IT mentor">IT mentor</option>
                 <option value="Ingliz tili mentor">Ingliz tili mentor</option>
@@ -193,7 +193,7 @@ export const ManualScheduleModal: React.FC<ManualScheduleModalProps> = ({
               <select
                 value={days}
                 onChange={(e) => setDays(e.target.value)}
-                className="w-full bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded-xl px-3 py-2.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/40 focus:border-[var(--brand-primary)] transition"
+                className="w-full bg-[var(--bg-canvas)] border border-border/30 rounded-xl px-3 py-2.5 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]/40 focus:border-[var(--brand-primary)] transition"
               >
                 <option value="Seshanba-Payshanba-Shanba">Seshanba-Payshanba-Shanba</option>
                 <option value="Dushanba-Chorshanba-Juma">Dushanba-Chorshanba-Juma</option>
@@ -250,11 +250,11 @@ export const ManualScheduleModal: React.FC<ManualScheduleModalProps> = ({
           </div>
 
           {/* Buttons */}
-          <div className="pt-4 border-t border-[var(--border-subtle)] flex items-center justify-end space-x-3">
+          <div className="pt-4 border-t border-border/15 flex items-center justify-end space-x-3">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2.5 text-xs font-semibold rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-secondary)] border border-[var(--border-default)] transition cursor-pointer"
+              className="px-4 py-2.5 text-xs font-semibold rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-secondary)] border-0 transition cursor-pointer"
             >
               Bekor qilish
             </button>

@@ -96,7 +96,7 @@ export const StudentTransferModal: React.FC<StudentTransferModalProps> = ({
             <div className="text-[11px] font-medium text-muted-foreground">Joriy guruh:</div>
             <div className="flex items-center gap-2">
               <span className="font-bold text-foreground text-sm">{membership.groupCode}</span>
-              <Badge variant="secondary" className="text-[10px] rounded-full">
+              <Badge variant="secondary" className="text-[10px] rounded-full border-0">
                 {membership.studentGrade}
               </Badge>
             </div>
@@ -111,7 +111,7 @@ export const StudentTransferModal: React.FC<StudentTransferModalProps> = ({
               value={targetGroupId}
               onChange={(e) => setTargetGroupId(e.target.value)}
               aria-label="Maqsadli yangi guruh"
-              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-10 w-full rounded-xl border-0 bg-muted/40 px-3 py-2 text-xs text-foreground shadow-none transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-medium"
             >
               <option value="">Guruhni tanlang...</option>
               {validGroups.map((g) => (
@@ -132,18 +132,18 @@ export const StudentTransferModal: React.FC<StudentTransferModalProps> = ({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               rows={3}
-              className="text-xs resize-none bg-background border-input focus-visible:ring-primary rounded-lg"
+              className="text-xs resize-none bg-muted/40 border-0 shadow-none focus-visible:ring-1 focus-visible:ring-primary rounded-xl"
             />
           </div>
 
-          <DialogFooter className="pt-3 gap-2 sm:gap-0">
+          <DialogFooter className="pt-3 gap-2 sm:gap-0 border-0">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={onClose}
               disabled={isLoading}
-              className="rounded-lg text-xs"
+              className="rounded-xl text-xs border-0 bg-muted/60 hover:bg-muted text-foreground"
             >
               Bekor qilish
             </Button>
@@ -153,7 +153,7 @@ export const StudentTransferModal: React.FC<StudentTransferModalProps> = ({
               size="sm"
               isLoading={isLoading}
               disabled={!targetGroupId || isLoading}
-              className="rounded-lg text-xs"
+              className="rounded-xl text-xs font-semibold border-0"
             >
               Ko‘chirishni tasdiqlash
             </Button>

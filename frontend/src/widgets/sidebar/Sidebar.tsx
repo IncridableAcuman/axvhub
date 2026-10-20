@@ -58,9 +58,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         return (
           <div key={sectionKey} className="space-y-1">
             {!isCollapsed && (
-              <h4 className="px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)] flex items-center justify-between">
-                <span>{t(sectionKey)}</span>
-                <span className="h-px flex-1 ml-2 bg-[var(--border-subtle)]" />
+              <h4 className="px-3 text-[10px] font-bold uppercase tracking-wider text-[var(--text-muted)]">
+                {t(sectionKey)}
               </h4>
             )}
 
@@ -143,56 +142,55 @@ export const Sidebar: React.FC<SidebarProps> = ({
       )}
 
       {/* Mobile Sidebar (Drawer) */}
-      <aside
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-[var(--bg-surface)] border-r border-[var(--border-default)] shadow-2xl transition-transform duration-200 md:hidden',
-          isMobileOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-        aria-label="Mobil navigatsiya menyusi"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-[var(--border-subtle)]">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] text-white flex items-center justify-center font-bold text-sm shadow-xs">
-              AXV
+      {isMobileOpen && (
+        <aside
+          className="fixed inset-y-0 left-0 z-50 w-72 flex flex-col bg-[var(--bg-surface)] border-r border-border/30 shadow-2xl transition-transform duration-200 md:hidden translate-x-0"
+          aria-label="Mobil navigatsiya menyusi"
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between h-16 px-4">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)] text-white flex items-center justify-center font-bold text-sm shadow-xs">
+                AXV
+              </div>
+              <span className="font-bold text-base text-[var(--text-primary)]">AXM Nexus</span>
             </div>
-            <span className="font-bold text-base text-[var(--text-primary)]">AXM Nexus</span>
+
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
+              aria-label="Menyuni yopish"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
 
-          <button
-            type="button"
-            onClick={onCloseMobile}
-            className="p-1.5 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]"
-            aria-label="Menyuni yopish"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+          {renderNavList()}
 
-        {renderNavList()}
-
-        <div className="p-3 border-t border-[var(--border-subtle)] text-xs text-[var(--text-muted)] flex items-center justify-between">
-          <div className="flex items-center gap-2 truncate">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse shrink-0" />
-            <MapPin className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
-            <span className="truncate font-medium text-[var(--text-secondary)]">IT Park Yangiariq</span>
+          <div className="p-3 border-t border-border/20 text-xs text-[var(--text-muted)] flex items-center justify-between">
+            <div className="flex items-center gap-2 truncate">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse shrink-0" />
+              <MapPin className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
+              <span className="truncate font-medium text-[var(--text-secondary)]">IT Park Yangiariq</span>
+            </div>
+            <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
+              {t('status.active')}
+            </span>
           </div>
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-            {t('status.active')}
-          </span>
-        </div>
-      </aside>
+        </aside>
+      )}
 
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          'hidden md:flex flex-col shrink-0 border-r border-[var(--border-default)] bg-[var(--bg-surface)]/90 backdrop-blur-md transition-all duration-300 sticky top-0 h-screen z-30 shadow-xs',
+          'hidden md:flex flex-col shrink-0 border-r border-border/30 bg-[var(--bg-surface)]/90 backdrop-blur-md transition-all duration-300 sticky top-0 h-screen z-30 shadow-xs',
           isCollapsed ? 'w-16' : 'w-64'
         )}
         aria-label="Asosiy navigatsiya"
       >
         {/* Logo & Collapse Toggle */}
-        <div className="flex items-center justify-between h-16 px-3 border-b border-[var(--border-subtle)]">
+        <div className="flex items-center justify-between h-16 px-3">
           {!isCollapsed ? (
             <>
               <div
@@ -241,7 +239,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Footer Filial Beacon */}
         {!isCollapsed && (
-          <div className="p-3 border-t border-[var(--border-subtle)] text-xs text-[var(--text-muted)] flex items-center justify-between">
+          <div className="p-3 border-t border-border/20 text-xs text-[var(--text-muted)] flex items-center justify-between">
             <div className="flex items-center gap-2 truncate">
               <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse shrink-0" />
               <MapPin className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
@@ -255,7 +253,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         {/* Footer Collapse Button (when collapsed) */}
         {isCollapsed && (
-          <div className="p-2 border-t border-[var(--border-subtle)] flex justify-center">
+          <div className="p-2 border-t border-border/20 flex justify-center">
             <button
               type="button"
               onClick={onToggleCollapse}

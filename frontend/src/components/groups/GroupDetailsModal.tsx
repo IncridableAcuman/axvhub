@@ -102,7 +102,7 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
               <DialogTitle className="text-lg sm:text-xl font-bold flex items-center gap-2">
                 <span>Guruh Tafsilotlari: {detail?.groupCode || 'Yuklanmoqda...'}</span>
                 {detail && (
-                  <Badge variant={detail.status === 'ACTIVE' ? 'success' : 'neutral'} className="text-[10px] rounded-full">
+                  <Badge variant={detail.status === 'ACTIVE' ? 'success' : 'neutral'} className="text-[10px] rounded-full border-0">
                     {detail.status === 'ACTIVE' ? 'Faol' : detail.status}
                   </Badge>
                 )}
@@ -134,7 +134,7 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
                     <span>Sinf bosqichi</span>
                   </div>
                   <div className="text-sm font-bold text-foreground">
-                    <Badge variant="secondary" className="font-semibold text-xs">
+                    <Badge variant="secondary" className="font-semibold text-xs border-0">
                       {detail.gradeLevel}
                     </Badge>
                   </div>
@@ -169,7 +169,7 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
                     <span>{detail.studentCount} / {detail.maxCapacity}</span>
                     <Badge
                       variant={detail.studentCount >= detail.maxCapacity ? 'destructive' : 'primary'}
-                      className="text-[10px] rounded-full px-1.5 py-0"
+                      className="text-[10px] rounded-full px-1.5 py-0 border-0"
                     >
                       {Math.round(((detail.studentCount || 0) / (detail.maxCapacity || 16)) * 100)}%
                     </Badge>
@@ -184,17 +184,17 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
               onValueChange={(val) => setActiveTab(val as 'members' | 'history')}
               className="w-full"
             >
-              <TabsList className="grid w-full grid-cols-2 rounded-xl bg-muted/50 p-1">
+              <TabsList className="grid w-full grid-cols-2 rounded-xl bg-muted/50 p-1 border-0">
                 <TabsTrigger
                   value="members"
-                  className="rounded-lg text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs flex items-center justify-center gap-2"
+                  className="rounded-lg text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs flex items-center justify-center gap-2 border-0"
                 >
                   <Users className="w-3.5 h-3.5" />
                   <span>Faol O‘quvchilar ({detail?.activeMembers?.length || 0})</span>
                 </TabsTrigger>
                 <TabsTrigger
                   value="history"
-                  className="rounded-lg text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs flex items-center justify-center gap-2"
+                  className="rounded-lg text-xs font-semibold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-xs flex items-center justify-center gap-2 border-0"
                 >
                   <History className="w-3.5 h-3.5" />
                   <span>A’zolik & Tarix ({history.length})</span>
@@ -205,40 +205,40 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
               <TabsContent value="members" className="pt-2">
                 <div className="rounded-xl overflow-hidden bg-muted/20 border-0">
                   <Table>
-                    <TableHeader className="bg-muted/40">
-                      <TableRow className="hover:bg-transparent border-0">
-                        <TableHead className="w-12 text-xs font-semibold text-muted-foreground">#</TableHead>
-                        <TableHead className="text-xs font-semibold text-muted-foreground">O‘quvchi</TableHead>
-                        <TableHead className="text-xs font-semibold text-muted-foreground">A’zo bo‘lgan sana</TableHead>
-                        <TableHead className="text-right text-xs font-semibold text-muted-foreground">Amal</TableHead>
+                    <TableHeader className="bg-muted/40 border-0 [&_tr]:border-b-0">
+                      <TableRow className="hover:bg-transparent border-0 border-b-0">
+                        <TableHead className="w-12 text-xs font-semibold text-muted-foreground border-0">#</TableHead>
+                        <TableHead className="text-xs font-semibold text-muted-foreground border-0">O‘quvchi</TableHead>
+                        <TableHead className="text-xs font-semibold text-muted-foreground border-0">A’zo bo‘lgan sana</TableHead>
+                        <TableHead className="text-right text-xs font-semibold text-muted-foreground border-0">Amal</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {detail?.activeMembers && detail.activeMembers.length > 0 ? (
                         detail.activeMembers.map((m, idx) => (
-                          <TableRow key={m.id} className="hover:bg-muted/30 border-0 transition-colors">
-                            <TableCell className="text-xs font-mono text-muted-foreground py-3">
+                          <TableRow key={m.id} className="hover:bg-muted/30 border-0 border-b-0 transition-colors">
+                            <TableCell className="text-xs font-mono text-muted-foreground py-3 border-0">
                               {idx + 1}
                             </TableCell>
-                            <TableCell className="py-3">
+                            <TableCell className="py-3 border-0">
                               <div className="flex items-center gap-2.5">
-                                <Avatar className="w-7 h-7 rounded-lg">
-                                  <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary rounded-lg">
+                                <Avatar className="w-7 h-7 rounded-lg ring-0 border-0">
+                                  <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary rounded-lg border-0">
                                     {m.studentName ? m.studentName.charAt(0) : 'O'}
                                   </AvatarFallback>
                                 </Avatar>
                                 <span className="font-semibold text-xs text-foreground">{m.studentName}</span>
                               </div>
                             </TableCell>
-                            <TableCell className="text-xs text-muted-foreground py-3">
+                            <TableCell className="text-xs text-muted-foreground py-3 border-0">
                               {new Date(m.enrolledAt).toLocaleDateString()}
                             </TableCell>
-                            <TableCell className="text-right py-3">
+                            <TableCell className="text-right py-3 border-0">
                               <Button
-                                variant="outline"
+                                variant="secondary"
                                 size="sm"
                                 onClick={() => setTransferTarget(m)}
-                                className="h-7 text-xs rounded-lg border-border/40 hover:bg-muted"
+                                className="h-7 text-xs rounded-lg border-0 bg-muted/60 hover:bg-muted"
                                 leftIcon={<ArrowRightLeft className="w-3 h-3" />}
                               >
                                 Ko‘chirish
@@ -248,7 +248,7 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
                         ))
                       ) : (
                         <TableRow className="border-0">
-                          <TableCell colSpan={4} className="py-10 text-center text-xs text-muted-foreground">
+                          <TableCell colSpan={4} className="py-10 text-center text-xs text-muted-foreground border-0">
                             Guruhda hozircha o‘quvchilar mavjud emas.
                           </TableCell>
                         </TableRow>
@@ -262,41 +262,41 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
               <TabsContent value="history" className="pt-2">
                 <div className="rounded-xl overflow-hidden bg-muted/20 border-0">
                   <Table>
-                    <TableHeader className="bg-muted/40">
-                      <TableRow className="hover:bg-transparent border-0">
-                        <TableHead className="text-xs font-semibold text-muted-foreground">O‘quvchi</TableHead>
-                        <TableHead className="text-xs font-semibold text-muted-foreground">Holat</TableHead>
-                        <TableHead className="text-xs font-semibold text-muted-foreground">Sana</TableHead>
-                        <TableHead className="text-xs font-semibold text-muted-foreground">Izoh / Sabab</TableHead>
+                    <TableHeader className="bg-muted/40 border-0 [&_tr]:border-b-0">
+                      <TableRow className="hover:bg-transparent border-0 border-b-0">
+                        <TableHead className="text-xs font-semibold text-muted-foreground border-0">O‘quvchi</TableHead>
+                        <TableHead className="text-xs font-semibold text-muted-foreground border-0">Holat</TableHead>
+                        <TableHead className="text-xs font-semibold text-muted-foreground border-0">Sana</TableHead>
+                        <TableHead className="text-xs font-semibold text-muted-foreground border-0">Izoh / Sabab</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {history.length > 0 ? (
                         history.map((h) => (
-                          <TableRow key={h.id} className="hover:bg-muted/30 border-0 transition-colors">
-                            <TableCell className="font-semibold text-xs text-foreground py-3">
+                          <TableRow key={h.id} className="hover:bg-muted/30 border-0 border-b-0 transition-colors">
+                            <TableCell className="font-semibold text-xs text-foreground py-3 border-0">
                               {h.studentName}
                             </TableCell>
-                            <TableCell className="py-3">
+                            <TableCell className="py-3 border-0">
                               <Badge
                                 variant={h.status === 'ACTIVE' ? 'success' : 'neutral'}
-                                className="text-[10px] rounded-full"
+                                className="text-[10px] rounded-full border-0"
                               >
                                 {h.status === 'ACTIVE' ? 'Faol a’zo' : 'Ko‘chirilgan'}
                               </Badge>
                             </TableCell>
-                            <TableCell className="text-xs text-muted-foreground py-3">
+                            <TableCell className="text-xs text-muted-foreground py-3 border-0">
                               {new Date(h.enrolledAt).toLocaleDateString()}
                               {h.leftAt && ` → ${new Date(h.leftAt).toLocaleDateString()}`}
                             </TableCell>
-                            <TableCell className="text-xs text-muted-foreground py-3">
+                            <TableCell className="text-xs text-muted-foreground py-3 border-0">
                               {h.transferReason || '—'}
                             </TableCell>
                           </TableRow>
                         ))
                       ) : (
                         <TableRow className="border-0">
-                          <TableCell colSpan={4} className="py-10 text-center text-xs text-muted-foreground">
+                          <TableCell colSpan={4} className="py-10 text-center text-xs text-muted-foreground border-0">
                             Hozircha o‘quvchilar ko‘chirish tarixi mavjud emas.
                           </TableCell>
                         </TableRow>
@@ -309,12 +309,12 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
           </div>
         )}
 
-        <DialogFooter className="pt-4 flex flex-row items-center justify-between sm:justify-between w-full">
+        <DialogFooter className="pt-4 flex flex-row items-center justify-between sm:justify-between w-full border-0">
           <Button
             variant="secondary"
             size="sm"
             onClick={() => setIsEnrollModalOpen(true)}
-            className="rounded-lg text-xs"
+            className="rounded-lg text-xs border-0 bg-muted/60 hover:bg-muted text-foreground"
             leftIcon={<UserPlus className="w-3.5 h-3.5" />}
           >
             O‘quvchi biriktirish
@@ -323,7 +323,7 @@ export const GroupDetailsModal: React.FC<GroupDetailsModalProps> = ({
             variant="default"
             size="sm"
             onClick={onClose}
-            className="rounded-lg text-xs"
+            className="rounded-lg text-xs border-0 font-semibold"
           >
             Yopish
           </Button>

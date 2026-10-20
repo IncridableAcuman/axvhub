@@ -220,18 +220,18 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNa
 
         {isOpen && (
           <div
-            className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-2xl shadow-black/15 z-50 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150"
+            className="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-border/30 bg-[var(--bg-surface)] shadow-2xl shadow-black/15 z-50 overflow-hidden flex flex-col animate-in fade-in zoom-in-95 duration-150"
             role="region"
             aria-label={t('notifications.title')}
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-3.5 border-b border-[var(--border-default)] bg-[var(--bg-subtle)]/70">
+            <div className="flex items-center justify-between p-3.5 border-b border-border/15 bg-[var(--bg-subtle)]/70">
               <div className="flex items-center gap-2">
                 <span className="font-bold text-sm text-[var(--text-primary)]">
                   {t('notifications.title')}
                 </span>
                 {unreadCount > 0 && (
-                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border border-blue-500/20">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 border-0">
                     {unreadCount} {t('notifications.unreadTab').toLowerCase()}
                   </span>
                 )}
@@ -291,7 +291,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNa
             </div>
 
             {/* Filter Tabs */}
-            <div className="flex items-center gap-1 px-3 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs">
+            <div className="flex items-center gap-1 px-3 py-2 border-b border-border/15 bg-[var(--bg-surface)] text-xs">
               <button
                 type="button"
                 onClick={() => setActiveTab('all')}
@@ -329,7 +329,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNa
 
             {/* AI Daily Digest Box */}
             {showAiDigest && (
-              <div className="p-3.5 border-b border-[var(--border-default)] bg-gradient-to-br from-amber-500/5 via-[var(--bg-subtle)] to-blue-500/5">
+              <div className="p-3.5 border-b border-border/15 bg-gradient-to-br from-amber-500/5 via-[var(--bg-subtle)] to-blue-500/5">
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-1.5">
                     <div className="p-1 rounded-md bg-amber-500/15 text-amber-600 dark:text-amber-400">
@@ -342,8 +342,8 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNa
                       <span
                         className={`px-1.5 py-0.2 rounded-full text-[9px] font-bold ${
                           aiDigest.urgency === 'HIGH'
-                            ? 'bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/20'
-                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                            ? 'bg-red-500/10 text-red-600 dark:text-red-400 border-0'
+                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0'
                         }`}
                       >
                         {aiDigest.urgency === 'HIGH' ? 'Muhim' : 'Normal'}
@@ -377,9 +377,9 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNa
                     <p className="text-[11px] text-[var(--text-muted)]">Groq & Gemini orqali tahlil qilinmoqda...</p>
                   </div>
                 ) : aiDigest ? (
-                  <div className="rounded-xl bg-[var(--bg-surface)] p-2.5 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] leading-relaxed shadow-2xs">
+                  <div className="rounded-xl bg-[var(--bg-surface)] p-2.5 border-0 text-xs text-[var(--text-secondary)] leading-relaxed shadow-2xs">
                     <p className="whitespace-pre-line">{aiDigest.digest}</p>
-                    <div className="mt-2 pt-1.5 border-t border-[var(--border-subtle)] flex items-center justify-between text-[10px] text-[var(--text-muted)]">
+                    <div className="mt-2 pt-1.5 border-t border-border/15 flex items-center justify-between text-[10px] text-[var(--text-muted)]">
                       <span>O‘qilmagan xabarlar: {aiDigest.unreadCount} ta</span>
                       <span className="font-mono text-[9px]">{aiDigest.providerUsed || 'groq / gemini'}</span>
                     </div>
@@ -393,7 +393,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNa
             )}
 
             {/* Notification List */}
-            <div className="max-h-84 overflow-y-auto divide-y divide-[var(--border-subtle)]">
+            <div className="max-h-84 overflow-y-auto divide-y divide-border/15">
               {loading && notifications.length === 0 ? (
                 <div className="py-10 text-center">
                   <div className="w-6 h-6 border-2 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-2" />
@@ -418,7 +418,7 @@ export const NotificationDropdown: React.FC<NotificationDropdownProps> = ({ onNa
                       !item.read ? 'bg-[var(--brand-subtle)]/25' : ''
                     }`}
                   >
-                    <div className="p-2 rounded-xl bg-[var(--bg-surface)] border border-[var(--border-default)] shrink-0 mt-0.5 shadow-2xs">
+                    <div className="p-2 rounded-xl bg-[var(--bg-surface)] border-0 shrink-0 mt-0.5 shadow-2xs">
                       {getTypeIcon(item.type)}
                     </div>
                     <div className="flex-1 min-w-0">

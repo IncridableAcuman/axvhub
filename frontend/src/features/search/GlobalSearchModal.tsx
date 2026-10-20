@@ -31,7 +31,6 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
 export interface SearchItem {
@@ -89,7 +88,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Boshqaruv paneli',
         subtitle: 'Asosiy monitoring, statistikalar, KPI va tizim holati',
         category: 'pages',
-        icon: <LayoutDashboard className="w-4 h-4 text-blue-500" />,
+        icon: <LayoutDashboard className="w-4 h-4 text-blue-600 dark:text-blue-400" />,
         badge: 'Asosiy',
         onSelect: () => onNavigateTab('dashboard'),
       },
@@ -98,7 +97,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Dars jadvallari & Davomat',
         subtitle: 'IT lab xonalari va haftalik dars jadvallari taqvimi',
         category: 'pages',
-        icon: <Calendar className="w-4 h-4 text-indigo-500" />,
+        icon: <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />,
         badge: 'Jadvallar',
         onSelect: () => onNavigateTab('timetable'),
       },
@@ -107,7 +106,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Darslarni boshqarish (Modul 08)',
         subtitle: '80 daqiqalik intensiv dars rejalari, nazariya/amaliyot va jonli taqdimot',
         category: 'pages',
-        icon: <BookMarked className="w-4 h-4 text-blue-500" />,
+        icon: <BookMarked className="w-4 h-4 text-blue-600 dark:text-blue-400" />,
         badge: 'Metodika',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('lessons'),
@@ -117,7 +116,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Resurslar kutubxonasi (Modul 09)',
         subtitle: 'PDF, taqdimotlar, video darslar, amaliy kod namunalari va havolalar',
         category: 'pages',
-        icon: <FolderGit2 className="w-4 h-4 text-emerald-500" />,
+        icon: <FolderGit2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
         badge: 'Resurslar',
         onSelect: () => onNavigateTab('materials'),
       },
@@ -126,7 +125,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Testlar & Topshiriqlar (Modul 10)',
         subtitle: 'Avto-baholanuvchi testlar, viktorinalar va uyga vazifalar',
         category: 'pages',
-        icon: <CheckSquare className="w-4 h-4 text-purple-500" />,
+        icon: <CheckSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />,
         badge: 'Baholash',
         onSelect: () => onNavigateTab('assessments'),
       },
@@ -135,7 +134,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Ballar & Gamifikatsiya (Modul 11)',
         subtitle: 'O‘quvchilar reytingi, XP tranzaksiyalari, yutuqlar va nishonlar',
         category: 'pages',
-        icon: <Trophy className="w-4 h-4 text-amber-500" />,
+        icon: <Trophy className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
         badge: 'Gamifikatsiya',
         onSelect: () => onNavigateTab('grading'),
       },
@@ -144,7 +143,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Guruhlar katalogi',
         subtitle: '8–11-sinf o‘quv guruhlari va sig‘im monitoringi',
         category: 'pages',
-        icon: <Users className="w-4 h-4 text-emerald-500" />,
+        icon: <Users className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
         badge: 'Guruhlar',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('groups'),
@@ -154,7 +153,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'O‘quvchilar ro‘yxati',
         subtitle: 'Talaba ID, PINFL, guruhlar va sahifalash bo‘yicha qidiruv',
         category: 'pages',
-        icon: <GraduationCap className="w-4 h-4 text-amber-500" />,
+        icon: <GraduationCap className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
         badge: 'O‘quvchilar',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('students'),
@@ -164,7 +163,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Mentorlar katalogi',
         subtitle: 'IT, ingliz tili va sun’iy intellekt bo‘yicha mentorlar',
         category: 'pages',
-        icon: <Award className="w-4 h-4 text-purple-500" />,
+        icon: <Award className="w-4 h-4 text-purple-600 dark:text-purple-400" />,
         badge: 'Mentorlar',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('mentors'),
@@ -174,7 +173,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Ta’lim Analitikasi (Modul 12)',
         subtitle: 'Guruhlar va o‘quvchilar akademik o‘zlashtirish ko‘rsatkichlari',
         category: 'pages',
-        icon: <BarChart3 className="w-4 h-4 text-teal-500" />,
+        icon: <BarChart3 className="w-4 h-4 text-teal-600 dark:text-teal-400" />,
         badge: 'Analitika',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => onNavigateTab('analytics'),
@@ -184,7 +183,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Foydalanuvchilar boshqaruvi',
         subtitle: 'Rollar va tizim hisoblari boshqaruvi',
         category: 'pages',
-        icon: <Shield className="w-4 h-4 text-rose-500" />,
+        icon: <Shield className="w-4 h-4 text-rose-600 dark:text-rose-400" />,
         badge: 'Xavfsizlik',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
         onSelect: () => onNavigateTab('users'),
@@ -194,7 +193,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Admin Markazi & Audit',
         subtitle: 'Tizim jurnallari, RBAC ruxsatlar va operatsion audit',
         category: 'pages',
-        icon: <ShieldAlert className="w-4 h-4 text-red-500" />,
+        icon: <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />,
         badge: 'Admin',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
         onSelect: () => onNavigateTab('admin'),
@@ -204,7 +203,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'O‘quv yo‘li (Curriculum 8–11)',
         subtitle: '80 daqiqalik dars metodikasi va o‘quv rejalari',
         category: 'pages',
-        icon: <BookOpen className="w-4 h-4 text-teal-500" />,
+        icon: <BookOpen className="w-4 h-4 text-teal-600 dark:text-teal-400" />,
         badge: 'Dastur',
         onSelect: () => onNavigateTab('curriculum'),
       },
@@ -213,7 +212,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Mening profilim',
         subtitle: 'Shaxsiy ma’lumotlar, parolni o‘zgartirish va xavfsizlik',
         category: 'pages',
-        icon: <User className="w-4 h-4 text-cyan-500" />,
+        icon: <User className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />,
         badge: 'Profil',
         onSelect: () => onNavigateTab('profile'),
       },
@@ -222,7 +221,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'UI Dizayn tizimi vitrinasi',
         subtitle: 'Komponentlar, tugmalar, modallar va dizayn tokenlari',
         category: 'pages',
-        icon: <Palette className="w-4 h-4 text-pink-500" />,
+        icon: <Palette className="w-4 h-4 text-pink-600 dark:text-pink-400" />,
         badge: 'Dizayn',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN'],
         onSelect: () => onNavigateTab('design-system'),
@@ -234,7 +233,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Yangi dars jadvali yaratish',
         subtitle: 'Qo‘lda dars jadvali, mentor va o‘quvchilarni kiritish',
         category: 'actions',
-        icon: <Plus className="w-4 h-4 text-emerald-500" />,
+        icon: <Plus className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />,
         badge: 'Tezkor amal',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => {
@@ -247,7 +246,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'AI Dars Taqsimoti & O‘quvchilar Importi',
         subtitle: 'Excel, PDF yoki rasm orqali dars jadvalini AI bilan generatsiya qilish',
         category: 'actions',
-        icon: <Sparkles className="w-4 h-4 text-indigo-500" />,
+        icon: <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />,
         badge: 'AI Smart',
         allowedRoles: ['ROLE_ADMIN', 'ROLE_SUPER_ADMIN', 'ROLE_MENTOR', 'ROLE_ENGLISH_MENTOR'],
         onSelect: () => {
@@ -260,8 +259,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: 'Tungi / Kunduzgi rejimni almashtirish',
         subtitle: `Hozirgi rejim: ${resolvedTheme === 'dark' ? 'Tungi (Qorong‘i)' : 'Kunduzgi (Yorug‘)'}`,
         category: 'actions',
-        icon: <SunMoon className="w-4 h-4 text-amber-500" />,
-        badge: 'Mavzu',
+        icon: <SunMoon className="w-4 h-4 text-amber-600 dark:text-amber-400" />,
+        badge: resolvedTheme === 'dark' ? 'Kunduzgi rejim' : 'Tungi rejim',
         onSelect: () => {
           setTheme(resolvedTheme === 'dark' ? 'light' : 'dark');
         },
@@ -273,7 +272,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: '8-sinf: Web Full-Stack Development',
         subtitle: 'HTML, CSS, JavaScript, React asoslari va loyihalar',
         category: 'courses',
-        icon: <BookOpen className="w-4 h-4 text-blue-500" />,
+        icon: <BookOpen className="w-4 h-4 text-blue-600 dark:text-blue-400" />,
         badge: '8-sinf',
         onSelect: () => onNavigateTab('curriculum'),
       },
@@ -282,7 +281,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: '9-sinf: Computer Science Foundation & Python',
         subtitle: 'Algoritmlar, ma’lumotlar tuzilmasi va sun’iy intellekt asoslari',
         category: 'courses',
-        icon: <BookOpen className="w-4 h-4 text-indigo-500" />,
+        icon: <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />,
         badge: '9-sinf',
         onSelect: () => onNavigateTab('curriculum'),
       },
@@ -291,7 +290,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: '10-sinf: Mobil dasturlash & Kiberxavfsizlik',
         subtitle: 'Cross-platform mobil ilovalar va xavfsizlik amaliyotlari',
         category: 'courses',
-        icon: <BookOpen className="w-4 h-4 text-cyan-500" />,
+        icon: <BookOpen className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />,
         badge: '10-sinf',
         onSelect: () => onNavigateTab('curriculum'),
       },
@@ -300,7 +299,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         title: '11-sinf: Professional IT Portfolio & Cloud',
         subtitle: 'Real loyihalar, xalqaro sertifikatlar va karyera yo‘li',
         category: 'courses',
-        icon: <BookOpen className="w-4 h-4 text-teal-500" />,
+        icon: <BookOpen className="w-4 h-4 text-teal-600 dark:text-teal-400" />,
         badge: '11-sinf',
         onSelect: () => onNavigateTab('curriculum'),
       },
@@ -387,7 +386,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   useEffect(() => {
     if (listRef.current) {
       const activeElement = listRef.current.children[selectedIndex] as HTMLElement;
-      if (activeElement) {
+      if (activeElement && typeof activeElement.scrollIntoView === 'function') {
         activeElement.scrollIntoView({ block: 'nearest' });
       }
     }
@@ -397,7 +396,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
         aria-label="Tezkor qidiruv modali"
-        className="p-0 gap-0 overflow-hidden w-[calc(100%-1.5rem)] sm:max-w-2xl border-border/70 bg-card/95 backdrop-blur-xl shadow-2xl rounded-2xl sm:rounded-3xl [&>button]:hidden top-[25%] sm:top-[30%] translate-y-[-25%] sm:translate-y-[-30%]"
+        data-testid="global-search-modal"
+        className="p-0 gap-0 overflow-hidden w-[calc(100%-1.5rem)] sm:max-w-2xl border-slate-200/90 dark:border-slate-800/90 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl shadow-2xl shadow-indigo-950/10 dark:shadow-black/70 rounded-2xl sm:rounded-3xl [&>button]:hidden top-[25%] sm:top-[30%] translate-y-[-25%] sm:translate-y-[-30%]"
       >
         <DialogHeader className="sr-only">
           <DialogTitle>Tezkor qidiruv</DialogTitle>
@@ -407,8 +407,8 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         </DialogHeader>
 
         {/* Top Spotlight Search Bar */}
-        <div className="relative flex items-center px-4 sm:px-5 py-3.5 border-b border-border/50 bg-background/50">
-          <Search className="w-5 h-5 text-primary shrink-0 mr-3" />
+        <div className="relative flex items-center px-4 sm:px-5 py-3.5 border-b border-slate-200/90 dark:border-slate-800/80 bg-slate-50/70 dark:bg-slate-900/60 transition-colors">
+          <Search className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mr-3" />
           <input
             ref={inputRef}
             type="text"
@@ -419,7 +419,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             }}
             onKeyDown={handleKeyDown}
             placeholder="AXM Nexus bo‘yicha qidirish (o‘quvchi, guruh, mentor, sahifa)..."
-            className="w-full text-sm sm:text-base bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none font-medium py-1"
+            className="spotlight-input w-full text-sm sm:text-base bg-transparent text-slate-900 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 font-medium py-1"
+            data-spotlight="true"
+            data-testid="spotlight-search-input"
           />
 
           {query && (
@@ -431,20 +433,20 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                 setQuery('');
                 inputRef.current?.focus();
               }}
-              className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted mr-1.5 cursor-pointer"
+              className="h-7 w-7 rounded-lg text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800 mr-1.5 cursor-pointer"
               aria-label="Matnni tozalash"
             >
               <X className="w-4 h-4" />
             </Button>
           )}
 
-          <kbd className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] bg-muted text-muted-foreground px-2 py-1 rounded-md border border-border font-medium select-none">
+          <kbd className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 px-2 py-1 rounded-md border border-slate-200 dark:border-slate-700 font-medium select-none shadow-2xs">
             ESC
           </kbd>
         </div>
 
         {/* Category Filter Chips */}
-        <div className="px-4 py-2 border-b border-border/40 bg-muted/20 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
+        <div className="px-4 py-2 border-b border-slate-200/70 dark:border-slate-800/60 bg-slate-100/50 dark:bg-slate-950/40 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar transition-colors">
           {[
             { id: 'all', label: 'Barchasi', count: categoryCounts.all },
             { id: 'pages', label: 'Sahifalar', count: categoryCounts.pages },
@@ -456,22 +458,23 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
               <button
                 key={cat.id}
                 type="button"
+                data-testid={`category-chip-${cat.id}`}
                 onClick={() => {
                   setSelectedCategory(cat.id as any);
                   setSelectedIndex(0);
                 }}
                 className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
                   isSelected
-                    ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
-                    : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-muted/70 border border-border/50 font-medium'
+                    ? 'bg-indigo-600 text-white font-semibold shadow-xs shadow-indigo-600/20 border border-indigo-600 dark:bg-indigo-600 dark:text-white dark:border-indigo-500'
+                    : 'bg-white/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700/60 font-medium shadow-2xs'
                 }`}
               >
                 <span>{cat.label}</span>
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold transition-colors ${
                     isSelected
-                      ? 'bg-primary-foreground/20 text-primary-foreground'
-                      : 'bg-muted text-muted-foreground'
+                      ? 'bg-white/20 text-white'
+                      : 'bg-slate-100 dark:bg-slate-900/80 text-slate-500 dark:text-slate-400'
                   }`}
                 >
                   {cat.count}
@@ -484,17 +487,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         {/* Results List */}
         <div
           ref={listRef}
-          className="max-h-[60vh] sm:max-h-[380px] overflow-y-auto p-2 sm:p-3 space-y-1"
+          data-testid="search-results-list"
+          className="max-h-[60vh] sm:max-h-[380px] overflow-y-auto p-2 sm:p-3 space-y-1 bg-white/50 dark:bg-slate-900/30"
         >
           {filteredItems.length === 0 ? (
             <div className="py-12 px-4 text-center">
-              <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-3 text-muted-foreground">
-                <Search className="w-6 h-6 opacity-60" />
+              <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800/80 border border-slate-200/60 dark:border-slate-700/60 flex items-center justify-center mx-auto mb-3 text-slate-400 dark:text-slate-500">
+                <Search className="w-6 h-6 opacity-70" />
               </div>
-              <p className="text-sm font-semibold text-foreground">
+              <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
                 Hech narsa topilmadi
               </p>
-              <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-xs mx-auto">
                 &ldquo;{query}&rdquo; so‘rovi bo‘yicha mos keladigan ma’lumot mavjud emas.
               </p>
             </div>
@@ -504,6 +508,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
               return (
                 <div
                   key={item.id}
+                  data-testid={`search-item-${item.id}`}
                   onClick={() => {
                     item.onSelect();
                     onClose();
@@ -511,16 +516,16 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                   onMouseEnter={() => setSelectedIndex(index)}
                   className={`flex items-center justify-between p-3 rounded-xl sm:rounded-2xl cursor-pointer transition-all duration-150 select-none ${
                     isSelected
-                      ? 'bg-primary/10 border border-primary/25 shadow-xs'
-                      : 'hover:bg-muted/60 border border-transparent'
+                      ? 'bg-indigo-50/90 dark:bg-indigo-950/40 border border-indigo-200/90 dark:border-indigo-500/30 shadow-xs shadow-indigo-100/40 dark:shadow-none'
+                      : 'hover:bg-slate-100/70 dark:hover:bg-slate-800/50 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all duration-150 ${
                         isSelected
-                          ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105'
-                          : 'bg-muted/80 text-muted-foreground'
+                          ? 'bg-indigo-600 text-white shadow-sm shadow-indigo-600/30 ring-2 ring-indigo-500/20 [&_svg]:!text-white'
+                          : 'bg-slate-100 dark:bg-slate-800/90 border border-slate-200/70 dark:border-slate-700/60'
                       }`}
                     >
                       {item.icon}
@@ -529,22 +534,33 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`text-xs sm:text-sm font-semibold truncate ${
-                            isSelected ? 'text-primary' : 'text-foreground'
+                          className={`text-xs sm:text-sm font-semibold truncate transition-colors ${
+                            isSelected
+                              ? 'text-indigo-600 dark:text-indigo-400'
+                              : 'text-slate-800 dark:text-slate-100'
                           }`}
                         >
                           {item.title}
                         </span>
                         {item.badge && (
-                          <Badge
-                            variant="secondary"
-                            className="text-[10px] px-1.5 py-0 h-4 font-medium border border-border/50"
+                          <span
+                            className={`text-[10px] px-1.5 py-0.5 rounded-md font-medium transition-colors border ${
+                              isSelected
+                                ? 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/60 dark:text-indigo-200 dark:border-indigo-700/50'
+                                : 'bg-slate-100 text-slate-600 border-slate-200/80 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700/70'
+                            }`}
                           >
                             {item.badge}
-                          </Badge>
+                          </span>
                         )}
                       </div>
-                      <span className="text-[11px] text-muted-foreground truncate mt-0.5">
+                      <span
+                        className={`text-[11px] truncate mt-0.5 transition-colors ${
+                          isSelected
+                            ? 'text-slate-600 dark:text-slate-300'
+                            : 'text-slate-500 dark:text-slate-400'
+                        }`}
+                      >
                         {item.subtitle}
                       </span>
                     </div>
@@ -552,15 +568,15 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
                   <div className="flex items-center gap-2 shrink-0">
                     {isSelected && (
-                      <kbd className="hidden sm:inline-flex items-center font-mono text-[10px] text-primary/80 bg-background px-1.5 py-0.5 rounded border border-primary/25">
+                      <kbd className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] font-semibold px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700/60 shadow-xs">
                         ↵ Enter
                       </kbd>
                     )}
                     <ArrowRight
-                      className={`w-4 h-4 transition-transform ${
+                      className={`w-4 h-4 transition-all duration-150 ${
                         isSelected
-                          ? 'translate-x-0.5 text-primary opacity-100'
-                          : 'opacity-0 text-muted-foreground'
+                          ? 'translate-x-0.5 text-indigo-600 dark:text-indigo-400 opacity-100'
+                          : 'opacity-0 text-slate-400 dark:text-slate-500'
                       }`}
                     />
                   </div>
@@ -571,22 +587,22 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         </div>
 
         {/* Footer Shortcut Bar */}
-        <div className="px-4 py-2.5 bg-muted/30 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
+        <div className="px-4 sm:px-5 py-2.5 bg-slate-50/90 dark:bg-slate-900/90 border-t border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400 transition-colors">
           <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono text-[10px] font-semibold text-foreground/80 shadow-2xs">
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px] font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
                 ↑↓
               </kbd>
               <span>Harakatlanish</span>
             </span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono text-[10px] font-semibold text-foreground/80 shadow-2xs">
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px] font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
                 ↵
               </kbd>
               <span>Tanlash</span>
             </span>
-            <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono text-[10px] font-semibold text-foreground/80 shadow-2xs">
+            <span className="flex items-center gap-1.5">
+              <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px] font-semibold text-slate-700 dark:text-slate-300 shadow-2xs">
                 ESC
               </kbd>
               <span>Yopish</span>
@@ -594,12 +610,9 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           </div>
 
           <div className="hidden sm:flex items-center gap-1.5">
-            <Badge
-              variant="outline"
-              className="text-[10px] font-medium text-primary border-primary/20 bg-primary/5 py-0.5"
-            >
+            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800/60 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
               AXM Nexus Spotlight
-            </Badge>
+            </span>
           </div>
         </div>
       </DialogContent>

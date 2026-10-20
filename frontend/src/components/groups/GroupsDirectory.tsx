@@ -372,12 +372,12 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
               <Card
                 key={group.id}
                 onClick={() => handleOpenDetail(group.id)}
-                className="group relative bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between border-0 ring-1 ring-border/20 hover:ring-border/40"
+                className="group relative bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between border-0"
               >
                 <div>
                   {/* Top badges */}
                   <div className="flex items-center justify-between mb-3">
-                    <Badge variant="secondary" className="font-semibold text-xs rounded-full px-2.5 py-0.5">
+                    <Badge variant="secondary" className="font-semibold text-xs rounded-full px-2.5 py-0.5 border-0">
                       {group.gradeLevel}
                     </Badge>
                     <Badge
@@ -388,7 +388,7 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                           ? 'neutral'
                           : 'warning'
                       }
-                      className="text-[10px] rounded-full px-2.5 py-0.5"
+                      className="text-[10px] rounded-full px-2.5 py-0.5 border-0"
                     >
                       {group.status === 'ACTIVE'
                         ? 'Faol'
@@ -414,8 +414,8 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                     </div>
                     {group.mentor ? (
                       <div className="flex items-center space-x-2.5">
-                        <Avatar className="w-7 h-7 rounded-lg">
-                          <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary rounded-lg">
+                        <Avatar className="w-7 h-7 rounded-lg ring-0 border-0">
+                          <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary rounded-lg border-0">
                             {group.mentor.fullName.charAt(0)}
                           </AvatarFallback>
                         </Avatar>
@@ -453,7 +453,7 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                     </div>
                     <Progress
                       value={capacityRatio}
-                      className="h-2 bg-muted/60"
+                      className="h-2 bg-muted/60 border-0"
                       indicatorClassName={
                         isFull
                           ? 'bg-destructive'
@@ -466,13 +466,13 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="pt-4 border-t border-border/20 flex items-center justify-between gap-2 mt-2">
+                <div className="pt-3 flex items-center justify-between gap-2 mt-2">
                   <Button
                     variant="secondary"
                     size="sm"
                     onClick={(e) => handleOpenEnroll(group, e)}
                     disabled={isFull}
-                    className="h-8 text-xs font-semibold rounded-lg gap-1"
+                    className="h-8 text-xs font-semibold rounded-lg gap-1 border-0"
                     title={isFull ? "Guruh sig'imi to'lgan" : "O'quvchi biriktirish"}
                   >
                     <UserPlus className="w-3.5 h-3.5" />
@@ -484,17 +484,17 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                       variant="ghost"
                       size="icon"
                       onClick={(e) => handleToggleStatus(group, e)}
-                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground border-0"
                       title={group.status === 'ACTIVE' ? 'Guruhni arxivlash' : 'Qayta faollashtirish'}
                     >
                       <Archive className="w-3.5 h-3.5" />
                     </Button>
 
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       onClick={() => handleOpenDetail(group.id)}
-                      className="h-8 text-xs font-semibold rounded-lg border-border/40 hover:bg-muted gap-1"
+                      className="h-8 text-xs font-semibold rounded-lg border-0 bg-muted/60 hover:bg-muted gap-1"
                     >
                       <span>Tafsilot</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -509,16 +509,16 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
         /* Table View */
         <Card className="rounded-2xl overflow-hidden border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card">
           <Table>
-            <TableHeader className="bg-muted/40">
-              <TableRow className="border-0 hover:bg-transparent">
-                <TableHead className="text-xs font-semibold text-muted-foreground">Guruh nomi</TableHead>
-                <TableHead className="text-xs font-semibold text-muted-foreground">Sinf</TableHead>
-                <TableHead className="text-xs font-semibold text-muted-foreground">Biriktirilgan Mentor</TableHead>
-                <TableHead className="text-xs font-semibold text-muted-foreground">Xona</TableHead>
-                <TableHead className="text-xs font-semibold text-muted-foreground">Dars vaqti</TableHead>
-                <TableHead className="text-xs font-semibold text-muted-foreground">Sig'im</TableHead>
-                <TableHead className="text-xs font-semibold text-muted-foreground">Holat</TableHead>
-                <TableHead className="text-right text-xs font-semibold text-muted-foreground">Amallar</TableHead>
+            <TableHeader className="bg-muted/40 border-0 [&_tr]:border-b-0">
+              <TableRow className="border-0 border-b-0 hover:bg-transparent">
+                <TableHead className="text-xs font-semibold text-muted-foreground border-0">Guruh nomi</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground border-0">Sinf</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground border-0">Biriktirilgan Mentor</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground border-0">Xona</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground border-0">Dars vaqti</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground border-0">Sig'im</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground border-0">Holat</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-muted-foreground border-0">Amallar</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -532,21 +532,21 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                   <TableRow
                     key={group.id}
                     onClick={() => handleOpenDetail(group.id)}
-                    className="hover:bg-muted/30 border-0 transition-colors cursor-pointer"
+                    className="hover:bg-muted/30 border-0 border-b-0 transition-colors cursor-pointer"
                   >
-                    <TableCell className="font-bold text-xs text-foreground py-3.5">
+                    <TableCell className="font-bold text-xs text-foreground py-3.5 border-0">
                       {group.name || group.groupCode}
                     </TableCell>
-                    <TableCell className="py-3.5">
-                      <Badge variant="secondary" className="text-xs font-semibold rounded-full">
+                    <TableCell className="py-3.5 border-0">
+                      <Badge variant="secondary" className="text-xs font-semibold rounded-full border-0">
                         {group.gradeLevel}
                       </Badge>
                     </TableCell>
-                    <TableCell className="py-3.5">
+                    <TableCell className="py-3.5 border-0">
                       {group.mentor ? (
                         <div className="flex items-center gap-2">
-                          <Avatar className="w-6 h-6 rounded-md">
-                            <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary rounded-md">
+                          <Avatar className="w-6 h-6 rounded-md ring-0 border-0">
+                            <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary rounded-md border-0">
                               {group.mentor.fullName.charAt(0)}
                             </AvatarFallback>
                           </Avatar>
@@ -556,17 +556,17 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                         <span className="text-xs text-muted-foreground italic">—</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground py-3.5">
+                    <TableCell className="text-xs text-muted-foreground py-3.5 border-0">
                       {group.roomLocation || group.room || 'Xona yo‘q'}
                     </TableCell>
-                    <TableCell className="text-xs text-muted-foreground py-3.5">
+                    <TableCell className="text-xs text-muted-foreground py-3.5 border-0">
                       {group.lessonDays || group.scheduleDays} ({group.lessonTime || group.scheduleTime})
                     </TableCell>
-                    <TableCell className="py-3.5">
+                    <TableCell className="py-3.5 border-0">
                       <div className="flex items-center gap-2 w-28">
                         <Progress
                           value={capacityRatio}
-                          className="h-1.5 bg-muted/60"
+                          className="h-1.5 bg-muted/60 border-0"
                           indicatorClassName={
                             isFull
                               ? 'bg-destructive'
@@ -580,7 +580,7 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                         </span>
                       </div>
                     </TableCell>
-                    <TableCell className="py-3.5">
+                    <TableCell className="py-3.5 border-0">
                       <Badge
                         variant={
                           group.status === 'ACTIVE'
@@ -589,7 +589,7 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                             ? 'neutral'
                             : 'warning'
                         }
-                        className="text-[10px] rounded-full"
+                        className="text-[10px] rounded-full border-0"
                       >
                         {group.status === 'ACTIVE'
                           ? 'Faol'
@@ -598,14 +598,14 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                           : group.status}
                       </Badge>
                     </TableCell>
-                    <TableCell className="text-right py-3.5" onClick={(e) => e.stopPropagation()}>
+                    <TableCell className="text-right py-3.5 border-0" onClick={(e) => e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-1.5">
                         <Button
                           variant="secondary"
                           size="sm"
                           onClick={(e) => handleOpenEnroll(group, e)}
                           disabled={isFull}
-                          className="h-7 text-xs rounded-lg px-2"
+                          className="h-7 text-xs rounded-lg px-2 border-0"
                           title="Biriktirish"
                         >
                           <UserPlus className="w-3.5 h-3.5" />
@@ -614,16 +614,16 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                           variant="ghost"
                           size="icon"
                           onClick={(e) => handleToggleStatus(group, e)}
-                          className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground"
+                          className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground border-0"
                           title={group.status === 'ACTIVE' ? 'Arxivlash' : 'Faollashtirish'}
                         >
                           <Archive className="w-3.5 h-3.5" />
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="secondary"
                           size="sm"
                           onClick={() => handleOpenDetail(group.id)}
-                          className="h-7 text-xs rounded-lg border-border/40 hover:bg-muted px-2.5"
+                          className="h-7 text-xs rounded-lg border-0 bg-muted/60 hover:bg-muted px-2.5"
                         >
                           Tafsilot
                         </Button>

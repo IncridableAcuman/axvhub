@@ -75,7 +75,7 @@ export const DropdownMenu: React.FC<DropdownMenuProps> = ({
           role="menu"
           aria-orientation="vertical"
           className={cn(
-            'absolute z-50 mt-1.5 min-w-[180px] rounded-lg border border-[var(--border-default)]',
+            'absolute z-50 mt-1.5 min-w-[180px] rounded-xl border border-border/40',
             'bg-[var(--bg-surface)] p-1 shadow-xl animate-in fade-in-50 zoom-in-95 duration-100',
             align === 'right' ? 'right-0' : 'left-0',
             className

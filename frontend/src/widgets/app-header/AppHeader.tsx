@@ -138,7 +138,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
 
   return (
     <>
-      <header className="sticky top-0 z-40 h-16 border-b border-border/40 bg-background/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shadow-xs transition-colors">
+      <header className="sticky top-0 z-40 h-16 bg-background/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shadow-xs transition-colors">
         {/* Left side: Mobile menu toggle, Breadcrumbs & Spotlight Search Button */}
         <div className="flex items-center gap-3">
           <Button
@@ -160,15 +160,15 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             variant="outline"
             size="sm"
             onClick={() => setIsSearchOpen(true)}
-            className="hidden md:inline-flex items-center gap-2 h-9 px-3 rounded-xl bg-muted/40 hover:bg-muted/70 border-border/40 hover:border-border text-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer group ml-2"
+            className="hidden md:inline-flex items-center gap-2 h-9 px-3 rounded-xl bg-slate-100/80 hover:bg-slate-200/70 dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-border/30 text-xs text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white transition-all shadow-2xs cursor-pointer group ml-2"
             title={t('common.quickSearchTooltip')}
             aria-label={t('common.quickSearch')}
           >
-            <Search className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
-            <span className="hidden lg:inline text-xs font-medium text-muted-foreground group-hover:text-foreground">
+            <Search className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform" />
+            <span className="hidden lg:inline text-xs font-medium text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white">
               {t('common.quickSearch')}
             </span>
-            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded bg-background px-1.5 font-mono text-[10px] font-bold text-muted-foreground border border-border/40 shadow-xs ml-1.5">
+            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-0.5 rounded-md bg-white dark:bg-slate-900 px-1.5 font-mono text-[10px] font-semibold text-slate-500 dark:text-slate-400 shadow-2xs ml-1.5">
               <span className="text-[11px]">⌘</span>K
             </kbd>
           </Button>
@@ -183,7 +183,7 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
           {/* Location badge with live beacon */}
           <Badge
             variant="outline"
-            className="hidden lg:inline-flex items-center gap-2 px-3 py-1 rounded-full border-border/40 bg-muted/30 text-xs font-medium text-foreground shadow-xs"
+            className="hidden lg:inline-flex items-center gap-2 px-3 py-1 rounded-full border-0 bg-muted/50 text-xs font-medium text-foreground shadow-2xs"
           >
             <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse shrink-0" />
             <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -200,11 +200,11 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
             variant="ghost"
             size="icon"
             onClick={() => setIsSearchOpen(true)}
-            className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground md:hidden cursor-pointer"
+            className="h-9 w-9 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 md:hidden cursor-pointer"
             title={t('common.quickSearchTooltip')}
             aria-label={t('common.quickSearch')}
           >
-            <Search className="w-4 h-4 text-primary" />
+            <Search className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
           </Button>
 
           {/* Notification Center Dropdown (Modul 14) */}

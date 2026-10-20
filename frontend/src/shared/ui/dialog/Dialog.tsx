@@ -92,7 +92,7 @@ export const Dialog: React.FC<DialogProps> = ({
         aria-describedby={description ? 'dialog-desc' : undefined}
         onClick={(e) => e.stopPropagation()}
         className={cn(
-          'relative w-full z-10 flex flex-col rounded-xl border border-[var(--border-default)]',
+          'relative w-full z-10 flex flex-col rounded-2xl border border-border/40',
           'bg-[var(--bg-surface)] text-[var(--text-primary)] shadow-2xl overflow-hidden',
           'animate-in zoom-in-95 duration-200 max-h-[90vh]',
           sizeStyles[size],
@@ -135,11 +135,11 @@ export const Dialog: React.FC<DialogProps> = ({
         )}
 
         {/* Body */}
-        <div className="p-4 sm:p-5 overflow-y-auto flex-1 text-sm">{children}</div>
+        <div className="p-4 sm:p-5 overflow-y-auto flex-1 text-sm text-[var(--text-primary)]">{children}</div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-2.5 p-4 sm:p-5 border-t border-[var(--border-subtle)] bg-[var(--bg-subtle)] shrink-0">
+          <div className="flex items-center justify-end gap-2.5 p-4 sm:p-5 border-t border-[var(--border-subtle)] bg-[var(--bg-subtle)] text-[var(--text-primary)] shrink-0">
             {footer}
           </div>
         )}

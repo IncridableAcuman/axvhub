@@ -36,7 +36,7 @@ export const DashboardRoleSwitcher: React.FC<DashboardRoleSwitcherProps> = ({
   const isPureStudent = isStudent && !isAdmin && !isMentor
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] shadow-xs">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3.5 rounded-2xl bg-card text-card-foreground shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0">
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white flex items-center justify-center font-black text-xs shadow-xs">
           AXM
@@ -46,7 +46,7 @@ export const DashboardRoleSwitcher: React.FC<DashboardRoleSwitcherProps> = ({
             <span className="text-xs font-bold text-[var(--text-primary)]">
               {t('dashboard.roleSwitcher.title')}
             </span>
-            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200/50">
+            <span className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold border-0">
               {activeRoleView === 'mentor' && t('dashboard.roleSwitcher.mentorView')}
               {activeRoleView === 'student' && t('dashboard.roleSwitcher.studentView')}
               {activeRoleView === 'admin' && t('dashboard.roleSwitcher.adminView')}

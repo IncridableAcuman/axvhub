@@ -106,7 +106,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
               onChange={(e) => setName(e.target.value)}
               placeholder="Masalan: 8-IT-A (Frontend asoslari)"
               required
-              className="text-xs h-9 rounded-lg bg-background border-input focus-visible:ring-primary"
+              className="text-xs h-9 rounded-xl bg-muted/40 border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none"
             />
           </div>
 
@@ -120,7 +120,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 value={gradeLevel}
                 onChange={(e) => setGradeLevel(e.target.value)}
                 aria-label="Sinf bosqichi"
-                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-full rounded-xl border-0 bg-muted/40 px-3 py-1 text-xs text-foreground shadow-none transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-medium"
               >
                 <option value="8-sinf">8-sinf</option>
                 <option value="9-sinf">9-sinf</option>
@@ -140,7 +140,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 max={30}
                 value={maxCapacity}
                 onChange={(e) => setMaxCapacity(parseInt(e.target.value, 10) || 16)}
-                className="text-xs h-9 rounded-lg bg-background border-input focus-visible:ring-primary"
+                className="text-xs h-9 rounded-xl bg-muted/40 border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none"
               />
             </div>
           </div>
@@ -155,7 +155,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 value={lessonDays}
                 onChange={(e) => setLessonDays(e.target.value)}
                 aria-label="Dars kunlari"
-                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-full rounded-xl border-0 bg-muted/40 px-3 py-1 text-xs text-foreground shadow-none transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-medium"
               >
                 <option value="Dush-Chor-Jum">Dush-Chor-Jum (Toq kunlar)</option>
                 <option value="Sesh-Pay-Shan">Sesh-Pay-Shan (Juft kunlar)</option>
@@ -173,7 +173,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 value={lessonTime}
                 onChange={(e) => setLessonTime(e.target.value)}
                 placeholder="Masalan: 14:00 - 16:00"
-                className="text-xs h-9 rounded-lg bg-background border-input focus-visible:ring-primary"
+                className="text-xs h-9 rounded-xl bg-muted/40 border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none"
               />
             </div>
           </div>
@@ -188,7 +188,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 value={mentorId ?? ''}
                 onChange={(e) => setMentorId(e.target.value ? Number(e.target.value) : undefined)}
                 aria-label="Biriktirilgan Mentor"
-                className="flex h-9 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex h-9 w-full rounded-xl border-0 bg-muted/40 px-3 py-1 text-xs text-foreground shadow-none transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer font-medium"
               >
                 <option value="">Mentorsiz</option>
                 {mentors.map((m) => (
@@ -208,19 +208,19 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
                 value={roomLocation}
                 onChange={(e) => setRoomLocation(e.target.value)}
                 placeholder="Masalan: IT Xona 204"
-                className="text-xs h-9 rounded-lg bg-background border-input focus-visible:ring-primary"
+                className="text-xs h-9 rounded-xl bg-muted/40 border-0 focus-visible:ring-1 focus-visible:ring-primary shadow-none"
               />
             </div>
           </div>
 
-          <DialogFooter className="pt-3 gap-2 sm:gap-0">
+          <DialogFooter className="pt-3 gap-2 sm:gap-0 border-0">
             <Button
               type="button"
-              variant="outline"
+              variant="secondary"
               size="sm"
               onClick={onClose}
               disabled={loading}
-              className="rounded-lg text-xs"
+              className="rounded-xl text-xs border-0 bg-muted/60 hover:bg-muted text-foreground"
             >
               Bekor qilish
             </Button>
@@ -229,7 +229,7 @@ export const CreateGroupModal: React.FC<CreateGroupModalProps> = ({
               variant="default"
               size="sm"
               disabled={loading}
-              className="rounded-lg text-xs"
+              className="rounded-xl text-xs font-semibold border-0"
             >
               {loading ? 'Saqlanmoqda...' : 'Guruhni yaratish'}
             </Button>

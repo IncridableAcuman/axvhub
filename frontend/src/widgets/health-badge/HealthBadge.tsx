@@ -12,7 +12,7 @@ export const HealthBadge: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center space-x-1.5 text-xs text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border border-slate-700/60">
+      <div className="flex items-center space-x-1.5 text-xs text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md border-0">
         <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
         <span>Tekshirilmoqda...</span>
       </div>
@@ -21,7 +21,7 @@ export const HealthBadge: React.FC = () => {
 
   if (isError || !data?.success) {
     return (
-      <div className="flex items-center space-x-1.5 text-xs text-amber-300 bg-amber-950/40 px-2.5 py-1 rounded-md border border-amber-800/60" title="Backend ulanishi kutilmoqda">
+      <div className="flex items-center space-x-1.5 text-xs text-amber-300 bg-amber-950/40 px-2.5 py-1 rounded-md border-0" title="Backend ulanishi kutilmoqda">
         <Activity className="w-3.5 h-3.5 text-amber-400" />
         <span>Lokal rejim</span>
       </div>
@@ -29,7 +29,7 @@ export const HealthBadge: React.FC = () => {
   }
 
   return (
-    <div className="flex items-center space-x-1.5 text-xs text-emerald-300 bg-emerald-950/40 px-2.5 py-1 rounded-md border border-emerald-800/60" title={`API: ${data.data.application} v${data.data.version}`}>
+    <div className="flex items-center space-x-1.5 text-xs text-emerald-300 bg-emerald-950/40 px-2.5 py-1 rounded-md border-0" title={`API: ${data.data.application} v${data.data.version}`}>
       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
       <span className="font-medium">Backend: {data.data.status}</span>
     </div>
