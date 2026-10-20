@@ -15,20 +15,7 @@ import {
   Award,
   LayoutGrid,
   List,
-  Calendar,
-  Layers,
-  CheckCheck,
-  ChevronRight,
-  TrendingUp,
   FileText,
-  X,
-  Code,
-  CheckSquare,
-  BookmarkCheck,
-  ArrowRight,
-  HelpCircle,
-  FolderGit2,
-  AlertCircle,
 } from 'lucide-react';
 import {
   Card,
@@ -59,7 +46,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Progress } from '@/components/ui/progress';
 import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { lessonPlanApi } from '@/api';

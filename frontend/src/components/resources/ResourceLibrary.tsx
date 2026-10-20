@@ -15,16 +15,12 @@ import {
   LayoutGrid,
   List,
   X,
-  Layers,
-  CheckCircle2,
-  BookOpen,
 } from 'lucide-react';
 import {
   Card,
   CardHeader,
   CardTitle,
   CardDescription,
-  CardContent,
   CardFooter,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';

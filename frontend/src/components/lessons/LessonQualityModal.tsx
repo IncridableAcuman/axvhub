@@ -12,25 +12,20 @@ import {
   Lightbulb,
   Save,
   RotateCcw,
+  X,
 } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Card } from '@/components/ui/card';
 import {
   Table,
-  TableBody,
-  TableCell,
-  TableHead,
   TableHeader,
+  TableBody,
+  TableHead,
   TableRow,
+  TableCell,
 } from '@/components/ui/table';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useTranslation } from '@/shared/i18n';
@@ -132,6 +127,7 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
         if (evalRes.data?.data && evalRes.data.data.length > 0) {
           setEvaluations(evalRes.data.data);
         } else if (students.length > 0) {
+          // Initialize empty rubric for active students
           const initialEvals: StudentLearningOutcomeEvaluation[] = students.map((s) => ({
             lessonId: lessonId,
             studentId: s.id,
@@ -146,7 +142,7 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
           setEvaluations(initialEvals);
         }
       } catch {
-        // Fallback or defaults
+        // Fallback or new lesson defaults
       } finally {
         setLoading(false);
       }
@@ -181,9 +177,9 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
         ...delivery,
         lessonId: currentLessonId,
       });
-      toast.success('Refleksiya', 'Dars o‘tish hisoboti va refleksiya saqlandi');
+      toast.success('Dars sifati', 'Dars o‘tish hisoboti va refleksiya saqlandi');
     } catch {
-      toast.error('Xatolik', 'Hisobotni saqlashda xatolik');
+      toast.error('Xatolik', 'Hisobotni saqlashda xatolik yuz berdi');
     } finally {
       setLoading(false);
     }
@@ -193,9 +189,9 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
     try {
       setLoading(true);
       await lessonQualityApi.saveOutcomeEvaluations(currentLessonId, evaluations);
-      toast.success('Ta’lim natijalari', 'O‘quvchilar natijalari baholandi va saqlandi');
+      toast.success('Dars sifati', 'Ta’lim natijalari muvaffaqiyatli baholandi');
     } catch {
-      toast.error('Xatolik', 'Natijalarni saqlashda xatolik');
+      toast.error('Xatolik', 'Baholashlarni saqlashda xatolik yuz berdi');
     } finally {
       setLoading(false);
     }
@@ -207,15 +203,15 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
       const res = await lessonQualityApi.getQualityAiSuggestions(currentLessonId);
       if (res.data?.data) {
         setAiSuggestions(res.data.data);
-      } else {
-        throw new Error('No suggestions');
+        toast.success('AI Maslahatchi', 'Dars sifati bo‘yicha AI tavsiyalari yuklandi');
       }
     } catch {
+      // Mock suggestions
       setAiSuggestions({
         lessonId: currentLessonId,
         topic: lesson.title,
         isAdvisory: true,
-        disclaimer: 'Ushbu tavsiyalar maslahat xarakterida bo‘lib, darsda qo‘llashdan oldin mentor tomonidan ko‘rib chiqilishi shart.',
+        disclaimer: 'Ushbu tavsiyalar maslahat xarakterida bo‘lib, mentor ko‘rib chiqishi shart.',
         alternativeExplanations: [
           'Murakkab tushunchalarni visual grafiklar yoki hayotiy analogiyalar orqali yoritish',
           'Kodni bosqichma-bosqich yozib, har bir satr natijasini konsolda ko‘rsatish',
@@ -239,186 +235,217 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-4xl max-h-[92vh] flex flex-col p-0 overflow-hidden bg-background border-border shadow-2xl">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        className="w-full max-w-4xl max-h-[90vh] bg-background border border-border/50 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Header */}
-        <DialogHeader className="p-6 pb-4 border-b border-border/40 bg-muted/20">
+        <div className="flex items-center justify-between p-5 border-b border-border/40 bg-muted/30">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
-              <Award className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center border border-primary/20 shadow-xs">
+              <Award className="w-5 h-5 text-amber-500" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold tracking-tight">
+              <h2 className="text-base font-bold text-foreground">
                 Dars Sifati va Ta’lim Natijalari (Learning Outcomes)
-              </DialogTitle>
-              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+              </h2>
+              <p className="text-xs text-muted-foreground">
                 {lesson.title} • {lesson.gradeLevel} • {lesson.subject}
-              </DialogDescription>
+              </p>
             </div>
           </div>
-        </DialogHeader>
-
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-2 px-6 pt-3 border-b border-border/40 bg-card text-xs">
-          <button
-            onClick={() => setActiveTab('plan')}
-            className={`flex items-center gap-1.5 pb-2.5 px-3 font-bold border-b-2 transition cursor-pointer text-xs ${
-              activeTab === 'plan'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onClose}
+            className="rounded-xl h-8 w-8 text-muted-foreground hover:text-foreground"
+            aria-label="Yopish"
           >
-            <Target className="w-4 h-4" />
-            <span>1. Dars Rejalashtirish (Plan)</span>
-          </button>
+            <X className="w-4 h-4" />
+          </Button>
+        </div>
 
-          <button
-            onClick={() => setActiveTab('delivery')}
-            className={`flex items-center gap-1.5 pb-2.5 px-3 font-bold border-b-2 transition cursor-pointer text-xs ${
-              activeTab === 'delivery'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Clock className="w-4 h-4" />
-            <span>2. Dars O‘tish va Refleksiya</span>
-          </button>
+        {/* Tab Navigation (Styled like shadcn segmented control) */}
+        <div className="px-5 pt-3 border-b border-border/40 bg-muted/10">
+          <div className="inline-flex rounded-xl bg-muted p-1 border border-border/40 w-full sm:w-auto overflow-x-auto">
+            <button
+              type="button"
+              role="button"
+              onClick={() => setActiveTab('plan')}
+              className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
+                activeTab === 'plan'
+                  ? 'bg-background text-foreground shadow-xs font-bold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Target className="w-3.5 h-3.5" />
+              <span>1. Dars Rejalashtirish (Plan)</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('outcomes')}
-            className={`flex items-center gap-1.5 pb-2.5 px-3 font-bold border-b-2 transition cursor-pointer text-xs ${
-              activeTab === 'outcomes'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <TrendingUp className="w-4 h-4" />
-            <span>3. Ta’lim Natijalari (Outcomes)</span>
-          </button>
+            <button
+              type="button"
+              role="button"
+              onClick={() => setActiveTab('delivery')}
+              className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
+                activeTab === 'delivery'
+                  ? 'bg-background text-foreground shadow-xs font-bold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <Clock className="w-3.5 h-3.5" />
+              <span>2. Dars O‘tish va Refleksiya</span>
+            </button>
 
-          <button
-            onClick={() => setActiveTab('ai')}
-            className={`flex items-center gap-1.5 pb-2.5 px-3 font-bold border-b-2 transition cursor-pointer text-xs ${
-              activeTab === 'ai'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <BrainCircuit className="w-4 h-4" />
-            <span>4. AI Maslahatchi</span>
-          </button>
+            <button
+              type="button"
+              role="button"
+              onClick={() => setActiveTab('outcomes')}
+              className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
+                activeTab === 'outcomes'
+                  ? 'bg-background text-foreground shadow-xs font-bold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>3. Ta’lim Natijalari (Outcomes)</span>
+            </button>
+
+            <button
+              type="button"
+              role="button"
+              onClick={() => setActiveTab('ai')}
+              className={`flex items-center gap-1.5 py-1.5 px-3 rounded-lg text-xs font-semibold transition cursor-pointer shrink-0 ${
+                activeTab === 'ai'
+                  ? 'bg-background text-foreground shadow-xs font-bold'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <BrainCircuit className="w-3.5 h-3.5 text-cyan-500" />
+              <span>4. AI Maslahatchi</span>
+            </button>
+          </div>
         </div>
 
         {/* Modal Body */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {/* TAB 1: Planning */}
           {activeTab === 'plan' && (
             <div className="space-y-4 text-xs">
-              <Card className="border-indigo-500/20 bg-indigo-500/5">
-                <CardContent className="p-3.5 text-indigo-700 dark:text-indigo-300 flex items-start gap-2.5">
-                  <Lightbulb className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p>
-                    Dars boshlanishidan oldin aniq ta’lim maqsadlari, kutilayotgan kompetensiyalar va baholash mezonlarini belgilang.
-                  </p>
-                </CardContent>
+              <Card className="rounded-2xl bg-indigo-500/10 border-indigo-500/20 text-indigo-800 dark:text-indigo-300 p-3.5 flex items-start gap-2.5">
+                <Lightbulb className="w-4 h-4 shrink-0 mt-0.5 text-indigo-600 dark:text-indigo-400" />
+                <p className="leading-relaxed">
+                  Dars boshlanishidan oldin aniq ta’lim maqsadlari, kutilayotgan kompetensiyalar va baholash mezonlarini belgilang.
+                </p>
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Ta’lim maqsadlari (Learning Objectives)
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     rows={3}
                     value={qualityPlan.learningObjectives}
                     onChange={(e) => setQualityPlan({ ...qualityPlan, learningObjectives: e.target.value })}
                     placeholder="Masalan: CSS Grid yordamida responsive kartalar setkasini yaratishni o‘rganish"
-                    className="w-full px-3 py-2 rounded-xl border border-input bg-background focus:ring-1 focus:ring-ring outline-none"
+                    className="rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Kutilayotgan kompetensiyalar (Competencies)
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     rows={3}
                     value={qualityPlan.expectedCompetencies || ''}
                     onChange={(e) => setQualityPlan({ ...qualityPlan, expectedCompetencies: e.target.value })}
                     placeholder="Masalan: grid-template-columns, gap, repeat() sintaksisidan erkin foydalanish"
-                    className="w-full px-3 py-2 rounded-xl border border-input bg-background focus:ring-1 focus:ring-ring outline-none"
+                    className="rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Nazariya vaqti (daq.)
-                  </label>
+                  </Label>
                   <Input
                     type="number"
                     value={qualityPlan.theoryDurationMinutes || 20}
                     onChange={(e) => setQualityPlan({ ...qualityPlan, theoryDurationMinutes: parseInt(e.target.value) || 20 })}
-                    className="h-9 text-xs"
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Amaliyot vaqti (daq.)
-                  </label>
+                  </Label>
                   <Input
                     type="number"
                     value={qualityPlan.practicalDurationMinutes || 30}
                     onChange={(e) => setQualityPlan({ ...qualityPlan, practicalDurationMinutes: parseInt(e.target.value) || 30 })}
-                    className="h-9 text-xs"
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Oldindan talab qilinadigan bilim
-                  </label>
+                  </Label>
                   <Input
                     type="text"
                     value={qualityPlan.requiredPriorKnowledge || ''}
                     onChange={(e) => setQualityPlan({ ...qualityPlan, requiredPriorKnowledge: e.target.value })}
                     placeholder="HTML asoslari, CSS selectorlar"
-                    className="h-9 text-xs"
+                    className="rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     O‘qitish metodlari (Teaching Methods)
-                  </label>
+                  </Label>
                   <Input
                     type="text"
                     value={qualityPlan.teachingMethods || ''}
                     onChange={(e) => setQualityPlan({ ...qualityPlan, teachingMethods: e.target.value })}
                     placeholder="Live coding, juftlikda ishlash, muammoli ta'lim"
-                    className="h-9 text-xs"
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Baholash mezonlari (Assessment Criteria)
-                  </label>
+                  </Label>
                   <Input
                     type="text"
                     value={qualityPlan.assessmentCriteria || ''}
                     onChange={(e) => setQualityPlan({ ...qualityPlan, assessmentCriteria: e.target.value })}
                     placeholder="Quiz testi (80%), Amaliy mashq (100%)"
-                    className="h-9 text-xs"
+                    className="rounded-xl"
                   />
                 </div>
               </div>
 
               <div className="flex justify-end pt-3 border-t border-border/40">
-                <Button variant="default" size="sm" onClick={handleSavePlan} disabled={loading} className="gap-1.5">
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Rejani saqlash</span>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleSavePlan}
+                  isLoading={loading}
+                  leftIcon={<Save className="w-3.5 h-3.5" />}
+                  className="rounded-xl font-semibold"
+                >
+                  Rejani saqlash
                 </Button>
               </div>
             </div>
@@ -427,47 +454,44 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
           {/* TAB 2: Delivery & Reflection */}
           {activeTab === 'delivery' && (
             <div className="space-y-4 text-xs">
-              <Card className="border-amber-500/20 bg-amber-500/5">
-                <CardContent className="p-3.5 text-amber-700 dark:text-amber-400 flex items-start gap-2.5">
-                  <RotateCcw className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p>
-                    Dars o‘tib bo‘lingach, darsning qanday kechganini, qaysi mavzularda qiyinchiliklar bo‘lganini va keyingi safar nimalarni o‘zgartirish kerakligini qayd qiling.
-                  </p>
-                </CardContent>
+              <Card className="rounded-2xl bg-amber-500/10 border-amber-500/20 text-amber-800 dark:text-amber-300 p-3.5 flex items-start gap-2.5">
+                <RotateCcw className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
+                <p className="leading-relaxed">
+                  Dars o‘tib bo‘lingach, darsning qanday kechganini, qaysi mavzularda qiyinchiliklar bo‘lganini va keyingi safar nimalarni o‘zgartirish kerakligini qayd qiling.
+                </p>
               </Card>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Haqiqiy davomiylik (daq.)
-                  </label>
+                  </Label>
                   <Input
                     type="number"
                     value={delivery.actualDurationMinutes}
                     onChange={(e) => setDelivery({ ...delivery, actualDurationMinutes: parseInt(e.target.value) || 80 })}
-                    className="h-9 text-xs"
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Bajarilgan amaliy mashqlar soni
-                  </label>
+                  </Label>
                   <Input
                     type="number"
                     value={delivery.practicalExercisesCompleted}
                     onChange={(e) => setDelivery({ ...delivery, practicalExercisesCompleted: parseInt(e.target.value) || 0 })}
-                    className="h-9 text-xs"
+                    className="rounded-xl"
                   />
                 </div>
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Mashqlar murakkablik darajasi
-                  </label>
+                  </Label>
                   <select
                     value={delivery.exerciseDifficulty}
                     onChange={(e) => setDelivery({ ...delivery, exerciseDifficulty: e.target.value })}
-                    aria-label="Mashqlar murakkablik darajasi"
-                    className="w-full text-xs h-9 rounded-md border border-input bg-background px-3 py-1 text-foreground shadow-xs focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+                    className="h-9 w-full rounded-xl border border-input bg-background px-3 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
                   >
                     <option value="TOO_EASY">Juda oson (O‘quvchilar tez zerikdi)</option>
                     <option value="BALANCED">Optimal / Muvozanatli</option>
@@ -478,74 +502,78 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     O‘quvchilar qiynalgan asosiy mavzular (Difficulties)
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     rows={2}
                     value={delivery.commonDifficulties || ''}
                     onChange={(e) => setDelivery({ ...delivery, commonDifficulties: e.target.value })}
                     placeholder="Masalan: grid-template-areas nomlash sintaksisida adashishdi"
-                    className="w-full px-3 py-2 rounded-xl border border-input bg-background outline-none"
+                    className="rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block font-semibold text-foreground">
+                  <Label className="text-xs font-semibold">
                     Qayta tushuntirilishi kerak bo‘lgan qismlar (Revision)
-                  </label>
-                  <textarea
+                  </Label>
+                  <Textarea
                     rows={2}
                     value={delivery.topicsRequiringRevision || ''}
                     onChange={(e) => setDelivery({ ...delivery, topicsRequiringRevision: e.target.value })}
                     placeholder="Masalan: repeat(auto-fit, minmax(...)) formulasi"
-                    className="w-full px-3 py-2 rounded-xl border border-input bg-background outline-none"
+                    className="rounded-xl"
                   />
                 </div>
               </div>
 
               {/* Mentor Reflection Section */}
-              <Card className="border-border/60 bg-muted/20">
-                <CardContent className="p-4 space-y-3">
-                  <h4 className="font-bold text-foreground flex items-center gap-1.5">
-                    <MessageSquare className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                    <span>Mentor Refleksiyasi (Dars tahlili)</span>
-                  </h4>
+              <Card className="rounded-2xl border-border/40 bg-muted/30 p-4 space-y-3">
+                <h4 className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                  <MessageSquare className="w-4 h-4 text-emerald-600" />
+                  <span>Mentor Refleksiyasi (Dars tahlili)</span>
+                </h4>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                    <div className="space-y-1.5">
-                      <label className="block font-semibold text-foreground">
-                        Nimalar kutilganidek yaxshi ishladi?
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={delivery.whatWorkedWell || ''}
-                        onChange={(e) => setDelivery({ ...delivery, whatWorkedWell: e.target.value })}
-                        placeholder="Masalan: Juftlikda ishlash mashqi juda samarali bo'ldi"
-                        className="w-full px-3 py-2 rounded-xl border border-input bg-background outline-none"
-                      />
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="block font-semibold text-foreground">
-                        Keyingi safar nimalarni o‘zgartirish kerak?
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={delivery.changeNextTime || ''}
-                        onChange={(e) => setDelivery({ ...delivery, changeNextTime: e.target.value })}
-                        placeholder="Masalan: Nazariyani yana 5 daqiqa qisqartirib, amaliyotni ko'paytirish"
-                        className="w-full px-3 py-2 rounded-xl border border-input bg-background outline-none"
-                      />
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">
+                      Nimalar kutilganidek yaxshi ishladi?
+                    </Label>
+                    <Textarea
+                      rows={2}
+                      value={delivery.whatWorkedWell || ''}
+                      onChange={(e) => setDelivery({ ...delivery, whatWorkedWell: e.target.value })}
+                      placeholder="Masalan: Juftlikda ishlash mashqi juda samarali bo'ldi"
+                      className="rounded-xl bg-background"
+                    />
                   </div>
-                </CardContent>
+
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-semibold">
+                      Keyingi safar nimalarni o‘zgartirish kerak?
+                    </Label>
+                    <Textarea
+                      rows={2}
+                      value={delivery.changeNextTime || ''}
+                      onChange={(e) => setDelivery({ ...delivery, changeNextTime: e.target.value })}
+                      placeholder="Masalan: Nazariyani yana 5 daqiqa qisqartirib, amaliyotni ko'paytirish"
+                      className="rounded-xl bg-background"
+                    />
+                  </div>
+                </div>
               </Card>
 
               <div className="flex justify-end pt-3 border-t border-border/40">
-                <Button variant="default" size="sm" onClick={handleSaveDelivery} disabled={loading} className="gap-1.5">
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Hisobot va Refleksiyani saqlash</span>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleSaveDelivery}
+                  isLoading={loading}
+                  leftIcon={<Save className="w-3.5 h-3.5" />}
+                  className="rounded-xl font-semibold"
+                >
+                  Hisobot va Refleksiyani saqlash
                 </Button>
               </div>
             </div>
@@ -554,24 +582,22 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
           {/* TAB 3: Learning Outcomes Evaluation */}
           {activeTab === 'outcomes' && (
             <div className="space-y-4 text-xs">
-              <Card className="border-rose-500/20 bg-rose-500/5">
-                <CardContent className="p-3.5 text-rose-700 dark:text-rose-400 flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-bold">Qat'iy ta’lim tamoyili:</span> O‘quvchi darsda qatnashganining o‘zi ta’lim maqsadiga erishilganini bildirmaydi. Har bir o‘quvchining o‘zlashtirishi aniq dalil (quiz, amaliy topshiriq yoki mentor kuzatuvi) asosida tasdiqlanishi lozim.
-                  </div>
-                </CardContent>
+              <Card className="rounded-2xl bg-rose-500/10 border-rose-500/20 text-rose-800 dark:text-rose-300 p-3.5 flex items-start gap-2.5">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600 dark:text-rose-400" />
+                <div className="leading-relaxed">
+                  <span className="font-bold">Qat'iy ta’lim tamoyili:</span> O‘quvchi darsda qatnashganining o‘zi ta’lim maqsadiga erishilganini bildirmaydi. Har bir o‘quvchining o‘zlashtirishi aniq dalil (quiz, amaliy topshiriq yoki mentor kuzatuvi) asosida tasdiqlanishi lozim.
+                </div>
               </Card>
 
-              <div className="rounded-xl border border-border/60 overflow-hidden bg-card">
+              <Card className="rounded-2xl border-border/40 overflow-hidden shadow-xs">
                 <Table>
-                  <TableHeader className="bg-muted/50">
-                    <TableRow>
-                      <TableHead className="text-xs font-semibold">O‘quvchi</TableHead>
-                      <TableHead className="text-xs font-semibold">Maqsad holati</TableHead>
-                      <TableHead className="text-xs font-semibold">Dalil manbai</TableHead>
-                      <TableHead className="text-xs font-semibold">Ball (%)</TableHead>
-                      <TableHead className="text-xs font-semibold">Mentor izohi</TableHead>
+                  <TableHeader>
+                    <TableRow className="bg-muted/40">
+                      <TableHead className="font-bold text-xs">O‘quvchi</TableHead>
+                      <TableHead className="font-bold text-xs">Maqsad holati</TableHead>
+                      <TableHead className="font-bold text-xs">Dalil manbai</TableHead>
+                      <TableHead className="font-bold text-xs">Ball (%)</TableHead>
+                      <TableHead className="font-bold text-xs">Mentor izohi</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -583,11 +609,11 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
                       </TableRow>
                     ) : (
                       evaluations.map((ev, idx) => (
-                        <TableRow key={ev.studentId} className="hover:bg-muted/40 transition">
-                          <TableCell className="font-semibold text-foreground">
+                        <TableRow key={ev.studentId} className="hover:bg-muted/30 transition">
+                          <TableCell className="font-semibold text-foreground py-3">
                             {ev.studentName || `Student #${ev.studentId}`}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="py-3">
                             <select
                               value={ev.status}
                               onChange={(e) => {
@@ -595,8 +621,7 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
                                 updated[idx].status = e.target.value as any;
                                 setEvaluations(updated);
                               }}
-                              aria-label="Maqsad holati"
-                              className={`px-2 py-1 rounded-md font-bold text-[11px] border cursor-pointer ${
+                              className={`px-2 py-1 rounded-lg font-bold text-[11px] border cursor-pointer ${
                                 ev.status === 'ACHIEVED' || ev.status === 'MASTERED'
                                   ? 'bg-emerald-500/10 text-emerald-600 border-emerald-500/20'
                                   : ev.status === 'DEVELOPING'
@@ -610,7 +635,7 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
                               <option value="MASTERED">Mukammal (Mastered)</option>
                             </select>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="py-3">
                             <select
                               value={ev.evidenceSource}
                               onChange={(e) => {
@@ -618,15 +643,14 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
                                 updated[idx].evidenceSource = e.target.value as any;
                                 setEvaluations(updated);
                               }}
-                              aria-label="Dalil manbai"
-                              className="px-2 py-1 rounded-md border border-input bg-background text-[11px] cursor-pointer"
+                              className="px-2 py-1 rounded-lg border border-input bg-background text-[11px] cursor-pointer"
                             >
                               <option value="QUIZ_RESULT">Quiz / Test natijasi</option>
                               <option value="ASSIGNMENT_SUBMISSION">Amaliy topshiriq</option>
                               <option value="MENTOR_OBSERVATION">Mentor kuzatuvi</option>
                             </select>
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="py-3">
                             <Input
                               type="number"
                               min="0"
@@ -637,10 +661,10 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
                                 updated[idx].evidenceScore = parseFloat(e.target.value) || 0;
                                 setEvaluations(updated);
                               }}
-                              className="w-16 h-8 text-center text-xs"
+                              className="w-16 h-8 rounded-lg text-center text-xs"
                             />
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="py-3">
                             <Input
                               type="text"
                               value={ev.mentorNotes || ''}
@@ -650,7 +674,7 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
                                 setEvaluations(updated);
                               }}
                               placeholder="Kuzatuv xulosasi..."
-                              className="h-8 text-xs"
+                              className="h-8 rounded-lg text-xs"
                             />
                           </TableCell>
                         </TableRow>
@@ -658,12 +682,18 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
                     )}
                   </TableBody>
                 </Table>
-              </div>
+              </Card>
 
               <div className="flex justify-end pt-3 border-t border-border/40">
-                <Button variant="default" size="sm" onClick={handleSaveEvaluations} disabled={loading} className="gap-1.5">
-                  <Save className="w-3.5 h-3.5" />
-                  <span>Ta’lim natijalarini tasdiqlash</span>
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleSaveEvaluations}
+                  isLoading={loading}
+                  leftIcon={<Save className="w-3.5 h-3.5" />}
+                  className="rounded-xl font-semibold"
+                >
+                  Ta’lim natijalarini tasdiqlash
                 </Button>
               </div>
             </div>
@@ -672,29 +702,27 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
           {/* TAB 4: AI Advisory Support */}
           {activeTab === 'ai' && (
             <div className="space-y-4 text-xs">
-              <Card className="border-cyan-500/20 bg-cyan-500/5">
-                <CardContent className="p-4 text-cyan-800 dark:text-cyan-300 flex items-start gap-3">
-                  <Sparkles className="w-5 h-5 shrink-0 text-cyan-600 mt-0.5" />
-                  <div>
-                    <h4 className="font-bold text-sm mb-1">Dars Sifatini Yaxshilash bo‘yicha AI Maslahatchisi</h4>
-                    <p className="text-xs opacity-90 leading-relaxed">
-                      AI tizimi dars o‘tish jarayonida qayd etilgan qiyinchiliklar va refleksiya asosida tushuntirishning muqobil variantlari, qo‘shimcha mashqlar va takrorlash metodlarini tavsiya qiladi.
-                    </p>
-                  </div>
-                </CardContent>
+              <Card className="rounded-2xl bg-cyan-500/10 border-cyan-500/20 text-cyan-900 dark:text-cyan-300 p-4 flex items-start gap-3">
+                <Sparkles className="w-5 h-5 shrink-0 text-cyan-600 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-sm mb-1">Dars Sifatini Yaxshilash bo‘yicha AI Maslahatchisi</h4>
+                  <p className="text-xs opacity-90 leading-relaxed">
+                    AI tizimi dars o‘tish jarayonida qayd etilgan qiyinchiliklar va refleksiya asosida tushuntirishning muqobil variantlari, qo‘shimcha mashqlar va takrorlash metodlarini tavsiya qiladi.
+                  </p>
+                </div>
               </Card>
 
               {!aiSuggestions ? (
                 <div className="py-12 text-center space-y-3">
                   <Button
                     variant="default"
-                    size="default"
+                    size="md"
                     onClick={handleLoadAiSuggestions}
-                    disabled={loading}
-                    className="gap-1.5"
+                    isLoading={loading}
+                    leftIcon={<BrainCircuit className="w-4 h-4" />}
+                    className="rounded-xl font-semibold shadow-md shadow-primary/20"
                   >
-                    <BrainCircuit className="w-4 h-4" />
-                    <span>AI Dars Tavsiyalarini Shakllantirish</span>
+                    AI Dars Tavsiyalarini Shakllantirish
                   </Button>
                   <p className="text-[11px] text-muted-foreground">
                     Dars o‘tish hisobotidagi ma’lumotlar asosida tahlil qilinadi
@@ -703,70 +731,62 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
               ) : (
                 <div className="space-y-4">
                   {/* Advisory Disclaimer Badge */}
-                  <div className="px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-400 text-[11px] font-medium flex items-center gap-2">
-                    <AlertCircle className="w-4 h-4 shrink-0" />
+                  <Card className="rounded-xl bg-amber-500/10 border-amber-500/20 text-amber-800 dark:text-amber-300 p-3 text-[11px] font-medium flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 shrink-0 text-amber-600" />
                     <span>{aiSuggestions.disclaimer}</span>
-                  </div>
+                  </Card>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Alternative Explanations */}
-                    <Card className="border-border/60 bg-muted/20">
-                      <CardContent className="p-4 space-y-2">
-                        <h4 className="font-bold text-foreground flex items-center gap-1.5">
-                          <Lightbulb className="w-4 h-4 text-amber-500" />
-                          <span>Muqobil tushuntirish usullari</span>
-                        </h4>
-                        <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
-                          {aiSuggestions.alternativeExplanations.map((item, idx) => (
-                            <li key={idx} className="leading-relaxed">{item}</li>
-                          ))}
-                        </ul>
-                      </CardContent>
+                    <Card className="rounded-2xl border-border/40 p-4 space-y-2">
+                      <h4 className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                        <Lightbulb className="w-4 h-4 text-amber-500" />
+                        <span>Muqobil tushuntirish usullari</span>
+                      </h4>
+                      <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
+                        {aiSuggestions.alternativeExplanations.map((item, idx) => (
+                          <li key={idx} className="leading-relaxed">{item}</li>
+                        ))}
+                      </ul>
                     </Card>
 
                     {/* Additional Practical Exercises */}
-                    <Card className="border-border/60 bg-muted/20">
-                      <CardContent className="p-4 space-y-2">
-                        <h4 className="font-bold text-foreground flex items-center gap-1.5">
-                          <BookOpen className="w-4 h-4 text-blue-500" />
-                          <span>Qo‘shimcha amaliy mashqlar</span>
-                        </h4>
-                        <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
-                          {aiSuggestions.additionalPracticalExercises.map((item, idx) => (
-                            <li key={idx} className="leading-relaxed">{item}</li>
-                          ))}
-                        </ul>
-                      </CardContent>
+                    <Card className="rounded-2xl border-border/40 p-4 space-y-2">
+                      <h4 className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                        <BookOpen className="w-4 h-4 text-blue-500" />
+                        <span>Qo‘shimcha amaliy mashqlar</span>
+                      </h4>
+                      <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
+                        {aiSuggestions.additionalPracticalExercises.map((item, idx) => (
+                          <li key={idx} className="leading-relaxed">{item}</li>
+                        ))}
+                      </ul>
                     </Card>
 
                     {/* Revision Activities */}
-                    <Card className="border-border/60 bg-muted/20">
-                      <CardContent className="p-4 space-y-2">
-                        <h4 className="font-bold text-foreground flex items-center gap-1.5">
-                          <RotateCcw className="w-4 h-4 text-emerald-500" />
-                          <span>Mustahkamlash faoliyatlari (Revision)</span>
-                        </h4>
-                        <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
-                          {aiSuggestions.revisionActivities.map((item, idx) => (
-                            <li key={idx} className="leading-relaxed">{item}</li>
-                          ))}
-                        </ul>
-                      </CardContent>
+                    <Card className="rounded-2xl border-border/40 p-4 space-y-2">
+                      <h4 className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                        <RotateCcw className="w-4 h-4 text-emerald-500" />
+                        <span>Mustahkamlash faoliyatlari (Revision)</span>
+                      </h4>
+                      <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
+                        {aiSuggestions.revisionActivities.map((item, idx) => (
+                          <li key={idx} className="leading-relaxed">{item}</li>
+                        ))}
+                      </ul>
                     </Card>
 
                     {/* Lesson Plan Improvements */}
-                    <Card className="border-border/60 bg-muted/20">
-                      <CardContent className="p-4 space-y-2">
-                        <h4 className="font-bold text-foreground flex items-center gap-1.5">
-                          <TrendingUp className="w-4 h-4 text-purple-500" />
-                          <span>Kelgusi darslar uchun yaxshilanishlar</span>
-                        </h4>
-                        <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
-                          {aiSuggestions.lessonPlanImprovements.map((item, idx) => (
-                            <li key={idx} className="leading-relaxed">{item}</li>
-                          ))}
-                        </ul>
-                      </CardContent>
+                    <Card className="rounded-2xl border-border/40 p-4 space-y-2">
+                      <h4 className="font-bold text-foreground flex items-center gap-1.5 text-xs">
+                        <TrendingUp className="w-4 h-4 text-purple-500" />
+                        <span>Kelgusi darslar uchun yaxshilanishlar</span>
+                      </h4>
+                      <ul className="space-y-1.5 text-xs text-muted-foreground list-disc pl-4">
+                        {aiSuggestions.lessonPlanImprovements.map((item, idx) => (
+                          <li key={idx} className="leading-relaxed">{item}</li>
+                        ))}
+                      </ul>
                     </Card>
                   </div>
                 </div>
@@ -776,15 +796,15 @@ export const LessonQualityModal: React.FC<LessonQualityModalProps> = ({
         </div>
 
         {/* Footer */}
-        <DialogFooter className="p-4 px-6 border-t border-border/40 bg-muted/20 flex items-center justify-between text-xs">
-          <span className="text-muted-foreground hidden sm:inline">
+        <div className="p-4 border-t border-border/40 bg-muted/20 flex items-center justify-between text-xs">
+          <span className="text-muted-foreground">
             AXM Nexus Dars Sifati Standarti • Muhammad Al-Xorazmiy Vorislari
           </span>
-          <Button variant="outline" size="sm" onClick={onClose}>
+          <Button variant="outline" size="sm" onClick={onClose} className="rounded-xl">
             {t('common.close')}
           </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </div>
+      </div>
+    </div>
   );
 };
