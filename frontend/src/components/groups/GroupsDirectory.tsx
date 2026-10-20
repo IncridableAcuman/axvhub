@@ -11,9 +11,27 @@ import {
   RefreshCw,
   UserPlus,
   ArrowRight,
+  LayoutGrid,
+  List,
+  BarChart3,
+  Layers,
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button/Button';
-import { Input } from '@/shared/ui/input/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardTitle } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { groupStructureApi } from '@/api';
 import { GroupDetailsModal } from './GroupDetailsModal';
 import { StudentEnrollmentModal } from './StudentEnrollmentModal';
@@ -38,6 +56,7 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
   const [search, setSearch] = useState('');
   const [selectedGrade, setSelectedGrade] = useState<string>('all');
   const [selectedStatus, setSelectedStatus] = useState<string>('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('grid');
 
   // Modals
   const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
@@ -108,23 +127,35 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
     { value: 'COMPLETED', label: 'Tamomlagan' },
   ];
 
+  // Executive summary metrics
+  const totalGroups = groups.length;
+  const activeGroupsCount = groups.filter((g) => g.status === 'ACTIVE').length;
+  const totalStudents = groups.reduce((acc, g) => acc + (g.studentCount || 0), 0);
+  const avgCapacity = totalGroups > 0
+    ? Math.round(
+        (groups.reduce((acc, g) => acc + ((g.studentCount || 0) / (g.maxCapacity || 16)), 0) /
+          totalGroups) *
+          100
+      )
+    : 0;
+
   return (
     <div className="space-y-6 animate-fade-in-up">
-      {/* Header Banner */}
-      <div className="glass-panel text-[var(--text-primary)] rounded-3xl p-6 border border-[var(--border-default)] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {/* 1. Header Banner */}
+      <div className="bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none flex flex-col md:flex-row md:items-center justify-between gap-4 border-0">
         <div>
           <div className="flex items-center space-x-3 mb-1">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center font-bold shadow-md shadow-emerald-500/20">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold">
               <GraduationCap className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)]">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
                   O'quv Tuzilmasi & Guruhlar Boshqaruvi
                 </h1>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               </div>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 8–11-sinflar bo‘yicha guruhlar, mentorlar taqsimoti, laboratoriya sig‘imi va a’zolik
               </p>
             </div>
@@ -132,14 +163,21 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
         </div>
 
         <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={loadGroups} disabled={loading} title="Yangilash">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={loadGroups}
+            disabled={loading}
+            title="Yangilash"
+            className="rounded-xl border-0 bg-muted/40 hover:bg-muted text-foreground"
+          >
+            <RefreshCw className={cn('w-4 h-4', loading && 'animate-spin')} />
           </Button>
           <Button
-            variant="primary"
+            variant="default"
             size="sm"
             onClick={() => setIsCreateOpen(true)}
-            className="btn-shimmer flex items-center space-x-1.5 shadow-md shadow-[var(--brand-primary)]/20"
+            className="rounded-xl shadow-xs gap-1.5 font-semibold text-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Yangi guruh ochish</span>
@@ -147,71 +185,182 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="glass-panel rounded-2xl p-4 border border-[var(--border-default)] shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
-        <form onSubmit={handleSearchSubmit} className="flex-1 w-full md:w-auto relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+      {/* 2. Executive KPI Cards (Soft, Borderless Modern Design) */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-card text-card-foreground rounded-2xl p-4 sm:p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">Jami guruhlar</span>
+            <div className="text-2xl font-extrabold text-foreground">{totalGroups} ta</div>
+            <span className="text-[11px] text-muted-foreground">8–11-sinflar umumiy</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+            <Layers className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-card text-card-foreground rounded-2xl p-4 sm:p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">Faol dars guruhlari</span>
+            <div className="text-2xl font-extrabold text-foreground">{activeGroupsCount} ta</div>
+            <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Faoliyat davom etmoqda</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+            <GraduationCap className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-card text-card-foreground rounded-2xl p-4 sm:p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">O‘quvchilar a’zoligi</span>
+            <div className="text-2xl font-extrabold text-foreground">{totalStudents} nafar</div>
+            <span className="text-[11px] text-muted-foreground">Guruhlarga biriktirilgan</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 flex items-center justify-center">
+            <Users className="w-5 h-5" />
+          </div>
+        </div>
+
+        <div className="bg-card text-card-foreground rounded-2xl p-4 sm:p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex items-center justify-between">
+          <div className="space-y-1">
+            <span className="text-xs font-medium text-muted-foreground">O‘rtacha laboratoriya sig‘imi</span>
+            <div className="text-2xl font-extrabold text-foreground">{avgCapacity}%</div>
+            <span className="text-[11px] text-muted-foreground">16 o‘rinlik me’yor bo‘yicha</span>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+            <BarChart3 className="w-5 h-5" />
+          </div>
+        </div>
+      </div>
+
+      {/* 3. Filter and Search Bar */}
+      <div className="bg-card text-card-foreground rounded-2xl p-3.5 shadow-xs border-0 flex flex-col md:flex-row gap-3 items-center justify-between">
+        <form onSubmit={handleSearchSubmit} className="flex-1 w-full md:w-auto">
           <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Guruh nomi, mentor yoki o'quv xonasi bo'yicha qidirish..."
-            className="pl-10 text-xs w-full"
+            leftIcon={<Search className="w-4 h-4 text-muted-foreground" />}
+            className="bg-muted/40 border-0 text-xs h-10 rounded-xl focus-visible:ring-1 focus-visible:ring-primary w-full"
           />
         </form>
 
-        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          {/* Grade filter */}
-          <div className="flex bg-slate-100 dark:bg-slate-800/60 p-1 rounded-xl text-xs font-semibold">
-            {gradeFilterOptions.map((grade) => (
-              <button
-                key={grade}
-                type="button"
-                onClick={() => setSelectedGrade(grade)}
-                className={`px-3 py-1.5 rounded-lg transition cursor-pointer text-xs ${
-                  selectedGrade === grade
-                    ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs font-bold'
-                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-                }`}
-              >
-                {grade === 'all' ? 'Barcha sinflar' : grade}
-              </button>
-            ))}
+        <div className="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
+          {/* Grade filter buttons */}
+          <div className="flex bg-muted/50 p-1 rounded-xl text-xs font-semibold gap-1 overflow-x-auto">
+            {gradeFilterOptions.map((grade) => {
+              const isSelected = selectedGrade === grade;
+              return (
+                <button
+                  key={grade}
+                  type="button"
+                  onClick={() => setSelectedGrade(grade)}
+                  className={cn(
+                    'px-3 py-1.5 rounded-lg transition-all cursor-pointer text-xs font-medium border-0',
+                    isSelected
+                      ? 'bg-card text-foreground shadow-xs font-bold'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                  )}
+                >
+                  {grade === 'all' ? 'Barcha sinflar' : grade}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Status filter */}
-          <select
-            value={selectedStatus}
-            onChange={(e) => setSelectedStatus(e.target.value)}
-            aria-label="Holat filtri"
-            className="text-xs rounded-xl border border-slate-300 dark:border-[var(--border-default)] bg-white dark:bg-[var(--bg-surface)] px-3 py-2 text-slate-700 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-blue-500 cursor-pointer"
-          >
-            {statusFilterOptions.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-2">
+            {/* Status filter */}
+            <select
+              value={selectedStatus}
+              onChange={(e) => setSelectedStatus(e.target.value)}
+              aria-label="Holat filtri"
+              className="text-xs h-9 rounded-xl bg-muted/40 border-0 px-3 py-1.5 text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary cursor-pointer font-medium"
+            >
+              {statusFilterOptions.map((opt) => (
+                <option key={opt.value} value={opt.value} className="bg-popover text-popover-foreground">
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+
+            {/* View Mode Switcher */}
+            <div className="flex items-center rounded-xl p-0.5 bg-muted/50">
+              <Button
+                type="button"
+                variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                size="icon"
+                onClick={() => setViewMode('grid')}
+                className={cn(
+                  'h-8 w-8 rounded-lg cursor-pointer border-0',
+                  viewMode === 'grid'
+                    ? 'bg-card text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="Karta ko‘rinishi"
+              >
+                <LayoutGrid className="w-4 h-4" />
+              </Button>
+              <Button
+                type="button"
+                variant={viewMode === 'table' ? 'default' : 'ghost'}
+                size="icon"
+                onClick={() => setViewMode('table')}
+                className={cn(
+                  'h-8 w-8 rounded-lg cursor-pointer border-0',
+                  viewMode === 'table'
+                    ? 'bg-card text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+                title="Jadval ko‘rinishi"
+              >
+                <List className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Groups Grid */}
+      {/* 4. Groups Content */}
       {loading && groups.length === 0 ? (
-        <div className="py-20 text-center">
-          <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-xs text-slate-500 font-medium">Guruhlar yuklanmoqda...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {[...Array(6)].map((_, i) => (
+            <Card key={i} className="rounded-2xl p-5 border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none space-y-4">
+              <div className="flex justify-between items-center">
+                <Skeleton className="h-5 w-20 rounded-full bg-muted/60" />
+                <Skeleton className="h-5 w-16 rounded-full bg-muted/60" />
+              </div>
+              <Skeleton className="h-6 w-3/4 rounded-md bg-muted/60" />
+              <Skeleton className="h-4 w-1/2 rounded-md bg-muted/60" />
+              <Skeleton className="h-14 w-full rounded-xl bg-muted/40" />
+              <div className="grid grid-cols-2 gap-2">
+                <Skeleton className="h-4 w-full bg-muted/60" />
+                <Skeleton className="h-4 w-full bg-muted/60" />
+              </div>
+              <Skeleton className="h-2 w-full rounded-full bg-muted/40" />
+              <div className="flex justify-between pt-2">
+                <Skeleton className="h-8 w-24 rounded-lg bg-muted/60" />
+                <Skeleton className="h-8 w-24 rounded-lg bg-muted/60" />
+              </div>
+            </Card>
+          ))}
         </div>
       ) : groups.length === 0 ? (
-        <div className="bg-white dark:bg-[var(--bg-surface)] rounded-2xl p-12 text-center border border-slate-200 dark:border-[var(--border-default)]">
-          <Users className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">Hech qanday guruh topilmadi</h3>
-          <p className="text-xs text-slate-400 mt-1 mb-4">
+        <Card className="rounded-2xl p-12 text-center border-0 shadow-xs bg-card">
+          <Users className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
+          <h3 className="text-sm font-bold text-foreground">Hech qanday guruh topilmadi</h3>
+          <p className="text-xs text-muted-foreground mt-1 mb-4">
             Qidiruv shartlarini o'zgartiring yoki yangi guruh yarating.
           </p>
-          <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)}>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={() => setIsCreateOpen(true)}
+            className="rounded-xl font-semibold text-xs"
+          >
             Yangi guruh ochish
           </Button>
-        </div>
-      ) : (
+        </Card>
+      ) : viewMode === 'grid' ? (
+        /* Grid Cards View */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {groups.map((group) => {
             const studentCount = group.studentCount ?? 0;
@@ -220,73 +369,76 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
             const isFull = studentCount >= maxCap;
 
             return (
-              <div
+              <Card
                 key={group.id}
                 onClick={() => handleOpenDetail(group.id)}
-                className="interactive-card shimmer-container group p-5 cursor-pointer flex flex-col justify-between"
+                className="group relative bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer flex flex-col justify-between border-0 ring-1 ring-border/20 hover:ring-border/40"
               >
                 <div>
                   {/* Top badges */}
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300 dark:border-blue-900">
+                    <Badge variant="secondary" className="font-semibold text-xs rounded-full px-2.5 py-0.5">
                       {group.gradeLevel}
-                    </span>
-                    <span
-                      className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full ${
+                    </Badge>
+                    <Badge
+                      variant={
                         group.status === 'ACTIVE'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300'
+                          ? 'success'
                           : group.status === 'ARCHIVED'
-                          ? 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400'
-                          : 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/40 dark:text-purple-300'
-                      }`}
+                          ? 'neutral'
+                          : 'warning'
+                      }
+                      className="text-[10px] rounded-full px-2.5 py-0.5"
                     >
                       {group.status === 'ACTIVE'
                         ? 'Faol'
                         : group.status === 'ARCHIVED'
                         ? 'Arxivlangan'
                         : group.status}
-                    </span>
+                    </Badge>
                   </div>
 
                   {/* Group Name & Room */}
-                  <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mb-1 group-hover:text-blue-600 transition">
+                  <CardTitle className="text-base font-bold text-foreground group-hover:text-primary transition-colors mb-1 line-clamp-1">
                     {group.name || group.groupCode}
-                  </h3>
-                  <div className="flex items-center text-xs text-slate-500 dark:text-slate-400 mb-3 space-x-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                  </CardTitle>
+                  <div className="flex items-center text-xs text-muted-foreground mb-3 space-x-1.5">
+                    <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
                     <span>{group.roomLocation || group.room || 'Xona belgilanmagan'}</span>
                   </div>
 
-                  {/* Mentor Info */}
-                  <div className="bg-slate-50 dark:bg-slate-900/60 rounded-xl p-3 mb-3 border border-slate-100 dark:border-slate-800">
-                    <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                  {/* Mentor Info (Soft background, no border) */}
+                  <div className="bg-muted/40 rounded-xl p-3 mb-3 border-0">
+                    <div className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1">
                       Biriktirilgan Mentor
                     </div>
                     {group.mentor ? (
-                      <div className="flex items-center space-x-2">
-                        <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white font-bold flex items-center justify-center text-xs">
-                          {group.mentor.fullName.charAt(0)}
-                        </div>
-                        <div>
-                          <div className="text-xs font-bold text-slate-800 dark:text-slate-200">
+                      <div className="flex items-center space-x-2.5">
+                        <Avatar className="w-7 h-7 rounded-lg">
+                          <AvatarFallback className="text-xs font-bold bg-primary/10 text-primary rounded-lg">
+                            {group.mentor.fullName.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="truncate">
+                          <div className="text-xs font-bold text-foreground truncate">
                             {group.mentor.fullName}
                           </div>
-                          <div className="text-[10px] text-slate-500">{group.mentor.role}</div>
+                          <div className="text-[10px] text-muted-foreground truncate">{group.mentor.role}</div>
                         </div>
                       </div>
                     ) : (
-                      <div className="text-xs text-slate-400 italic">Mentor belgilanmagan</div>
+                      <div className="text-xs text-muted-foreground italic">Mentor belgilanmagan</div>
                     )}
                   </div>
 
                   {/* Schedule Details */}
-                  <div className="grid grid-cols-2 gap-2 text-xs text-slate-600 dark:text-slate-400 mb-4">
-                    <div className="flex items-center space-x-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
+                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground mb-4">
+                    <div className="flex items-center space-x-1.5 truncate">
+                      <Calendar className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                       <span className="truncate">{group.lessonDays || group.scheduleDays || 'Dush-Chor-Jum'}</span>
                     </div>
-                    <div className="flex items-center space-x-1.5">
-                      <Clock className="w-3.5 h-3.5 text-slate-400" />
+                    <div className="flex items-center space-x-1.5 truncate">
+                      <Clock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
                       <span className="truncate">{group.lessonTime || group.scheduleTime || '14:00 - 16:00'}</span>
                     </div>
                   </div>
@@ -294,75 +446,198 @@ export const GroupsDirectory: React.FC<GroupsDirectoryProps> = ({
                   {/* Capacity Progress Bar */}
                   <div className="space-y-1.5 mb-2">
                     <div className="flex items-center justify-between text-xs font-semibold">
-                      <span className="text-slate-600 dark:text-slate-400">Guruh sig'imi:</span>
-                      <span
-                        className={
-                          isFull
-                            ? 'text-rose-600 font-bold dark:text-rose-400'
-                            : 'text-slate-800 dark:text-slate-200'
-                        }
-                      >
+                      <span className="text-muted-foreground">Guruh sig'imi:</span>
+                      <span className={isFull ? 'text-destructive font-bold' : 'text-foreground font-semibold'}>
                         {studentCount} / {maxCap} {isFull ? '(To‘lgan)' : ''}
                       </span>
                     </div>
-                    <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-2 overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ${
-                          isFull
-                            ? 'bg-rose-500'
-                            : capacityRatio > 75
-                            ? 'bg-amber-500'
-                            : 'bg-blue-600'
-                        }`}
-                        style={{ width: `${capacityRatio}%` }}
-                      ></div>
-                    </div>
+                    <Progress
+                      value={capacityRatio}
+                      className="h-2 bg-muted/60"
+                      indicatorClassName={
+                        isFull
+                          ? 'bg-destructive'
+                          : capacityRatio > 75
+                          ? 'bg-amber-500'
+                          : 'bg-primary'
+                      }
+                    />
                   </div>
                 </div>
 
                 {/* Footer Buttons */}
-                <div className="pt-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-                  <button
+                <div className="pt-4 border-t border-border/20 flex items-center justify-between gap-2 mt-2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
                     onClick={(e) => handleOpenEnroll(group, e)}
                     disabled={isFull}
-                    className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition flex items-center space-x-1 cursor-pointer ${
-                      isFull
-                        ? 'opacity-40 cursor-not-allowed text-slate-400 bg-slate-100 dark:bg-slate-800'
-                        : 'bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300'
-                    }`}
+                    className="h-8 text-xs font-semibold rounded-lg gap-1"
                     title={isFull ? "Guruh sig'imi to'lgan" : "O'quvchi biriktirish"}
                   >
                     <UserPlus className="w-3.5 h-3.5" />
                     <span>Biriktirish</span>
-                  </button>
+                  </Button>
 
                   <div className="flex items-center space-x-1.5">
-                    <button
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       onClick={(e) => handleToggleStatus(group, e)}
-                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition cursor-pointer"
+                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
                       title={group.status === 'ACTIVE' ? 'Guruhni arxivlash' : 'Qayta faollashtirish'}
                     >
                       <Archive className="w-3.5 h-3.5" />
-                    </button>
+                    </Button>
 
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleOpenDetail(group.id)}
-                      className="text-xs font-semibold flex items-center space-x-1"
+                      className="h-8 text-xs font-semibold rounded-lg border-border/40 hover:bg-muted gap-1"
                     >
                       <span>Tafsilot</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Button>
                   </div>
                 </div>
-              </div>
+              </Card>
             );
           })}
         </div>
+      ) : (
+        /* Table View */
+        <Card className="rounded-2xl overflow-hidden border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card">
+          <Table>
+            <TableHeader className="bg-muted/40">
+              <TableRow className="border-0 hover:bg-transparent">
+                <TableHead className="text-xs font-semibold text-muted-foreground">Guruh nomi</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground">Sinf</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground">Biriktirilgan Mentor</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground">Xona</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground">Dars vaqti</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground">Sig'im</TableHead>
+                <TableHead className="text-xs font-semibold text-muted-foreground">Holat</TableHead>
+                <TableHead className="text-right text-xs font-semibold text-muted-foreground">Amallar</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {groups.map((group) => {
+                const studentCount = group.studentCount ?? 0;
+                const maxCap = group.maxCapacity || 16;
+                const capacityRatio = Math.min(100, Math.round((studentCount / maxCap) * 100));
+                const isFull = studentCount >= maxCap;
+
+                return (
+                  <TableRow
+                    key={group.id}
+                    onClick={() => handleOpenDetail(group.id)}
+                    className="hover:bg-muted/30 border-0 transition-colors cursor-pointer"
+                  >
+                    <TableCell className="font-bold text-xs text-foreground py-3.5">
+                      {group.name || group.groupCode}
+                    </TableCell>
+                    <TableCell className="py-3.5">
+                      <Badge variant="secondary" className="text-xs font-semibold rounded-full">
+                        {group.gradeLevel}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="py-3.5">
+                      {group.mentor ? (
+                        <div className="flex items-center gap-2">
+                          <Avatar className="w-6 h-6 rounded-md">
+                            <AvatarFallback className="text-[10px] font-bold bg-primary/10 text-primary rounded-md">
+                              {group.mentor.fullName.charAt(0)}
+                            </AvatarFallback>
+                          </Avatar>
+                          <span className="text-xs font-medium text-foreground">{group.mentor.fullName}</span>
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground italic">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground py-3.5">
+                      {group.roomLocation || group.room || 'Xona yo‘q'}
+                    </TableCell>
+                    <TableCell className="text-xs text-muted-foreground py-3.5">
+                      {group.lessonDays || group.scheduleDays} ({group.lessonTime || group.scheduleTime})
+                    </TableCell>
+                    <TableCell className="py-3.5">
+                      <div className="flex items-center gap-2 w-28">
+                        <Progress
+                          value={capacityRatio}
+                          className="h-1.5 bg-muted/60"
+                          indicatorClassName={
+                            isFull
+                              ? 'bg-destructive'
+                              : capacityRatio > 75
+                              ? 'bg-amber-500'
+                              : 'bg-primary'
+                          }
+                        />
+                        <span className="text-[11px] font-semibold text-muted-foreground shrink-0">
+                          {studentCount}/{maxCap}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell className="py-3.5">
+                      <Badge
+                        variant={
+                          group.status === 'ACTIVE'
+                            ? 'success'
+                            : group.status === 'ARCHIVED'
+                            ? 'neutral'
+                            : 'warning'
+                        }
+                        className="text-[10px] rounded-full"
+                      >
+                        {group.status === 'ACTIVE'
+                          ? 'Faol'
+                          : group.status === 'ARCHIVED'
+                          ? 'Arxivlangan'
+                          : group.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right py-3.5" onClick={(e) => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={(e) => handleOpenEnroll(group, e)}
+                          disabled={isFull}
+                          className="h-7 text-xs rounded-lg px-2"
+                          title="Biriktirish"
+                        >
+                          <UserPlus className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={(e) => handleToggleStatus(group, e)}
+                          className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground"
+                          title={group.status === 'ACTIVE' ? 'Arxivlash' : 'Faollashtirish'}
+                        >
+                          <Archive className="w-3.5 h-3.5" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOpenDetail(group.id)}
+                          className="h-7 text-xs rounded-lg border-border/40 hover:bg-muted px-2.5"
+                        >
+                          Tafsilot
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
-      {/* Modals */}
+      {/* 5. Modals */}
       <GroupDetailsModal
         groupId={selectedGroupId}
         isOpen={isDetailOpen}

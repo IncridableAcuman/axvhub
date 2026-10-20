@@ -12,9 +12,15 @@ import {
   AlertTriangle,
   Lightbulb,
   GraduationCap,
+  Loader2,
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button/Button';
-import { Badge } from '@/shared/ui/badge/Badge';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Skeleton } from '@/components/ui/skeleton';
+import { cn } from '@/lib/utils';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { aiAssistantApi } from '@/api';
 import type {
@@ -106,9 +112,12 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
         },
         ...prev.slice(0, 7),
       ]);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('AI generation error:', err);
-      toast.error(err.response?.data?.message || 'AI xizmati vaqtinchalik band yoki xatolik yuz berdi.');
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'AI xizmati vaqtinchalik band yoki xatolik yuz berdi.';
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -141,7 +150,9 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
         group?.id
       );
 
-      toast.success('Dars rejasi muvaffaqiyatli DRAFT sifatida saqlandi! Darslar bo‘limida ko‘rib chiqishingiz mumkin.');
+      toast.success(
+        'Dars rejasi muvaffaqiyatli DRAFT sifatida saqlandi! Darslar bo‘limida ko‘rib chiqishingiz mumkin.'
+      );
       if (onNavigateTab) {
         onNavigateTab('lessons');
       }
@@ -174,7 +185,9 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
         questions: response.generatedQuizQuestions,
       });
 
-      toast.success('Test savollari muvaffaqiyatli DRAFT sifatida saqlandi! Testlar bo‘limida ko‘rib chiqishingiz mumkin.');
+      toast.success(
+        'Test savollari muvaffaqiyatli DRAFT sifatida saqlandi! Testlar bo‘limida ko‘rib chiqishingiz mumkin.'
+      );
       if (onNavigateTab) {
         onNavigateTab('assessments');
       }
@@ -187,105 +200,135 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto pb-16">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[var(--border-subtle)] pb-5">
+    <div className="space-y-6 max-w-7xl mx-auto pb-16 animate-fade-in-up">
+      {/* 1. Page Header Banner (Soft, Borderless Modern Design) */}
+      <div className="bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center shadow-xs">
-              <Sparkles className="w-5 h-5" />
+          <div className="flex items-center gap-3.5">
+            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
+              <Sparkles className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h1 className="text-xl md:text-2xl font-bold text-[var(--text-primary)]">
+                <h1 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
                   AI Teaching & Learning Assistant
                 </h1>
-                <Badge variant="outline" className="border-emerald-600 text-emerald-700 font-medium">
+                <Badge variant="secondary" className="font-semibold text-xs rounded-full">
                   Modul 13
                 </Badge>
               </div>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Mentorlar uchun dars rejalari va testlar tuzuvchi, o‘quvchilar uchun mavzularni tushuntiruvchi aqlli yordamchi
               </p>
             </div>
           </div>
         </div>
 
-        {/* Advisory Header Badge */}
-        <div className="flex items-center gap-2 p-2 px-3 bg-amber-50 rounded-xl border border-amber-200/80 text-amber-900 text-xs">
-          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+        {/* Advisory Header Badge (Border-free soft amber notice) */}
+        <div className="flex items-center gap-2 p-2.5 px-3.5 bg-amber-500/10 rounded-xl text-amber-700 dark:text-amber-300 text-xs font-medium border-0 shrink-0">
+          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
           <span>AI maslahat beradi — E’lon qilishdan oldin mentor tekshirishi shart</span>
         </div>
       </div>
 
-      {/* Main Workspace Layout */}
+      {/* 2. Main Workspace Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Control Column (Options & Prompts) */}
-        <div className="lg:col-span-4 space-y-5">
-          {/* Role Switcher */}
-          <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs space-y-4">
-            <label className="block text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+        <div className="lg:col-span-4 space-y-4">
+          {/* Role Switcher & Configuration */}
+          <Card className="rounded-2xl p-5 border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card text-card-foreground space-y-4">
+            <div className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
               Assistent Rejimi
-            </label>
-            <div className="grid grid-cols-2 gap-2 p-1 bg-[var(--surface-secondary)] rounded-xl">
+            </div>
+
+            {/* Segmented Mode Switcher */}
+            <div className="grid grid-cols-2 gap-1 p-1 bg-muted/50 rounded-xl border-0">
               <button
+                type="button"
                 onClick={() => {
                   setRole('MENTOR_ASSISTANT');
                   setIntent('LESSON_PLAN');
                 }}
-                className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                className={cn(
+                  'flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer border-0',
                   role === 'MENTOR_ASSISTANT'
-                    ? 'bg-[var(--bg-surface)] text-[var(--brand-primary)] shadow-xs border border-[var(--border-default)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                }`}
+                    ? 'bg-card text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                )}
               >
-                <GraduationCap className="w-4 h-4" />
-                Mentor Uchun
+                <GraduationCap className="w-4 h-4 text-primary" />
+                <span>Mentor Uchun</span>
               </button>
               <button
+                type="button"
                 onClick={() => {
                   setRole('STUDENT_ASSISTANT');
                   setIntent('SIMPLE_EXPLANATION');
                 }}
-                className={`flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all ${
+                className={cn(
+                  'flex items-center justify-center gap-2 py-2 px-3 rounded-lg text-xs font-bold transition-all cursor-pointer border-0',
                   role === 'STUDENT_ASSISTANT'
-                    ? 'bg-[var(--bg-surface)] text-[var(--brand-primary)] shadow-xs border border-[var(--border-default)]'
-                    : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-                }`}
+                    ? 'bg-card text-foreground shadow-xs'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/60'
+                )}
               >
-                <Bot className="w-4 h-4" />
-                O‘quvchi Uchun
+                <Bot className="w-4 h-4 text-primary" />
+                <span>O‘quvchi Uchun</span>
               </button>
             </div>
 
             {/* Task Intent Selector */}
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1.5">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-foreground">
                 Vazifa turi (Use Case):
               </label>
               <select
                 aria-label="Vazifa turini tanlash"
                 value={intent}
                 onChange={(e) => setIntent(e.target.value as AiIntent)}
-                className="w-full text-xs bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg p-2.5 font-medium text-[var(--text-primary)] focus:outline-hidden"
+                className="w-full text-xs bg-muted/40 border-0 rounded-xl p-2.5 font-medium text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary cursor-pointer"
               >
                 {role === 'MENTOR_ASSISTANT' ? (
                   <>
-                    <option value="LESSON_PLAN">80 daqiqalik Dars Rejasi (Lesson Plan Draft)</option>
-                    <option value="QUIZ_GENERATION">Oraliq Test Savollari (Draft Quiz)</option>
-                    <option value="CONCEPT_EXPLANATION">Mavzuni Tushuntirish Metodikasi</option>
-                    <option value="DIFFERENTIATED_EXERCISES">3 Darajali Differensial Topshiriqlar</option>
-                    <option value="PRACTICAL_EXERCISES">Amaliy Laboratoriya Mashqlari</option>
-                    <option value="HOMEWORK_SUGGESTION">Ijodiy Uyga Vazifalar</option>
-                    <option value="SUMMARIZE_MATERIAL">O‘quv Materiallarini Qisqartirish</option>
+                    <option value="LESSON_PLAN" className="bg-popover text-popover-foreground">
+                      80 daqiqalik Dars Rejasi (Lesson Plan Draft)
+                    </option>
+                    <option value="QUIZ_GENERATION" className="bg-popover text-popover-foreground">
+                      Oraliq Test Savollari (Draft Quiz)
+                    </option>
+                    <option value="CONCEPT_EXPLANATION" className="bg-popover text-popover-foreground">
+                      Mavzuni Tushuntirish Metodikasi
+                    </option>
+                    <option value="DIFFERENTIATED_EXERCISES" className="bg-popover text-popover-foreground">
+                      3 Darajali Differensial Topshiriqlar
+                    </option>
+                    <option value="PRACTICAL_EXERCISES" className="bg-popover text-popover-foreground">
+                      Amaliy Laboratoriya Mashqlari
+                    </option>
+                    <option value="HOMEWORK_SUGGESTION" className="bg-popover text-popover-foreground">
+                      Ijodiy Uyga Vazifalar
+                    </option>
+                    <option value="SUMMARIZE_MATERIAL" className="bg-popover text-popover-foreground">
+                      O‘quv Materiallarini Qisqartirish
+                    </option>
                   </>
                 ) : (
                   <>
-                    <option value="SIMPLE_EXPLANATION">Oddiy So‘zlar Bilan Tushuntir (Simple Concept)</option>
-                    <option value="EXERCISE_HINT">Masala Bo‘yicha Maslahat (Guided Hint)</option>
-                    <option value="EXPLAIN_INCORRECT_ANSWER">Noto‘g‘ri Javob Tahlili (Error Analysis)</option>
-                    <option value="FURTHER_RESOURCES">Qo‘shimcha O‘rganish Manbalari</option>
-                    <option value="INDEPENDENT_THINKING">Sokratik Mustaqil Fikrlash</option>
+                    <option value="SIMPLE_EXPLANATION" className="bg-popover text-popover-foreground">
+                      Oddiy So‘zlar Bilan Tushuntir (Simple Concept)
+                    </option>
+                    <option value="EXERCISE_HINT" className="bg-popover text-popover-foreground">
+                      Masala Bo‘yicha Maslahat (Guided Hint)
+                    </option>
+                    <option value="EXPLAIN_INCORRECT_ANSWER" className="bg-popover text-popover-foreground">
+                      Noto‘g‘ri Javob Tahlili (Error Analysis)
+                    </option>
+                    <option value="FURTHER_RESOURCES" className="bg-popover text-popover-foreground">
+                      Qo‘shimcha O‘rganish Manbalari
+                    </option>
+                    <option value="INDEPENDENT_THINKING" className="bg-popover text-popover-foreground">
+                      Sokratik Mustaqil Fikrlash
+                    </option>
                   </>
                 )}
               </select>
@@ -293,97 +336,98 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
 
             {/* Parameters Row (Grade, Language) */}
             <div className="grid grid-cols-2 gap-3 pt-1">
-              <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-foreground">
                   Sinf:
                 </label>
                 <select
                   aria-label="Sinfni tanlash"
                   value={gradeLevel}
                   onChange={(e) => setGradeLevel(e.target.value)}
-                  className="w-full text-xs bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg p-2 font-medium"
+                  className="w-full text-xs bg-muted/40 border-0 rounded-xl p-2 font-medium text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary cursor-pointer"
                 >
-                  <option value="8-sinf">8-sinf</option>
-                  <option value="9-sinf">9-sinf</option>
-                  <option value="10-sinf">10-sinf</option>
-                  <option value="11-sinf">11-sinf</option>
+                  <option value="8-sinf" className="bg-popover text-popover-foreground">8-sinf</option>
+                  <option value="9-sinf" className="bg-popover text-popover-foreground">9-sinf</option>
+                  <option value="10-sinf" className="bg-popover text-popover-foreground">10-sinf</option>
+                  <option value="11-sinf" className="bg-popover text-popover-foreground">11-sinf</option>
                 </select>
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-foreground">
                   Til:
                 </label>
                 <select
                   aria-label="Tilni tanlash"
                   value={language}
-                  onChange={(e) => setLanguage(e.target.value as any)}
-                  className="w-full text-xs bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg p-2 font-medium"
+                  onChange={(e) => setLanguage(e.target.value as 'uz' | 'ru' | 'en')}
+                  className="w-full text-xs bg-muted/40 border-0 rounded-xl p-2 font-medium text-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary cursor-pointer"
                 >
-                  <option value="uz">O‘zbekcha (Lotin)</option>
-                  <option value="ru">Русский</option>
-                  <option value="en">English</option>
+                  <option value="uz" className="bg-popover text-popover-foreground">O‘zbekcha (Lotin)</option>
+                  <option value="ru" className="bg-popover text-popover-foreground">Русский</option>
+                  <option value="en" className="bg-popover text-popover-foreground">English</option>
                 </select>
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-foreground">
                 Fan / Yo‘nalish:
               </label>
-              <input
+              <Input
                 type="text"
                 aria-label="Fan yoki yo‘nalish"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
                 placeholder="Masalan: Web Dasturlash, Kompyuter Arxitekturasi"
-                className="w-full text-xs bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg p-2 font-medium text-[var(--text-primary)]"
+                className="w-full text-xs bg-muted/40 border-0 rounded-xl h-9 text-foreground focus-visible:ring-primary"
               />
             </div>
 
             {/* AI Engine Provider Indicator */}
-            <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-xs">
-              <span className="text-[var(--text-secondary)] font-medium flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <div className="pt-3 border-t border-border/20 flex items-center justify-between text-xs">
+              <span className="text-muted-foreground font-medium flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 AI Dvigatel:
               </span>
-              <span className="font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-lg border border-emerald-200 text-[11px]">
+              <Badge variant="success" className="text-[11px] rounded-lg font-semibold">
                 Groq LLM (Qwen 27B)
-              </span>
+              </Badge>
             </div>
-          </div>
+          </Card>
 
           {/* Suggested Quick Prompts */}
-          <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
-              <Lightbulb className="w-3.5 h-3.5 text-amber-600" />
-              Tavsiya Etilgan So‘rovlar
+          <Card className="rounded-2xl p-5 border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card text-card-foreground space-y-3">
+            <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-wider">
+              <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
+              <span>Tavsiya Etilgan So‘rovlar</span>
             </div>
             <div className="space-y-2">
               {suggestedPrompts.map((p, idx) => (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => {
                     setUserPrompt(p.prompt);
                     handleGenerate(p.prompt);
                   }}
-                  className="w-full text-left p-2.5 rounded-lg border border-[var(--border-subtle)] hover:border-emerald-500 hover:bg-emerald-50/40 text-xs transition-all group"
+                  className="w-full text-left p-3 rounded-xl bg-muted/30 hover:bg-muted/70 text-xs transition-all cursor-pointer border-0 group"
                 >
-                  <div className="font-semibold text-[var(--text-primary)] group-hover:text-emerald-800">
+                  <div className="font-semibold text-foreground group-hover:text-primary transition-colors">
                     {p.label}
                   </div>
-                  <div className="text-[11px] text-[var(--text-secondary)] line-clamp-2 mt-0.5">
+                  <div className="text-[11px] text-muted-foreground line-clamp-2 mt-0.5">
                     {p.prompt}
                   </div>
                 </button>
               ))}
             </div>
-          </div>
+          </Card>
 
           {/* Session History */}
           {history.length > 0 && (
-            <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs space-y-2">
-              <span className="text-xs font-bold text-[var(--text-secondary)] uppercase tracking-wider">
+            <Card className="rounded-2xl p-4 border-0 shadow-xs bg-card text-card-foreground space-y-2">
+              <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
                 Sessiya Tarixi
               </span>
               <div className="space-y-1.5 text-xs">
@@ -394,34 +438,34 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
                       setUserPrompt(h.prompt);
                       setIntent(h.intent);
                     }}
-                    className="p-2 rounded-lg bg-[var(--surface-secondary)]/50 hover:bg-[var(--surface-secondary)] cursor-pointer flex items-center justify-between"
+                    className="p-2.5 rounded-xl bg-muted/30 hover:bg-muted/70 cursor-pointer flex items-center justify-between text-xs transition-colors border-0"
                   >
-                    <span className="truncate max-w-[200px] text-[var(--text-primary)] font-medium">
+                    <span className="truncate max-w-[200px] text-foreground font-medium">
                       {h.prompt}
                     </span>
-                    <span className="text-[10px] text-[var(--text-secondary)] shrink-0">{h.timestamp}</span>
+                    <span className="text-[10px] text-muted-foreground shrink-0">{h.timestamp}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
           )}
         </div>
 
         {/* Right Output & Interactive Chat Workspace */}
         <div className="lg:col-span-8 space-y-4">
           {/* Prompt Input Form */}
-          <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs space-y-3">
+          <Card className="rounded-2xl p-5 border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card text-card-foreground space-y-3.5">
             <div className="flex items-center justify-between">
-              <label className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-emerald-600" />
-                Mavzu yoki So‘rovingizni kiriting:
+              <label className="text-xs font-bold text-foreground flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary" />
+                <span>Mavzu yoki So‘rovingizni kiriting:</span>
               </label>
-              <span className="text-[11px] text-[var(--text-secondary)]">
+              <span className="text-[11px] text-muted-foreground">
                 Maksimal 4000 ta belgi (PII xavfsiz)
               </span>
             </div>
 
-            <textarea
+            <Textarea
               aria-label="AI so‘rov matni"
               value={userPrompt}
               onChange={(e) => setUserPrompt(e.target.value)}
@@ -431,61 +475,72 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
                   : 'Masalan: CPU va RAM o‘rtasidagi farqni oddiy hayotiy misol bilan tushuntirib ber...'
               }
               rows={3}
-              className="w-full text-xs p-3 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl focus:border-[var(--brand-primary)] focus:outline-hidden text-[var(--text-primary)] resize-none"
+              className="w-full text-xs p-3.5 bg-muted/40 border-0 rounded-xl focus-visible:ring-1 focus-visible:ring-primary text-foreground resize-none"
             />
 
-            <div className="flex items-center justify-between pt-1">
-              <div className="text-[11px] text-[var(--text-secondary)] flex items-center gap-1.5">
-                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
+              <div className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
                 <span>PII Himoyasi Faol: JSHSHIR va telefon raqamlari yashiriladi</span>
               </div>
 
               <Button
-                variant="primary"
+                variant="default"
+                size="sm"
                 onClick={() => handleGenerate()}
                 disabled={loading || !userPrompt.trim()}
-                className="gap-2 bg-[var(--brand-primary)] text-xs py-2 px-4 shadow-sm"
+                className="rounded-xl shadow-xs gap-2 font-semibold text-xs"
               >
                 {loading ? (
                   <>
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    AI Tayyorlamoqda...
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>AI Tayyorlamoqda...</span>
                   </>
                 ) : (
                   <>
                     <Send className="w-3.5 h-3.5" />
-                    Generatsiya Qilish
+                    <span>Generatsiya Qilish</span>
                   </>
                 )}
               </Button>
             </div>
-          </div>
+          </Card>
 
-          {/* AI Response Card */}
+          {/* AI Response Loading State */}
           {loading && (
-            <div className="bg-[var(--surface-primary)] p-12 rounded-xl border border-[var(--border-subtle)] text-center space-y-3">
-              <div className="w-8 h-8 border-3 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin mx-auto"></div>
-              <p className="text-xs font-semibold text-[var(--text-primary)]">
-                Pedagogik AI tavsiyalarni tuzmoqda...
-              </p>
-              <p className="text-[11px] text-[var(--text-secondary)]">
-                Dars rejalari, tushuntirishlar va test savollari 80 daqiqalik o‘quv standartiga moslanmoqda.
-              </p>
-            </div>
+            <Card className="rounded-2xl p-10 border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card text-card-foreground text-center space-y-4">
+              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                <Loader2 className="w-5 h-5 animate-spin" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs font-bold text-foreground">
+                  Pedagogik AI tavsiyalarni tuzmoqda...
+                </p>
+                <p className="text-[11px] text-muted-foreground max-w-md mx-auto">
+                  Dars rejalari, tushuntirishlar va test savollari 80 daqiqalik o‘quv standartiga moslanmoqda.
+                </p>
+              </div>
+              <div className="space-y-2 pt-2 max-w-lg mx-auto">
+                <Skeleton className="h-4 w-full bg-muted/60 rounded-md" />
+                <Skeleton className="h-4 w-4/5 mx-auto bg-muted/60 rounded-md" />
+                <Skeleton className="h-4 w-3/5 mx-auto bg-muted/40 rounded-md" />
+              </div>
+            </Card>
           )}
 
+          {/* AI Response Card */}
           {!loading && response && (
-            <div className="bg-[var(--surface-primary)] rounded-xl border border-[var(--border-subtle)] shadow-xs overflow-hidden animate-in fade-in duration-150">
+            <Card className="rounded-2xl overflow-hidden border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card text-card-foreground animate-in fade-in duration-200">
               {/* Response Header & Actions Toolbar */}
-              <div className="p-4 bg-[var(--surface-secondary)] border-b border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">
+              <div className="p-4 bg-muted/40 flex flex-wrap items-center justify-between gap-3 border-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">
                     AI
                   </div>
                   <div>
-                    <div className="text-xs font-bold text-[var(--text-primary)] flex items-center gap-2">
+                    <div className="text-xs font-bold text-foreground flex items-center gap-2">
                       <span>AXM Nexus Pedagogik Javobi</span>
-                      <Badge variant="outline" className="text-[10px] bg-white">
+                      <Badge variant="secondary" className="text-[10px] rounded-full">
                         {response.provider} / {response.model}
                       </Badge>
                     </div>
@@ -493,42 +548,42 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
                 </div>
 
                 {/* Response Actions */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 text-xs gap-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    className="h-8 text-xs gap-1.5 rounded-lg text-muted-foreground hover:text-foreground"
                     onClick={handleCopy}
                   >
-                    {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
-                    {isCopied ? 'Nusxalandi' : 'Nusxa olish'}
+                    {isCopied ? <Check className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                    <span>{isCopied ? 'Nusxalandi' : 'Nusxa olish'}</span>
                   </Button>
 
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 text-xs gap-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    className="h-8 text-xs gap-1.5 rounded-lg text-muted-foreground hover:text-foreground"
                     onClick={() => setIsEditing(!isEditing)}
                   >
                     <Edit3 className="w-3.5 h-3.5" />
-                    {isEditing ? 'Ko‘rish' : 'Tahrirlash'}
+                    <span>{isEditing ? 'Ko‘rish' : 'Tahrirlash'}</span>
                   </Button>
 
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 text-xs gap-1 text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+                    className="h-8 text-xs gap-1.5 rounded-lg text-muted-foreground hover:text-foreground"
                     onClick={() => handleGenerate()}
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    Qayta yaratish
+                    <span>Qayta yaratish</span>
                   </Button>
                 </div>
               </div>
 
-              {/* Advisory Disclaimer Notice */}
-              <div className="p-3 bg-amber-50/70 border-b border-amber-200/60 text-amber-900 text-[11px] flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+              {/* Advisory Disclaimer Notice (Soft amber, borderless) */}
+              <div className="p-3 bg-amber-500/10 text-amber-900 dark:text-amber-200 text-[11px] flex items-center gap-2 border-0">
+                <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
                 <span>{response.advisoryDisclaimer}</span>
               </div>
 
@@ -536,17 +591,17 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
               <div className="p-6">
                 {isEditing ? (
                   <div className="space-y-3">
-                    <textarea
+                    <Textarea
                       value={editableContent}
                       onChange={(e) => setEditableContent(e.target.value)}
                       rows={14}
-                      className="w-full font-mono text-xs p-3 bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-xl focus:border-[var(--brand-primary)] focus:outline-hidden"
+                      className="w-full font-mono text-xs p-3.5 bg-muted/40 border-0 rounded-xl focus-visible:ring-1 focus-visible:ring-primary text-foreground"
                     />
                     <div className="flex justify-end gap-2">
                       <Button
-                        variant="primary"
+                        variant="default"
                         size="sm"
-                        className="text-xs bg-[var(--brand-primary)]"
+                        className="text-xs rounded-lg"
                         onClick={() => {
                           if (response) response.content = editableContent;
                           setIsEditing(false);
@@ -558,59 +613,62 @@ export const AiAssistantInterface: React.FC<AiAssistantInterfaceProps> = ({
                     </div>
                   </div>
                 ) : (
-                  <div className="prose prose-sm max-w-none text-xs text-[var(--text-primary)] whitespace-pre-wrap font-sans leading-relaxed">
+                  <div className="prose prose-sm dark:prose-invert max-w-none text-xs text-foreground whitespace-pre-wrap font-sans leading-relaxed">
                     {response.content}
                   </div>
                 )}
               </div>
 
               {/* Bottom Conversion Actions */}
-              <div className="p-4 bg-[var(--surface-secondary)] border-t border-[var(--border-subtle)] flex flex-wrap items-center justify-between gap-3">
-                <div className="text-[11px] text-[var(--text-secondary)]">
+              <div className="p-4 bg-muted/40 flex flex-wrap items-center justify-between gap-3 border-0">
+                <div className="text-[11px] text-muted-foreground">
                   Sarflangan tokenlar: {response.tokensUsed || 450} ta | Rasmiy hujjatga aylantirish:
                 </div>
 
                 <div className="flex items-center gap-2">
                   {response.generatedLessonPlan && (
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       disabled={savingDraft}
-                      className="text-xs gap-1.5 border-emerald-600 text-emerald-800 bg-emerald-50 hover:bg-emerald-100"
+                      className="text-xs gap-1.5 font-semibold bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/25 border-0 rounded-xl"
                       onClick={handleSaveAsLessonDraft}
                     >
                       <BookOpen className="w-3.5 h-3.5" />
-                      Dars Rejasi Sifatida Saqlash (DRAFT)
+                      <span>Dars Rejasi Sifatida Saqlash (DRAFT)</span>
                     </Button>
                   )}
 
                   {response.generatedQuizQuestions && response.generatedQuizQuestions.length > 0 && (
                     <Button
-                      variant="outline"
+                      variant="secondary"
                       size="sm"
                       disabled={savingDraft}
-                      className="text-xs gap-1.5 border-blue-600 text-blue-800 bg-blue-50 hover:bg-blue-100"
+                      className="text-xs gap-1.5 font-semibold bg-blue-500/15 text-blue-700 dark:text-blue-300 hover:bg-blue-500/25 border-0 rounded-xl"
                       onClick={handleSaveAsAssessmentDraft}
                     >
                       <CheckSquare className="w-3.5 h-3.5" />
-                      Test Savollari Sifatida Saqlash (DRAFT)
+                      <span>Test Savollari Sifatida Saqlash (DRAFT)</span>
                     </Button>
                   )}
                 </div>
               </div>
-            </div>
+            </Card>
           )}
 
+          {/* Empty State when no response generated yet */}
           {!loading && !response && (
-            <div className="p-12 text-center border-2 border-dashed border-[var(--border-subtle)] rounded-xl space-y-3">
-              <Bot className="w-10 h-10 text-[var(--text-secondary)] mx-auto opacity-50" />
-              <h3 className="text-sm font-bold text-[var(--text-primary)]">
+            <Card className="rounded-2xl p-12 text-center border-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card text-card-foreground space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mx-auto">
+                <Bot className="w-6 h-6" />
+              </div>
+              <CardTitle className="text-sm font-bold text-foreground">
                 Pedagogik AI Yordamchi Ishga Tayyor
-              </h3>
-              <p className="text-xs text-[var(--text-secondary)] max-w-md mx-auto">
+              </CardTitle>
+              <p className="text-xs text-muted-foreground max-w-md mx-auto leading-relaxed">
                 Chap tomondagi tayyor promptlardan birini tanlang yoki yuqoridagi maydonga dars mavzusini kiritib «Generatsiya Qilish» tugmasini bosing.
               </p>
-            </div>
+            </Card>
           )}
         </div>
       </div>

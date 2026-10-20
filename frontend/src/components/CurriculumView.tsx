@@ -27,19 +27,9 @@ import {
   Building2,
   FolderGit2,
 } from 'lucide-react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import {
   Dialog,
@@ -49,7 +39,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { useTranslation } from '@/shared/i18n';
 
 export interface CurriculumTopic {
@@ -828,101 +817,123 @@ export const CurriculumView: React.FC = () => {
   }, [activeTab, searchQuery]);
 
   return (
-    <div className="space-y-8 animate-fade-in-up pb-12">
-      {/* Decree & Standards Alert */}
-      <Alert variant="info" className="bg-primary/5 border-primary/20 shadow-2xs">
-        <Sparkles className="w-4 h-4 text-primary" />
-        <AlertTitle className="text-xs font-bold text-foreground">
-          {t('curriculum.title')}
-        </AlertTitle>
-        <AlertDescription className="text-xs text-muted-foreground mt-0.5">
-          {t('curriculum.subtitle')} — Davlat ta’lim standarti (PQ-3274) doirasida 80 daqiqalik intensiv dars metodikasi asosida tasdiqlangan.
-        </AlertDescription>
-      </Alert>
+    <div className="space-y-7 animate-in fade-in duration-300 pb-12">
+      {/* 1. PRESIDENTIAL DECREE BANNER (Luxurious Gold/Amber Card, Borderless, matches Dashboard) */}
+      <div className="relative overflow-hidden rounded-2xl p-5 sm:p-6 bg-gradient-to-r from-amber-500/12 via-amber-500/5 to-indigo-500/5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.03)] dark:shadow-none border-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-amber-500/25">
+              <Sparkles className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-800 dark:text-amber-300 text-[10px] font-bold uppercase tracking-wider">
+                  PQ-3274 Davlat Dasturi
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  Muhammad Al-Xorazmiy Vorislari
+                </span>
+              </div>
+              <h2 className="text-sm sm:text-base font-bold text-foreground">
+                {t('curriculum.title')}
+              </h2>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-4xl">
+                {t('curriculum.subtitle')} — Davlat ta’lim standarti (PQ-3274) doirasida 80 daqiqalik intensiv dars metodikasi asosida tasdiqlangan.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* ========================================================
-          HERO BANNER (Redesigned with shadcn Card)
+          2. HERO EXECUTIVE BANNER (Borderless, Luxury Ambient Style, matches Dashboard)
       ======================================================== */}
-      <Card className="relative overflow-hidden border-border/60 bg-gradient-to-br from-indigo-500/10 via-cyan-500/10 to-transparent dark:from-slate-950 dark:via-indigo-950/40 dark:to-slate-900 shadow-xl">
-        <div className="absolute -top-24 -left-24 w-80 h-80 bg-blue-600/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-1/2 -right-20 w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-xl border-0">
+        {/* Soft Ambient Glows */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-3xl pointer-events-none -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-1/3 w-[350px] h-[350px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <CardHeader className="relative z-10 p-6 sm:p-8 lg:p-10 space-y-4 max-w-4xl">
+        <div className="p-7 sm:p-9 lg:p-10 relative z-10 space-y-6">
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="primary" className="gap-1.5 px-3 py-1 font-semibold shadow-xs">
-              <BookOpen className="w-3.5 h-3.5" />
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 backdrop-blur-md text-cyan-300 text-xs font-semibold">
+              <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
               <span>Muhammad Al-Xorazmiy Vorislari Ta’lim Standarti</span>
-            </Badge>
-            <Badge variant="outline" className="border-border/70 text-xs font-semibold">
-              <Sparkles className="w-3 h-3 text-amber-500 mr-1" />
-              PQ-3274 Davlat Dasturi
-            </Badge>
+            </span>
+
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-slate-200 text-xs font-medium">
+              <Sparkles className="w-3 h-3 text-amber-400" />
+              <span>PQ-3274 Davlat Dasturi</span>
+            </span>
+
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-[11px] font-semibold">
+              <span>2026–2027 O‘quv Rejasi</span>
+            </span>
           </div>
 
-          <div className="space-y-2">
-            <CardTitle className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
+          <div className="space-y-2 max-w-4xl">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black tracking-tight leading-tight">
               8-Sinfdan 11-Sinfgacha O‘quv Yo‘li —{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 dark:from-cyan-400 dark:via-blue-300 dark:to-indigo-300">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-blue-300 to-indigo-200">
                 Professional IT Roadmap
               </span>
-            </CardTitle>
-            <CardDescription className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-3xl">
+            </h1>
+            <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-3xl">
               Nazariya emas — haqiqiy mahsulotlar! Mashq emas — real loyiha. 8–11-sinf o‘quvchilari uchun IT
               poydevoridan tortib xalqaro darajadagi loyihalar portfeligacha bo‘lgan 4 yillik uzluksiz ta’lim xaritasi.
-            </CardDescription>
+            </p>
           </div>
 
-          {/* Quick Stats Badges Grid */}
+          {/* Quick Stat Pills Grid (Borderless, Luxury Ambient Style) */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-background/80 dark:bg-card/70 border border-border/60 shadow-2xs">
-              <div className="p-2 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400">
-                <Clock className="w-4 h-4" />
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 backdrop-blur-md">
+              <div className="p-2.5 rounded-xl bg-blue-500/20 text-cyan-300 shrink-0">
+                <Clock className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-foreground">102 soat / yil</p>
-                <p className="text-[11px] text-muted-foreground">Amaliy ta’lim</p>
+                <p className="text-xs font-bold text-white">102 soat / yil</p>
+                <p className="text-[11px] text-slate-300">Amaliy ta’lim</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-background/80 dark:bg-card/70 border border-border/60 shadow-2xs">
-              <div className="p-2 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                <Zap className="w-4 h-4" />
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 backdrop-blur-md">
+              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-300 shrink-0">
+                <Zap className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-foreground">80 daqiqa</p>
-                <p className="text-[11px] text-muted-foreground">4 bosqichli dars</p>
+                <p className="text-xs font-bold text-white">80 daqiqa</p>
+                <p className="text-[11px] text-slate-300">4 bosqichli dars</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-background/80 dark:bg-card/70 border border-border/60 shadow-2xs">
-              <div className="p-2 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                <Layers className="w-4 h-4" />
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 backdrop-blur-md">
+              <div className="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 shrink-0">
+                <Layers className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-foreground">9 ta Yo‘nalish</p>
-                <p className="text-[11px] text-muted-foreground">Kasbiy ixtisoslashuv</p>
+                <p className="text-xs font-bold text-white">9 ta Yo‘nalish</p>
+                <p className="text-[11px] text-slate-300">Kasbiy ixtisoslashuv</p>
               </div>
             </div>
 
-            <div className="flex items-center gap-2.5 p-3 rounded-xl bg-background/80 dark:bg-card/70 border border-border/60 shadow-2xs">
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                <Briefcase className="w-4 h-4" />
+            <div className="flex items-center gap-3 p-3.5 rounded-2xl bg-white/5 backdrop-blur-md">
+              <div className="p-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 shrink-0">
+                <Briefcase className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-foreground">100% Portfolio</p>
-                <p className="text-[11px] text-muted-foreground">Stajirovka va bozor</p>
+                <p className="text-xs font-bold text-white">100% Portfolio</p>
+                <p className="text-[11px] text-slate-300">Stajirovka va bozor</p>
               </div>
             </div>
           </div>
-        </CardHeader>
-      </Card>
+        </div>
+      </div>
 
       {/* ========================================================
-          SEARCH & METHODOLOGY SECTION (shadcn Card & Input)
+          3. SEARCH & METHODOLOGY SECTION (Borderless, Soft Panels)
       ======================================================== */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 items-stretch">
         {/* Search & Filter Card */}
-        <Card className="lg:col-span-2 p-5 border-border/60 bg-card shadow-xs flex flex-col justify-between gap-4">
+        <div className="lg:col-span-2 bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex flex-col justify-between gap-4">
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
@@ -930,9 +941,9 @@ export const CurriculumView: React.FC = () => {
                 <span>O‘quv Dasturidan Qidirish</span>
               </span>
               {searchQuery && (
-                <Badge variant="secondary" className="text-[11px]">
+                <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary">
                   {filteredItems.length} ta natija topildi
-                </Badge>
+                </span>
               )}
             </div>
             <p className="text-xs text-muted-foreground">
@@ -941,19 +952,19 @@ export const CurriculumView: React.FC = () => {
           </div>
 
           <div className="relative">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             <Input
               type="text"
               placeholder="Masalan: Python, React, Kiberxavfsizlik, Django, Unity, SQL..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10 h-11 bg-background/80 rounded-xl border-border focus-visible:ring-primary text-sm"
+              className="pl-10 pr-10 h-11 bg-muted/40 hover:bg-muted/60 focus:bg-background border-0 rounded-xl focus-visible:ring-2 focus-visible:ring-primary/40 text-sm shadow-none transition-colors"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-full transition-colors"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-full transition-colors cursor-pointer"
                 title="Tozalash"
               >
                 <X className="w-4 h-4" />
@@ -968,28 +979,28 @@ export const CurriculumView: React.FC = () => {
                 key={tag}
                 type="button"
                 onClick={() => setSearchQuery(tag)}
-                className={`text-[11px] px-2.5 py-0.5 rounded-lg border transition-colors cursor-pointer ${
+                className={`text-[11px] font-semibold px-3 py-1 rounded-xl transition-all cursor-pointer ${
                   searchQuery.toLowerCase() === tag.toLowerCase()
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-muted/50 hover:bg-muted text-muted-foreground border-border/60 hover:text-foreground'
+                    ? 'bg-primary text-primary-foreground shadow-sm shadow-primary/25'
+                    : 'bg-muted/50 hover:bg-muted/80 text-muted-foreground hover:text-foreground'
                 }`}
               >
                 {tag}
               </button>
             ))}
           </div>
-        </Card>
+        </div>
 
         {/* 80-minute Lesson Standard Compact Card */}
-        <Card className="p-5 border-border/60 bg-card shadow-xs flex flex-col justify-between">
+        <div className="bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex flex-col justify-between">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Badge variant="warning" className="text-[10px] font-bold">
+              <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300">
                 Metodika Standarti
-              </Badge>
+              </span>
               <span className="text-xs font-mono font-bold text-muted-foreground">80 daqiqa</span>
             </div>
-            <h4 className="font-bold text-sm text-foreground flex items-center gap-1.5">
+            <h4 className="font-bold text-sm text-foreground flex items-center gap-2 pt-1">
               <Clock className="w-4 h-4 text-amber-500 shrink-0" />
               <span>4 Bosqichli Dars Modeli</span>
             </h4>
@@ -999,14 +1010,14 @@ export const CurriculumView: React.FC = () => {
           </div>
 
           {/* Visual Progress Breakdown */}
-          <div className="space-y-2 pt-3 mt-2 border-t border-border/50">
+          <div className="space-y-2 pt-3 mt-3">
             <div className="grid grid-cols-4 gap-1 text-[10px] font-mono font-bold text-center">
               <span className="text-indigo-600 dark:text-indigo-400">10m</span>
               <span className="text-blue-600 dark:text-blue-400">20m</span>
               <span className="text-emerald-600 dark:text-emerald-400">40m</span>
               <span className="text-purple-600 dark:text-purple-400">10m</span>
             </div>
-            <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-muted">
+            <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-muted/60">
               <div className="w-[12.5%] bg-indigo-500" title="10m: Nazariya & Muammo" />
               <div className="w-[25%] bg-blue-500" title="20m: Live Coding namoyishi" />
               <div className="w-[50%] bg-emerald-500" title="40m: Mustaqil amaliyot" />
@@ -1018,11 +1029,11 @@ export const CurriculumView: React.FC = () => {
               <span>Audit (10m)</span>
             </div>
           </div>
-        </Card>
+        </div>
       </div>
 
       {/* ========================================================
-          GRADE TABS NAVIGATION (shadcn Tabs)
+          4. GRADE TABS NAVIGATION (Borderless, Luxury Minimalist Style)
       ======================================================== */}
       <Tabs
         value={activeTab}
@@ -1030,28 +1041,28 @@ export const CurriculumView: React.FC = () => {
         className="w-full space-y-6"
       >
         <div className="flex items-center justify-between flex-wrap gap-3">
-          <TabsList className="bg-muted/70 p-1 rounded-2xl border border-border/60 shadow-xs h-auto flex-wrap">
+          <TabsList className="bg-muted/50 p-1.5 rounded-2xl border-0 shadow-none h-auto flex-wrap gap-1">
             <TabsTrigger
               value="all"
-              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all cursor-pointer"
+              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground transition-all cursor-pointer border-0"
             >
               Barcha Sinflar (8–11)
             </TabsTrigger>
             <TabsTrigger
               value="8"
-              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all cursor-pointer"
+              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground transition-all cursor-pointer border-0"
             >
               8-Sinf (Poydevor • 102 soat)
             </TabsTrigger>
             <TabsTrigger
               value="9-10"
-              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all cursor-pointer"
+              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground transition-all cursor-pointer border-0"
             >
               9–10-Sinf (9 ta IT Yo‘nalish)
             </TabsTrigger>
             <TabsTrigger
               value="11"
-              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all cursor-pointer"
+              className="rounded-xl px-4 py-2 text-xs font-bold data-[state=active]:bg-card data-[state=active]:text-foreground data-[state=active]:shadow-sm text-muted-foreground hover:text-foreground transition-all cursor-pointer border-0"
             >
               11-Sinf (Professional Bozor)
             </TabsTrigger>
@@ -1068,22 +1079,18 @@ export const CurriculumView: React.FC = () => {
         {/* ----------------------------------------------------
             TAB CONTENT: ALL GRADES
         ---------------------------------------------------- */}
-        <TabsContent value="all" className="space-y-10 mt-6 focus-visible:outline-none">
+        <TabsContent value="all" className="space-y-8 mt-6 focus-visible:outline-none">
           {/* Grade 8 Section */}
           <Grade8Block
             items={filteredItems.filter((i) => i.grade === '8')}
             onSelectItem={setSelectedItem}
           />
 
-          <Separator className="my-8" />
-
           {/* Grade 9-10 Section */}
           <Grade910Block
             items={filteredItems.filter((i) => i.grade === '9-10')}
             onSelectItem={setSelectedItem}
           />
-
-          <Separator className="my-8" />
 
           {/* Grade 11 Section */}
           <Grade11Block
@@ -1124,31 +1131,31 @@ export const CurriculumView: React.FC = () => {
       </Tabs>
 
       {/* ========================================================
-          INTERACTIVE DETAIL DIALOG MODAL (shadcn Dialog)
+          5. INTERACTIVE DETAIL DIALOG MODAL (Borderless, Modern Dialog)
       ======================================================== */}
       {selectedItem && (
         <Dialog open={!!selectedItem} onOpenChange={(open) => !open && setSelectedItem(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-6 sm:p-8">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 rounded-3xl border-0 shadow-2xl bg-card text-card-foreground">
             <DialogHeader className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <Badge variant="primary" className="font-bold">
+                <span className="px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
                   {selectedItem.gradeLabel}
-                </Badge>
-                <Badge variant="secondary" className="font-semibold">
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-muted text-muted-foreground text-xs font-semibold">
                   {selectedItem.category}
-                </Badge>
-                <Badge variant="outline" className="gap-1 font-mono text-xs">
+                </span>
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/60 text-foreground font-mono text-xs font-medium">
                   <Clock className="w-3 h-3 text-primary" />
                   <span>{selectedItem.hours}</span>
-                </Badge>
-                <Badge variant="info" className="text-xs">
+                </span>
+                <span className="px-2.5 py-1 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-xs font-semibold">
                   Daraja: {selectedItem.level}
-                </Badge>
+                </span>
               </div>
 
-              <div className="flex items-center gap-3 pt-1">
+              <div className="flex items-center gap-3.5 pt-1">
                 <div
-                  className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${selectedItem.gradient} text-white flex items-center justify-center shrink-0 shadow-md`}
+                  className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${selectedItem.gradient} text-white flex items-center justify-center shrink-0 shadow-lg`}
                 >
                   <selectedItem.icon className="w-6 h-6" />
                 </div>
@@ -1167,11 +1174,11 @@ export const CurriculumView: React.FC = () => {
               </DialogDescription>
             </DialogHeader>
 
-            <Separator className="my-4" />
+            <div className="my-4 border-t border-border/15" />
 
             <div className="space-y-6 text-sm">
               {/* Prerequisites Card */}
-              <div className="p-3.5 rounded-xl bg-muted/50 border border-border/70 flex items-start gap-3">
+              <div className="p-3.5 rounded-xl bg-muted/40 border-0 flex items-start gap-3">
                 <Info className="w-4 h-4 text-primary shrink-0 mt-0.5" />
                 <div className="text-xs">
                   <span className="font-bold text-foreground">Boshlang‘ich talab:</span>{' '}
@@ -1181,19 +1188,18 @@ export const CurriculumView: React.FC = () => {
 
               {/* Technologies Used */}
               <div>
-                <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-1.5">
+                <h4 className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-2.5 flex items-center gap-1.5">
                   <Code className="w-3.5 h-3.5 text-primary" />
                   <span>O‘rganiladigan Texnologiyalar & Vositalar</span>
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {selectedItem.techStack.map((tech) => (
-                    <Badge
+                    <span
                       key={tech.name}
-                      variant="secondary"
-                      className="text-xs font-semibold px-2.5 py-1 border border-border/60"
+                      className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-muted/70 text-foreground border-0"
                     >
                       {tech.name}
-                    </Badge>
+                    </span>
                   ))}
                 </div>
               </div>
@@ -1208,7 +1214,7 @@ export const CurriculumView: React.FC = () => {
                   {selectedItem.topics.map((topic, idx) => (
                     <div
                       key={idx}
-                      className="p-3 rounded-xl bg-card border border-border/60 shadow-2xs space-y-1"
+                      className="p-3.5 rounded-xl bg-muted/30 dark:bg-muted/15 border-0 space-y-1"
                     >
                       <div className="flex items-center gap-2">
                         <span className="w-5 h-5 rounded-full bg-primary/10 text-primary text-[10px] font-bold flex items-center justify-center shrink-0">
@@ -1234,7 +1240,7 @@ export const CurriculumView: React.FC = () => {
                   {selectedItem.projects.map((proj, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-emerald-500/5 dark:bg-emerald-500/10 border border-emerald-500/20 text-xs font-medium text-foreground"
+                      className="flex items-center gap-2.5 p-3 rounded-xl bg-emerald-500/10 text-xs font-medium text-foreground border-0"
                     >
                       <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
                       <span>{proj}</span>
@@ -1254,7 +1260,7 @@ export const CurriculumView: React.FC = () => {
                     {selectedItem.weeklyPlan.map((plan, idx) => (
                       <div
                         key={idx}
-                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2.5 rounded-xl bg-muted/40 border border-border/60 text-xs"
+                        className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-3 rounded-xl bg-muted/30 dark:bg-muted/15 border-0 text-xs"
                       >
                         <div className="flex items-center gap-2 font-bold text-foreground">
                           <span className="text-[11px] font-mono text-primary px-2 py-0.5 rounded-md bg-primary/10">
@@ -1280,22 +1286,29 @@ export const CurriculumView: React.FC = () => {
                   </h4>
                   <div className="flex flex-wrap gap-2">
                     {selectedItem.careerRoles.map((role) => (
-                      <Badge key={role} variant="outline" className="text-xs font-medium py-1">
+                      <span
+                        key={role}
+                        className="text-xs font-semibold px-3 py-1 rounded-lg bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-0"
+                      >
                         {role}
-                      </Badge>
+                      </span>
                     ))}
                   </div>
                 </div>
               )}
             </div>
 
-            <Separator className="my-4" />
+            <div className="my-4 border-t border-border/15" />
 
             <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-between sm:items-center gap-2">
               <span className="text-xs text-muted-foreground">
                 Tasdiqlangan amaliy ta’lim xaritasi • 2026–2027
               </span>
-              <Button variant="default" onClick={() => setSelectedItem(null)} className="w-full sm:w-auto">
+              <Button
+                variant="default"
+                onClick={() => setSelectedItem(null)}
+                className="w-full sm:w-auto rounded-xl border-0 shadow-sm font-semibold"
+              >
                 Tushunarli & Yopish
               </Button>
             </DialogFooter>
@@ -1307,7 +1320,7 @@ export const CurriculumView: React.FC = () => {
 };
 
 // ============================================================
-// SUB-COMPONENT: GRADE 8 BLOCK
+// SUB-COMPONENT: GRADE 8 BLOCK (Borderless, Luxury Ambient Style)
 // ============================================================
 interface GradeBlockProps {
   items: CurriculumItem[];
@@ -1318,149 +1331,143 @@ const Grade8Block: React.FC<GradeBlockProps> = ({ items, onSelectItem }) => {
   if (items.length === 0) return null;
 
   return (
-    <Card className="border-border/60 shadow-xs bg-card/60 backdrop-blur-xs overflow-hidden">
-      <CardHeader className="p-6 sm:p-8 border-b border-border/50 bg-gradient-to-r from-blue-500/5 via-indigo-500/5 to-transparent">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-500/20">
-              <Layers className="w-6 h-6" />
+    <div className="bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/25">
+            <Layers className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                8-sinf
+              </span>
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">
+                Asosiy IT Poydevori (Foundation)
+              </h3>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <Badge variant="primary" className="text-xs font-extrabold px-2.5 py-0.5">
-                  8-sinf
-                </Badge>
-                <CardTitle className="text-xl sm:text-2xl font-bold">
-                  Asosiy IT Poydevori (Foundation)
-                </CardTitle>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              IT olamiga kirish, algoritmik mantiq va real web-ilovalarni noldan yaratish
+            </p>
+          </div>
+        </div>
+
+        <span className="px-3.5 py-1.5 font-bold text-xs gap-1.5 w-fit rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center">
+          <Clock className="w-3.5 h-3.5" />
+          <span>Jami 102 soat amaliy ta’lim</span>
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="flex flex-col justify-between rounded-2xl p-6 bg-muted/30 dark:bg-muted/15 hover:bg-muted/50 dark:hover:bg-muted/25 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 group"
+          >
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <span className="inline-flex items-center gap-1.5 font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-primary/10 text-primary">
+                  <item.icon className="w-3.5 h-3.5" />
+                  <span>{item.trackNumber}-Modul</span>
+                </span>
+                <span className="font-mono text-xs font-bold px-2.5 py-1 rounded-lg bg-muted text-muted-foreground">
+                  {item.hours}
+                </span>
               </div>
-              <CardDescription className="text-xs sm:text-sm mt-1">
-                IT olamiga kirish, algoritmik mantiq va real web-ilovalarni noldan yaratish
-              </CardDescription>
+
+              <div>
+                <h4 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                  {item.title}
+                </h4>
+                <p className="text-xs mt-1 leading-relaxed text-muted-foreground line-clamp-2">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* Tech Badges */}
+              <div className="flex flex-wrap gap-1.5">
+                {item.techStack.slice(0, 5).map((tech) => (
+                  <span
+                    key={tech.name}
+                    className="text-[11px] font-semibold px-2.5 py-0.5 rounded-lg bg-muted/70 text-foreground"
+                  >
+                    {tech.name}
+                  </span>
+                ))}
+                {item.techStack.length > 5 && (
+                  <span className="text-[10px] font-semibold px-2 py-0.5 rounded-lg bg-muted text-muted-foreground">
+                    +{item.techStack.length - 5}
+                  </span>
+                )}
+              </div>
+
+              {/* Topics */}
+              <div className="space-y-2 text-xs pt-1">
+                {item.topics.slice(0, 3).map((topic, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-start gap-2.5 p-3 rounded-xl bg-background/80 dark:bg-card/70 border-0"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                    <div>
+                      <span className="font-bold text-foreground">{topic.title}:</span>{' '}
+                      <span className="text-muted-foreground">{topic.desc}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Mini projects pill row */}
+              <div className="pt-1">
+                <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block mb-2">
+                  Yaratiladigan Mahsulotlar:
+                </span>
+                <div className="flex flex-wrap gap-1.5 text-xs">
+                  {item.projects.map((proj) => (
+                    <span
+                      key={proj}
+                      className="px-2.5 py-1 rounded-lg bg-background/80 dark:bg-card/70 text-foreground text-[11px] font-medium border-0"
+                    >
+                      {proj}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              {/* Hours Allocation Progress */}
+              <div className="pt-2 space-y-1.5">
+                <div className="flex justify-between items-center text-[11px] font-medium text-muted-foreground">
+                  <span>Ajratilgan o‘quv yuklamasi:</span>
+                  <span className="font-mono font-bold text-foreground">
+                    {item.hours} ({item.id === 'cs-foundation' ? '35%' : '65%'})
+                  </span>
+                </div>
+                <Progress
+                  value={item.id === 'cs-foundation' ? 35 : 65}
+                  className="h-1.5 bg-muted/60"
+                />
+              </div>
+            </div>
+
+            <div className="mt-5 pt-4 border-t border-border/15 flex items-center justify-between">
+              <span className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                <span>Amaliy loyiha asosida</span>
+              </span>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => onSelectItem(item)}
+                className="gap-1.5 text-xs font-bold rounded-xl border-0 shadow-sm"
+              >
+                <span>Batafsil Sillabus</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Button>
             </div>
           </div>
-
-          <Badge variant="outline" className="px-3.5 py-1.5 font-bold text-xs gap-1.5 w-fit border-blue-500/30 text-blue-700 dark:text-blue-300 bg-blue-50/50 dark:bg-blue-950/40">
-            <Clock className="w-3.5 h-3.5 text-blue-600 dark:text-blue-400" />
-            <span>Jami 102 soat amaliy ta’lim</span>
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-6 sm:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {items.map((item) => (
-            <Card
-              key={item.id}
-              className="flex flex-col justify-between border-border/70 hover:border-primary/50 transition-all hover:shadow-md bg-card group"
-            >
-              <CardHeader className="p-6 pb-4 space-y-3">
-                <div className="flex items-center justify-between">
-                  <Badge variant="secondary" className="font-mono text-xs font-bold gap-1.5">
-                    <item.icon className="w-3.5 h-3.5 text-primary" />
-                    <span>{item.trackNumber}-Modul</span>
-                  </Badge>
-                  <Badge variant="outline" className="font-mono text-xs font-bold">
-                    {item.hours}
-                  </Badge>
-                </div>
-
-                <div>
-                  <CardTitle className="text-lg font-bold group-hover:text-primary transition-colors">
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription className="text-xs mt-1 leading-relaxed line-clamp-2">
-                    {item.description}
-                  </CardDescription>
-                </div>
-
-                {/* Tech Badges */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {item.techStack.slice(0, 5).map((tech) => (
-                    <Badge
-                      key={tech.name}
-                      variant="secondary"
-                      className="text-[11px] font-semibold bg-muted/60"
-                    >
-                      {tech.name}
-                    </Badge>
-                  ))}
-                  {item.techStack.length > 5 && (
-                    <Badge variant="outline" className="text-[10px]">
-                      +{item.techStack.length - 5}
-                    </Badge>
-                  )}
-                </div>
-              </CardHeader>
-
-              <CardContent className="p-6 pt-0 space-y-3">
-                <div className="space-y-2 text-xs">
-                  {item.topics.slice(0, 3).map((topic, idx) => (
-                    <div
-                      key={idx}
-                      className="flex items-start gap-2.5 p-2.5 rounded-xl bg-muted/40 border border-border/50"
-                    >
-                      <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                      <div>
-                        <span className="font-bold text-foreground">{topic.title}:</span>{' '}
-                        <span className="text-muted-foreground">{topic.desc}</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Mini projects pill row */}
-                <div className="pt-2">
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground block mb-1.5">
-                    Yaratiladigan Mahsulotlar:
-                  </span>
-                  <div className="flex flex-wrap gap-1.5 text-xs">
-                    {item.projects.map((proj) => (
-                      <span
-                        key={proj}
-                        className="px-2.5 py-1 rounded-lg bg-muted/50 text-foreground border border-border/60 text-[11px] font-medium"
-                      >
-                        {proj}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Hours Allocation Progress */}
-                <div className="pt-3 space-y-1.5">
-                  <div className="flex justify-between items-center text-[11px] font-medium text-muted-foreground">
-                    <span>Ajratilgan o‘quv yuklamasi:</span>
-                    <span className="font-mono font-bold text-foreground">
-                      {item.hours} ({item.id === 'cs-foundation' ? '35%' : '65%'})
-                    </span>
-                  </div>
-                  <Progress
-                    value={item.id === 'cs-foundation' ? 35 : 65}
-                    className="h-1.5 bg-muted"
-                  />
-                </div>
-              </CardContent>
-
-              <CardFooter className="p-6 pt-0 border-t border-border/40 mt-4 flex items-center justify-between">
-                <span className="text-[11px] text-muted-foreground flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-                  <span>Amaliy loyiha asosida</span>
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onSelectItem(item)}
-                  className="gap-1.5 text-xs font-bold hover:bg-primary hover:text-primary-foreground group-hover:border-primary transition-all"
-                >
-                  <span>Batafsil Sillabus</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -1471,106 +1478,99 @@ const Grade910Block: React.FC<GradeBlockProps> = ({ items, onSelectItem }) => {
   if (items.length === 0) return null;
 
   return (
-    <Card className="border-border/60 shadow-xs bg-card/60 backdrop-blur-xs overflow-hidden">
-      <CardHeader className="p-6 sm:p-8 border-b border-border/50 bg-gradient-to-r from-indigo-500/5 via-purple-500/5 to-transparent">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/20">
-              <Laptop className="w-6 h-6" />
+    <div className="bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-indigo-600/25">
+            <Laptop className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                9–10-sinf
+              </span>
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">
+                9 ta Zamonaviy IT Yo‘nalishi
+              </h3>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <Badge variant="primary" className="text-xs font-extrabold px-2.5 py-0.5 bg-gradient-to-r from-indigo-600 to-purple-600 border-transparent text-white">
-                  9–10-sinf
-                </Badge>
-                <CardTitle className="text-xl sm:text-2xl font-bold">
-                  9 ta Zamonaviy IT Yo‘nalishi
-                </CardTitle>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              O‘quvchilar o‘z qiziqishiga mos yo‘nalish tanlab, chuqurlashtirilgan bilim oladilar
+            </p>
+          </div>
+        </div>
+
+        <span className="px-3.5 py-1.5 font-bold text-xs gap-1.5 w-fit rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center">
+          <Sparkles className="w-3.5 h-3.5" />
+          <span>Kasbiy Ixtisoslashuv</span>
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="flex flex-col justify-between rounded-2xl p-5 bg-muted/30 dark:bg-muted/15 hover:bg-muted/50 dark:hover:bg-muted/25 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 group"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div
+                  className={`w-10 h-10 rounded-xl bg-gradient-to-tr ${item.gradient} text-white flex items-center justify-center shadow-md group-hover:scale-110 transition-transform`}
+                >
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <span className="font-mono text-xs font-black text-muted-foreground group-hover:text-primary transition-colors">
+                  #{item.trackNumber}
+                </span>
               </div>
-              <CardDescription className="text-xs sm:text-sm mt-1">
-                O‘quvchilar o‘z qiziqishiga mos yo‘nalish tanlab, chuqurlashtirilgan bilim oladilar
-              </CardDescription>
+
+              <div>
+                <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                  {item.title}
+                </h4>
+                <p className="text-xs mt-1 leading-relaxed text-muted-foreground line-clamp-2">
+                  {item.description}
+                </p>
+              </div>
+
+              {/* Tech tags preview */}
+              <div className="flex flex-wrap gap-1 pt-1">
+                {item.techStack.slice(0, 3).map((tech) => (
+                  <span
+                    key={tech.name}
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted/70 text-foreground"
+                  >
+                    {tech.name}
+                  </span>
+                ))}
+                {item.techStack.length > 3 && (
+                  <span className="text-[10px] text-muted-foreground self-center px-1">
+                    +{item.techStack.length - 3}
+                  </span>
+                )}
+              </div>
+
+              <div className="p-3 rounded-xl bg-background/80 dark:bg-card/70 text-[11px] text-muted-foreground space-y-1 border-0">
+                <span className="font-bold text-foreground block">Asosiy Natija:</span>
+                <p className="line-clamp-2">{item.outcomes[0]}</p>
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-border/15 flex items-center justify-between">
+              <span className="text-[11px] font-mono text-muted-foreground">{item.hours}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onSelectItem(item)}
+                className="gap-1 text-xs font-bold text-primary hover:text-primary hover:bg-primary/10 px-2 py-1 h-auto rounded-lg border-0"
+              >
+                <span>Rejani ko‘rish</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </div>
           </div>
-
-          <Badge variant="outline" className="px-3.5 py-1.5 font-bold text-xs gap-1.5 w-fit border-indigo-500/30 text-indigo-700 dark:text-indigo-300 bg-indigo-50/50 dark:bg-indigo-950/40">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-500" />
-            <span>Kasbiy Ixtisoslashuv</span>
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-6 sm:p-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {items.map((item) => (
-            <Card
-              key={item.id}
-              className="flex flex-col justify-between border-border/70 hover:border-primary/60 transition-all hover:shadow-md bg-card group hover:-translate-y-0.5 duration-200"
-            >
-              <CardHeader className="p-5 pb-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div
-                    className={`w-10 h-10 rounded-xl bg-gradient-to-tr ${item.gradient} text-white flex items-center justify-center shadow-xs group-hover:scale-110 transition-transform`}
-                  >
-                    <item.icon className="w-5 h-5" />
-                  </div>
-                  <span className="font-mono text-xs font-black text-muted-foreground group-hover:text-primary transition-colors">
-                    #{item.trackNumber}
-                  </span>
-                </div>
-
-                <div>
-                  <CardTitle className="text-base font-bold group-hover:text-primary transition-colors">
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription className="text-xs mt-1 leading-relaxed line-clamp-2">
-                    {item.description}
-                  </CardDescription>
-                </div>
-
-                {/* Tech tags preview */}
-                <div className="flex flex-wrap gap-1 pt-1">
-                  {item.techStack.slice(0, 3).map((tech) => (
-                    <Badge
-                      key={tech.name}
-                      variant="secondary"
-                      className="text-[10px] font-semibold px-2 py-0.5"
-                    >
-                      {tech.name}
-                    </Badge>
-                  ))}
-                  {item.techStack.length > 3 && (
-                    <span className="text-[10px] text-muted-foreground self-center">
-                      +{item.techStack.length - 3}
-                    </span>
-                  )}
-                </div>
-              </CardHeader>
-
-              <CardContent className="p-5 pt-0">
-                <div className="p-2.5 rounded-xl bg-muted/40 border border-border/50 text-[11px] text-muted-foreground space-y-1">
-                  <span className="font-bold text-foreground block">Asosiy Natija:</span>
-                  <p className="line-clamp-2">{item.outcomes[0]}</p>
-                </div>
-              </CardContent>
-
-              <CardFooter className="p-5 pt-0 border-t border-border/40 mt-3 flex items-center justify-between">
-                <span className="text-[11px] font-mono text-muted-foreground">{item.hours}</span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onSelectItem(item)}
-                  className="gap-1 text-xs font-bold text-primary hover:text-primary hover:bg-primary/10 p-0 h-auto"
-                >
-                  <span>Rejani ko‘rish</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+    </div>
   );
 };
 
@@ -1581,90 +1581,87 @@ const Grade11Block: React.FC<GradeBlockProps> = ({ items, onSelectItem }) => {
   if (items.length === 0) return null;
 
   return (
-    <Card className="border-border/60 shadow-xs bg-card/60 backdrop-blur-xs overflow-hidden">
-      <CardHeader className="p-6 sm:p-8 border-b border-border/50 bg-gradient-to-r from-purple-500/5 via-pink-500/5 to-transparent">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-purple-600/20">
-              <GraduationCap className="w-6 h-6" />
+    <div className="bg-card text-card-foreground rounded-3xl p-6 sm:p-8 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start sm:items-center gap-3.5">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-pink-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-purple-600/25">
+            <GraduationCap className="w-6 h-6" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-black px-2.5 py-0.5 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                11-sinf
+              </span>
+              <h3 className="text-xl sm:text-2xl font-bold text-foreground">
+                Professional Rivojlanish & Xalqaro Bozor
+              </h3>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <Badge variant="primary" className="text-xs font-extrabold px-2.5 py-0.5 bg-gradient-to-r from-purple-600 to-pink-600 border-transparent text-white">
-                  11-sinf
-                </Badge>
-                <CardTitle className="text-xl sm:text-2xl font-bold">
-                  Professional Rivojlanish & Xalqaro Bozor
-                </CardTitle>
+            <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+              Bilimni real daromad va imkoniyatga aylantirish, karyera va stajirovka tayyorgarligi
+            </p>
+          </div>
+        </div>
+
+        <span className="px-3.5 py-1.5 font-bold text-xs gap-1.5 w-fit rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center">
+          <Award className="w-3.5 h-3.5" />
+          <span>Bitiruvchi Bosqichi</span>
+        </span>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="flex flex-col justify-between rounded-2xl p-5 bg-muted/30 dark:bg-muted/15 hover:bg-muted/50 dark:hover:bg-muted/25 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 group"
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xs">
+                  #{item.trackNumber}
+                </div>
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-md bg-muted text-muted-foreground">
+                  {item.hours}
+                </span>
               </div>
-              <CardDescription className="text-xs sm:text-sm mt-1">
-                Bilimni real daromad va imkoniyatga aylantirish, karyera va stajirovka tayyorgarligi
-              </CardDescription>
+
+              <div>
+                <h4 className="text-base font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                  {item.title}
+                </h4>
+                <p className="text-xs mt-1 leading-relaxed text-muted-foreground line-clamp-3">
+                  {item.description}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap gap-1">
+                {item.techStack.slice(0, 3).map((st) => (
+                  <span
+                    key={st.name}
+                    className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-muted/70 text-foreground"
+                  >
+                    {st.name}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-border/15 flex items-center justify-between">
+              <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400">
+                {item.category}
+              </span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onSelectItem(item)}
+                className="gap-1 text-xs font-bold text-primary hover:text-primary hover:bg-primary/10 px-2 py-1 h-auto rounded-lg border-0"
+              >
+                <span>Batafsil</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              </Button>
             </div>
           </div>
-
-          <Badge variant="outline" className="px-3.5 py-1.5 font-bold text-xs gap-1.5 w-fit border-purple-500/30 text-purple-700 dark:text-purple-300 bg-purple-50/50 dark:bg-purple-950/40">
-            <Award className="w-3.5 h-3.5 text-purple-500" />
-            <span>Bitiruvchi Bosqichi</span>
-          </Badge>
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-6 sm:p-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {items.map((item) => (
-            <Card
-              key={item.id}
-              className="flex flex-col justify-between border-border/70 hover:border-purple-500/60 transition-all hover:shadow-md bg-card group"
-            >
-              <CardHeader className="p-5 pb-3 space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold text-xs">
-                    #{item.trackNumber}
-                  </div>
-                  <Badge variant="outline" className="text-[10px] font-mono">
-                    {item.hours}
-                  </Badge>
-                </div>
-
-                <div>
-                  <CardTitle className="text-base font-bold group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
-                    {item.title}
-                  </CardTitle>
-                  <CardDescription className="text-xs mt-1 leading-relaxed line-clamp-3">
-                    {item.description}
-                  </CardDescription>
-                </div>
-              </CardHeader>
-
-              <CardContent className="p-5 pt-0">
-                <div className="flex flex-wrap gap-1">
-                  {item.techStack.slice(0, 3).map((st) => (
-                    <Badge key={st.name} variant="secondary" className="text-[10px]">
-                      {st.name}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-
-              <CardFooter className="p-5 pt-0 border-t border-border/40 mt-3 flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-purple-600 dark:text-purple-400">
-                  {item.category}
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => onSelectItem(item)}
-                  className="gap-1 text-xs font-bold text-primary hover:text-primary hover:bg-primary/10 p-0 h-auto"
-                >
-                  <span>Batafsil</span>
-                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      </CardContent>
-    </Card>
+        ))}
+      </div>
+    </div>
   );
 };

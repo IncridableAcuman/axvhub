@@ -1,7 +1,16 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { AuthUser, LoginRequest, RegisterRequest, AuthResponse, VerifyEmailRequest } from '@/types';
 import { authApi } from '@/api';
-import { ConfirmDialog } from '@/shared/ui/dialog/ConfirmDialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { AlertTriangle } from 'lucide-react';
 
 const STORAGE_KEY = 'axm_nexus_user';
 
@@ -232,16 +241,41 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     >
       {children}
 
-      <ConfirmDialog
-        isOpen={isLogoutConfirmOpen}
-        onClose={cancelLogout}
-        onConfirm={confirmLogout}
-        title="Tizimdan chiqishni tasdiqlaysizmi?"
-        description="Haqiqatan ham o‘z hisobingizdan chiqmoqchimisiz? Qayta kirish uchun HEMIS ID raqamingiz va parolingiz talab qilinadi."
-        confirmText="Ha, chiqish"
-        cancelText="Bekor qilish"
-        variant="destructive"
-      />
+      <Dialog open={isLogoutConfirmOpen} onOpenChange={(open) => !open && cancelLogout()}>
+        <DialogContent className="sm:max-w-md border-0 rounded-2xl shadow-2xl bg-card text-card-foreground p-6">
+          <DialogHeader className="space-y-2 text-left">
+            <div className="w-10 h-10 rounded-xl bg-destructive/10 text-destructive flex items-center justify-center mb-1">
+              <AlertTriangle className="w-5 h-5" />
+            </div>
+            <DialogTitle className="text-base font-bold text-foreground">
+              Tizimdan chiqishni tasdiqlaysizmi?
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
+              Haqiqatan ham o‘z hisobingizdan chiqmoqchimisiz? Qayta kirish uchun HEMIS ID raqamingiz va parolingiz talab qilinadi.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex flex-row justify-end gap-2 pt-3 border-0">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={cancelLogout}
+              className="rounded-xl border-0 bg-muted/60 hover:bg-muted text-foreground cursor-pointer"
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={confirmLogout}
+              className="rounded-xl border-0 shadow-sm cursor-pointer"
+            >
+              Ha, chiqish
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AuthContext.Provider>
   );
 };

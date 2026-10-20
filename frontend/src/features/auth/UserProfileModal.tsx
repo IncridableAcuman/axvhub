@@ -1,8 +1,14 @@
 import React from 'react';
 import { User, Mail, Shield, LogOut, KeyRound } from 'lucide-react';
-import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { Button } from '@/shared/ui/button/Button';
-import { Badge } from '@/shared/ui/badge/Badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from './AuthContext';
 import { useTranslation } from '@/shared/i18n';
 
@@ -19,9 +25,9 @@ export const UserProfileModal: React.FC = () => {
 
   const getRoleBadgeVariant = (roles: string[]) => {
     if (roles.includes('ROLE_ADMIN') || roles.includes('ROLE_SUPER_ADMIN')) return 'destructive';
-    if (roles.includes('ROLE_MENTOR')) return 'primary';
-    if (roles.includes('ROLE_ENGLISH_MENTOR')) return 'warning';
-    return 'info';
+    if (roles.includes('ROLE_MENTOR')) return 'default';
+    if (roles.includes('ROLE_ENGLISH_MENTOR')) return 'secondary';
+    return 'outline';
   };
 
   const getRoleLabel = (roles: string[]) => {
@@ -42,104 +48,110 @@ export const UserProfileModal: React.FC = () => {
   };
 
   return (
-    <Dialog
-      isOpen={isProfileModalOpen}
-      onClose={closeProfileModal}
-      size="sm"
-      title={t('auth.profileModalTitle')}
-      description={t('auth.profileModalDesc')}
-    >
-      <div className="space-y-4">
-        {/* Profile Card Header */}
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--bg-subtle)] border border-[var(--border-default)]">
-          <div className="w-12 h-12 rounded-full bg-[var(--brand-primary)] text-white font-bold text-base flex items-center justify-center shadow-sm shrink-0">
-            {getInitials(user.fullName)}
-          </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="text-sm font-bold text-[var(--text-primary)] truncate">
-              {user.fullName}
-            </h3>
-            <div className="mt-0.5">
-              <Badge variant={getRoleBadgeVariant(user.roles)} size="sm">
-                {getRoleLabel(user.roles)}
-              </Badge>
-            </div>
-          </div>
-        </div>
+    <Dialog open={isProfileModalOpen} onOpenChange={(open) => !open && closeProfileModal()}>
+      <DialogContent className="sm:max-w-sm border-0 rounded-3xl shadow-2xl bg-card text-card-foreground p-6 sm:p-7">
+        <DialogHeader className="space-y-1 text-left">
+          <DialogTitle className="text-base sm:text-lg font-bold text-foreground">
+            {t('auth.profileModalTitle')}
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            {t('auth.profileModalDesc')}
+          </DialogDescription>
+        </DialogHeader>
 
-        {/* Details list */}
-        <div className="space-y-2 text-xs">
-          <div className="flex items-center justify-between p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-              <Mail className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-              <span>{t('auth.email')}:</span>
+        <div className="space-y-4 pt-2">
+          {/* Profile Card Header */}
+          <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-muted/40 border-0">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-black text-lg flex items-center justify-center shadow-md shadow-indigo-600/25 shrink-0 border-0">
+              {getInitials(user.fullName)}
             </div>
-            <span className="font-semibold text-[var(--text-primary)] truncate max-w-[180px]">
-              {user.email || t('auth.notProvided')}
-            </span>
+            <div className="min-w-0 flex-1 space-y-1">
+              <h3 className="text-sm font-bold text-foreground truncate">
+                {user.fullName}
+              </h3>
+              <div className="flex items-center gap-1.5">
+                <Badge variant={getRoleBadgeVariant(user.roles)} className="border-0 rounded-full text-[10px] font-semibold">
+                  {getRoleLabel(user.roles)}
+                </Badge>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center justify-between p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-              <User className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-              <span>{t('auth.username')}:</span>
-            </div>
-            <span className="font-semibold text-[var(--text-primary)] truncate max-w-[180px]">
-              {user.username}
-            </span>
-          </div>
-
-          <div className="flex items-center justify-between p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-            <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-              <Shield className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-              <span>{t('auth.emailVerification')}</span>
-            </div>
-            {user.emailVerified ? (
-              <span className="font-semibold text-emerald-600 dark:text-emerald-400">
-                {t('auth.verifiedBadge')}
+          {/* Details list */}
+          <div className="space-y-2 text-xs">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border-0">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Mail className="w-3.5 h-3.5 text-primary" />
+                <span>{t('auth.email')}:</span>
+              </div>
+              <span className="font-semibold text-foreground truncate max-w-[180px]">
+                {user.email || t('auth.notProvided')}
               </span>
-            ) : (
-              <span className="font-semibold text-amber-600 dark:text-amber-400">
-                {t('auth.pendingBadge')}
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border-0">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <User className="w-3.5 h-3.5 text-primary" />
+                <span>{t('auth.username')}:</span>
+              </div>
+              <span className="font-semibold text-foreground truncate max-w-[180px]">
+                {user.username}
               </span>
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border-0">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Shield className="w-3.5 h-3.5 text-primary" />
+                <span>{t('auth.emailVerification')}</span>
+              </div>
+              {user.emailVerified ? (
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">
+                  {t('auth.verifiedBadge')}
+                </span>
+              ) : (
+                <span className="font-semibold text-amber-600 dark:text-amber-400">
+                  {t('auth.pendingBadge')}
+                </span>
+              )}
+            </div>
+
+            {user.id && (
+              <div className="flex items-center justify-between p-3 rounded-xl bg-muted/30 border-0">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <KeyRound className="w-3.5 h-3.5 text-primary" />
+                  <span>{t('auth.idNumber')}</span>
+                </div>
+                <span className="font-mono font-bold text-foreground">
+                  #{user.id}
+                </span>
+              </div>
             )}
           </div>
 
-          {user.id && (
-            <div className="flex items-center justify-between p-2.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-              <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                <KeyRound className="w-3.5 h-3.5 text-[var(--text-muted)]" />
-                <span>{t('auth.idNumber')}</span>
-              </div>
-              <span className="font-semibold text-[var(--text-muted)]">
-                #{user.id}
-              </span>
-            </div>
-          )}
+          {/* Actions */}
+          <div className="flex items-center gap-2 pt-3 border-t border-border/10">
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              onClick={handleLogout}
+              className="flex-1 rounded-xl border-0 shadow-none cursor-pointer"
+            >
+              <LogOut className="w-3.5 h-3.5 mr-1.5" />
+              <span>{t('auth.logoutAction')}</span>
+            </Button>
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              onClick={closeProfileModal}
+              className="rounded-xl border-0 bg-muted/60 hover:bg-muted text-foreground cursor-pointer"
+            >
+              <span>{t('common.close')}</span>
+            </Button>
+          </div>
         </div>
-
-        {/* Actions */}
-        <div className="flex items-center gap-2 pt-2 border-t border-[var(--border-subtle)]">
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={handleLogout}
-            leftIcon={<LogOut className="w-3.5 h-3.5" />}
-            className="flex-1"
-          >
-            <span>{t('auth.logoutAction')}</span>
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={closeProfileModal}
-          >
-            <span>{t('common.close')}</span>
-          </Button>
-        </div>
-      </div>
+      </DialogContent>
     </Dialog>
   );
 };

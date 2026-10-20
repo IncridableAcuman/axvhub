@@ -429,6 +429,7 @@ export const ru = {
     addStudentSubtitle: 'Зачисление ученика 8–11 классов в группу',
     fullNameLabel: 'Ф.И.О (Полное имя)',
     fullNamePlaceholder: 'Например: Абдурашарипов Иззатбек',
+    phoneLabel: 'Номер телефона',
     gradeLevelLabel: 'Класс',
     studyGroupLabel: 'Учебная группа',
     saveStudentBtn: 'Сохранить ученика',

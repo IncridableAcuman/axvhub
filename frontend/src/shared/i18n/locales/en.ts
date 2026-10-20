@@ -429,6 +429,7 @@ export const en = {
     addStudentSubtitle: 'Enroll a grade 8–11 student into a group',
     fullNameLabel: 'Full Name',
     fullNamePlaceholder: 'e.g. Abdurasharipov Izzatbek',
+    phoneLabel: 'Phone Number',
     gradeLevelLabel: 'Grade Level',
     studyGroupLabel: 'Study Group',
     saveStudentBtn: 'Save Student',

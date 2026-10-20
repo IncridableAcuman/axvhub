@@ -15,9 +15,7 @@ import {
   AlertCircle,
   GraduationCap,
 } from 'lucide-react';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { attendanceApi } from '@/api';
@@ -205,250 +203,360 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
   const todayAttendanceRate = totalRosterToday > 0 ? Math.round((totalPresentToday / totalRosterToday) * 100) : 0;
 
   return (
-    <div className="space-y-6">
-      {/* Header Banner with Gradient Accent */}
-      <Card className="border-border/60 bg-gradient-to-br from-card via-card to-primary/5 shadow-xs overflow-hidden">
-        <CardContent className="p-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-bold shadow-md shadow-primary/25 shrink-0">
-                <CalendarIcon className="w-6 h-6" />
+    <div className="space-y-6 sm:space-y-7 animate-in fade-in duration-300">
+      {/* 1. EXECUTIVE HERO BANNER (Borderless, Luxury Ambient Style like Dashboard) */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-xl">
+        {/* Soft Ambient Glows */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-3xl pointer-events-none -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-1/3 w-[350px] h-[350px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="p-7 sm:p-9 lg:p-10 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="max-w-2xl space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 backdrop-blur-md text-cyan-300 text-xs font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <CalendarIcon className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Muhammad Al-Xorazmiy Vorislari</span>
+                </span>
+
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-slate-200 text-xs font-medium">
+                  <Clock className="w-3.5 h-3.5 text-cyan-300" />
+                  <span className="capitalize">
+                    {currentDate.toLocaleDateString(locale === 'uz' ? 'uz-UZ' : locale === 'ru' ? 'ru-RU' : 'en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </span>
+                </span>
               </div>
+
               <div>
-                <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
-                    {t('schedule.title')}
-                  </h1>
-                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+                  {t('schedule.title')}
+                </h1>
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mt-1.5">
                   {t('schedule.subtitle')}
                 </p>
               </div>
+
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                {canManageAttendance && (
+                  <Button
+                    onClick={() => setIsCreateOpen(true)}
+                    size="default"
+                    className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-600/30 font-semibold border-0 rounded-xl"
+                  >
+                    <Plus className="w-4 h-4 mr-2 text-cyan-200" />
+                    <span>{t('schedule.planNewLesson')}</span>
+                  </Button>
+                )}
+
+                <Button
+                  onClick={loadData}
+                  disabled={loading}
+                  variant="secondary"
+                  className="bg-white/10 hover:bg-white/15 text-white border-0 font-medium rounded-xl backdrop-blur-md"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 mr-1.5 text-blue-300 ${loading ? 'animate-spin' : ''}`} />
+                  <span>{t('common.refresh')}</span>
+                </Button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={loadData}
-                disabled={loading}
-                title={t('common.refresh')}
-                className="gap-1.5"
-              >
-                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-                <span className="hidden sm:inline">{t('common.refresh')}</span>
-              </Button>
-              {canManageAttendance && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => setIsCreateOpen(true)}
-                  className="shadow-sm shadow-primary/25 gap-1.5"
-                >
-                  <Plus className="w-4 h-4" />
-                  <span>{t('schedule.planNewLesson')}</span>
-                </Button>
-              )}
+            {/* Quick Metrics Pillar in Hero */}
+            <div className="lg:shrink-0 grid grid-cols-2 gap-3 bg-white/5 backdrop-blur-xl rounded-2xl p-4 sm:p-5 text-center">
+              <div className="p-4 rounded-xl bg-white/5">
+                <span className="text-[10px] uppercase font-bold text-cyan-300 block tracking-wider">
+                  Bugungi darslar
+                </span>
+                <span className="text-2xl font-black text-white font-mono mt-1 block">
+                  {todayTotal}
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  Rejadagi mashg‘ulotlar
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-white/5">
+                <span className="text-[10px] uppercase font-bold text-emerald-300 block tracking-wider">
+                  Qatnashish ko‘rsatkichi
+                </span>
+                <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+                  {totalRosterToday > 0 ? `${todayAttendanceRate}%` : '100%'}
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  O‘quvchilar faolligi
+                </span>
+              </div>
+
+              <div className="col-span-2 p-3 rounded-xl bg-indigo-500/20 text-[11px] text-indigo-200 flex items-center justify-center gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Barcha darslar belgilangan standart asosida nazoratda</span>
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Modern KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* KPI 1: Today total */}
-        <Card className="border-border/50 bg-card hover:border-primary/40 transition-colors shadow-xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('schedule.todaySummary')}
-              </p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-black text-foreground">{todayTotal}</span>
-                <span className="text-xs text-muted-foreground">mashg‘ulot</span>
-              </div>
-            </div>
-            <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
-              <CalendarDays className="w-5 h-5" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* KPI 2: Scheduled */}
-        <Card className="border-border/50 bg-card hover:border-primary/40 transition-colors shadow-xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('status.scheduled')}
-              </p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-black text-foreground">{todayScheduled}</span>
-                <span className="text-xs text-blue-500 font-medium">Kutilmoqda</span>
-              </div>
-            </div>
-            <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-              <Clock className="w-5 h-5" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* KPI 3: Completed */}
-        <Card className="border-border/50 bg-card hover:border-emerald-500/40 transition-colors shadow-xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                {t('status.completed')}
-              </p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{todayCompleted}</span>
-                <span className="text-xs text-emerald-500 font-medium">O‘tildi</span>
-              </div>
-            </div>
-            <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-              <CheckCircle2 className="w-5 h-5" />
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* KPI 4: Attendance Rate */}
-        <Card className="border-border/50 bg-card hover:border-primary/40 transition-colors shadow-xs">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="space-y-1">
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
-                Bugungi Davomat
-              </p>
-              <div className="flex items-baseline gap-2">
-                <span className="text-2xl font-black text-foreground">
-                  {totalRosterToday > 0 ? `${todayAttendanceRate}%` : '—'}
-                </span>
-                {todayCancelled > 0 ? (
-                  <span className="text-xs text-rose-500 font-medium">({todayCancelled} bekor)</span>
-                ) : (
-                  <span className="text-xs text-muted-foreground">faollik</span>
-                )}
-              </div>
-            </div>
-            <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
-              <CheckCheck className="w-5 h-5" />
-            </div>
-          </CardContent>
-        </Card>
+        </div>
       </div>
 
-      {/* Control Bar: Date Navigation, Search, View Mode, Filters */}
-      <Card className="border-border/60 bg-card shadow-xs">
-        <CardContent className="p-4 space-y-3">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
-            {/* Date Navigation */}
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={handlePrev} className="h-8 w-8">
-                <ChevronLeft className="w-4 h-4" />
-              </Button>
-              <Button variant="outline" size="sm" onClick={handleToday} className="h-8 text-xs font-semibold px-3">
-                {t('schedule.today')}
-              </Button>
-              <Button variant="outline" size="icon" onClick={handleNext} className="h-8 w-8">
-                <ChevronRight className="w-4 h-4" />
-              </Button>
-
-              <div className="flex items-center gap-2 ml-2">
-                <CalendarIcon className="w-4 h-4 text-primary" />
-                <span className="text-sm font-bold text-foreground capitalize">
-                  {currentDate.toLocaleDateString(locale === 'uz' ? 'uz-UZ' : locale === 'ru' ? 'ru-RU' : 'en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: viewMode === 'day' ? 'numeric' : undefined,
-                  })}
-                </span>
+      {/* 2. EXECUTIVE KPI CARDS (Soft, Modern, Borderless Design like Dashboard) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {/* KPI 1: Today total */}
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <CalendarDays className="w-6 h-6" />
               </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                Bugun
+              </span>
             </div>
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-foreground">
+                  {todayTotal}
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">mashg‘ulot</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                {t('schedule.todaySummary')}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Bugun rejalashtirilgan barcha guruh darslari
+              </p>
+            </div>
+          </div>
+        </div>
 
-            {/* View Mode Toggle (Day / Week / Month) via Shadcn Tabs */}
-            <div className="flex items-center gap-2">
-              <Tabs value={viewMode} onValueChange={(val) => setViewMode(val as 'day' | 'week' | 'month')}>
-                <TabsList className="h-8 bg-muted/60 p-0.5">
-                  <TabsTrigger value="day" className="h-7 text-xs px-3 font-semibold data-[state=active]:bg-background">
-                    {t('schedule.viewDay')}
-                  </TabsTrigger>
-                  <TabsTrigger value="week" className="h-7 text-xs px-3 font-semibold data-[state=active]:bg-background">
-                    {t('schedule.viewWeek')}
-                  </TabsTrigger>
-                  <TabsTrigger value="month" className="h-7 text-xs px-3 font-semibold data-[state=active]:bg-background">
-                    {t('schedule.viewMonth')}
-                  </TabsTrigger>
-                </TabsList>
-              </Tabs>
+        {/* KPI 2: Scheduled */}
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <Clock className="w-6 h-6" />
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                Kutilmoqda
+              </span>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-foreground">
+                  {todayScheduled}
+                </span>
+                <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">navbatda</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                {t('status.scheduled')}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Boshlanishi kutilayotgan dars mashg‘ulotlari
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 3: Completed */}
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                O‘tildi
+              </span>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-emerald-600 dark:text-emerald-400">
+                  {todayCompleted}
+                </span>
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">yakunlandi</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                {t('status.completed')}
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Muvaffaqiyatli yakunlangan darslar
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI 4: Attendance Rate */}
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
+                <CheckCheck className="w-6 h-6" />
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                {todayCancelled > 0 ? `${todayCancelled} bekor` : 'Davomat'}
+              </span>
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-foreground">
+                  {totalRosterToday > 0 ? `${todayAttendanceRate}%` : '—'}
+                </span>
+                <span className="text-xs font-semibold text-purple-600 dark:text-purple-400">faollik</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                Bugungi Davomat
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Mashg‘ulotlarda ishtirok etgan o‘quvchilar
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. CONTROL BAR: Date Navigation, Search, View Mode, Filters */}
+      <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 space-y-4">
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+          {/* Date Navigation */}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handlePrev}
+              className="h-8 w-8 rounded-xl bg-muted/40 hover:bg-muted/70 text-foreground border-0"
+              aria-label="Oldingi sana"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleToday}
+              className="h-8 text-xs font-semibold px-3 rounded-xl bg-muted/40 hover:bg-muted/70 text-foreground border-0"
+            >
+              {t('schedule.today')}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleNext}
+              className="h-8 w-8 rounded-xl bg-muted/40 hover:bg-muted/70 text-foreground border-0"
+              aria-label="Keyingi sana"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+
+            <div className="flex items-center gap-2 ml-2">
+              <CalendarIcon className="w-4 h-4 text-primary" />
+              <span className="text-sm font-bold text-foreground capitalize">
+                {currentDate.toLocaleDateString(locale === 'uz' ? 'uz-UZ' : locale === 'ru' ? 'ru-RU' : 'en-US', {
+                  year: 'numeric',
+                  month: 'long',
+                  day: viewMode === 'day' ? 'numeric' : undefined,
+                })}
+              </span>
             </div>
           </div>
 
-          {/* Search & Select Filters */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/40">
-            <div className="relative">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Fan, mavzu, xona yoki mentor bo‘yicha qidiruv..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8.5 h-8 text-xs bg-background"
-              />
-            </div>
-
-            <select
-              value={selectedMentor}
-              onChange={(e) => setSelectedMentor(e.target.value)}
-              aria-label={t('schedule.mentorFilter')}
-              className="w-full text-xs h-8 rounded-md border border-input bg-background px-3 py-1 text-foreground shadow-xs focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-            >
-              <option value="all">{t('schedule.allMentors')}</option>
-              {mentors.map((m) => (
-                <option key={m.id} value={m.id.toString()}>
-                  {m.fullName}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={selectedGroup}
-              onChange={(e) => setSelectedGroup(e.target.value)}
-              aria-label={t('schedule.groupFilter')}
-              className="w-full text-xs h-8 rounded-md border border-input bg-background px-3 py-1 text-foreground shadow-xs focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
-            >
-              <option value="all">{t('schedule.allGroups')}</option>
-              {groups.map((g) => (
-                <option key={g.id} value={g.id.toString()}>
-                  {g.name || g.groupCode}
-                </option>
-              ))}
-            </select>
+          {/* View Mode Toggle via Shadcn Tabs */}
+          <div className="flex items-center gap-2">
+            <Tabs value={viewMode} onValueChange={(val) => setViewMode(val as 'day' | 'week' | 'month')}>
+              <TabsList className="h-9 bg-muted/50 p-1 rounded-xl border-0">
+                <TabsTrigger
+                  value="day"
+                  className="h-7 text-xs px-3 font-semibold rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-xs border-0"
+                >
+                  {t('schedule.viewDay')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="week"
+                  className="h-7 text-xs px-3 font-semibold rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-xs border-0"
+                >
+                  {t('schedule.viewWeek')}
+                </TabsTrigger>
+                <TabsTrigger
+                  value="month"
+                  className="h-7 text-xs px-3 font-semibold rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-xs border-0"
+                >
+                  {t('schedule.viewMonth')}
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </div>
-        </CardContent>
-      </Card>
+        </div>
 
-      {/* Sessions Grid */}
+        {/* Search & Select Filters */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-3 border-t border-border/15">
+          <div className="relative">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              placeholder="Fan, mavzu, xona yoki mentor bo‘yicha qidiruv..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-9 text-xs bg-muted/30 border-0 rounded-xl focus-visible:ring-1"
+            />
+          </div>
+
+          <select
+            value={selectedMentor}
+            onChange={(e) => setSelectedMentor(e.target.value)}
+            aria-label={t('schedule.mentorFilter')}
+            className="w-full text-xs h-9 rounded-xl border-0 bg-muted/30 px-3 py-1.5 text-foreground shadow-none focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+          >
+            <option value="all">{t('schedule.allMentors')}</option>
+            {mentors.map((m) => (
+              <option key={m.id} value={m.id.toString()}>
+                {m.fullName}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedGroup}
+            onChange={(e) => setSelectedGroup(e.target.value)}
+            aria-label={t('schedule.groupFilter')}
+            className="w-full text-xs h-9 rounded-xl border-0 bg-muted/30 px-3 py-1.5 text-foreground shadow-none focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+          >
+            <option value="all">{t('schedule.allGroups')}</option>
+            {groups.map((g) => (
+              <option key={g.id} value={g.id.toString()}>
+                {g.name || g.groupCode}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* 4. SESSIONS GRID */}
       {loading ? (
         <div className="py-20 text-center space-y-3">
           <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
           <p className="text-xs text-muted-foreground font-medium">{t('common.loading')}</p>
         </div>
       ) : filteredSessions.length === 0 ? (
-        <Card className="border-border/60 bg-card p-12 text-center shadow-xs">
+        <div className="bg-card text-card-foreground rounded-3xl p-12 text-center shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0">
           <CalendarIcon className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-foreground">
+          <h3 className="text-base font-bold text-foreground">
             {t('schedule.noSessionsTitle')}
           </h3>
           <p className="text-xs text-muted-foreground mt-1 mb-4 max-w-sm mx-auto">
             {t('schedule.noSessionsDesc')}
           </p>
           {canManageAttendance && (
-            <Button variant="default" size="sm" onClick={() => setIsCreateOpen(true)} className="gap-1.5">
+            <Button
+              variant="default"
+              size="sm"
+              onClick={() => setIsCreateOpen(true)}
+              className="gap-1.5 rounded-xl border-0 shadow-sm"
+            >
               <Plus className="w-4 h-4" />
-              {t('schedule.addLessonBtn')}
+              <span>{t('schedule.addLessonBtn')}</span>
             </Button>
           )}
-        </Card>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {filteredSessions.map((session) => {
             const startDate = getSessionDate(session);
             const dateStr = startDate.toLocaleDateString(locale === 'uz' ? 'uz-UZ' : locale === 'ru' ? 'ru-RU' : 'en-US', {
@@ -470,41 +578,36 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
             const isRescheduled = session.status === 'RESCHEDULED';
 
             return (
-              <Card
+              <div
                 key={session.id}
                 onClick={() => {
                   if (canManageAttendance) {
                     handleOpenAttendance(session);
                   }
                 }}
-                className={`flex flex-col justify-between transition-all duration-200 border-border/60 ${
-                  canManageAttendance ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''
+                className={`bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between group ${
+                  canManageAttendance ? 'cursor-pointer' : ''
                 } ${
-                  isCancelled
-                    ? 'bg-destructive/5 border-destructive/20 opacity-85'
-                    : isCompleted
-                    ? 'bg-card hover:border-emerald-500/40'
-                    : 'bg-card hover:border-primary/50'
+                  isCancelled ? 'opacity-85 bg-destructive/5 dark:bg-destructive/10' : ''
                 }`}
               >
-                <CardHeader className="p-4.5 pb-2">
-                  <div className="flex items-center justify-between gap-2">
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-3">
                     <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
                       <Clock className="w-3.5 h-3.5 text-primary" />
                       <span>{dateStr}, {timeStr}</span>
                     </div>
 
-                    <Badge
-                      variant={
+                    <span
+                      className={`text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full ${
                         isCompleted
-                          ? 'success'
+                          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
                           : isCancelled
-                          ? 'destructive'
+                          ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                           : isRescheduled
-                          ? 'warning'
-                          : 'default'
-                      }
-                      className="text-[10px] uppercase font-bold"
+                          ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+                          : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                      }`}
                     >
                       {isCompleted
                         ? t('status.completed')
@@ -513,22 +616,20 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
                         : isRescheduled
                         ? t('status.rescheduled')
                         : t('status.scheduled')}
-                    </Badge>
+                    </span>
                   </div>
 
-                  <CardTitle className="text-base font-bold text-foreground mt-2 line-clamp-1">
+                  <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
                     {session.subject}
-                  </CardTitle>
+                  </h3>
                   {session.topic && (
-                    <CardDescription className="text-xs line-clamp-1 mt-0.5">
-                      {t('schedule.topic')}: {session.topic}
-                    </CardDescription>
+                    <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                      {t('schedule.topic')}: <span className="text-foreground font-medium">{session.topic}</span>
+                    </p>
                   )}
-                </CardHeader>
 
-                <CardContent className="p-4.5 pt-1 space-y-3">
-                  {/* Group & Room Details */}
-                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground bg-muted/30 p-2.5 rounded-xl border border-border/40">
+                  {/* Group & Room Details (Soft borderless card) */}
+                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground bg-muted/40 rounded-xl p-3 mt-3">
                     <div className="flex items-center gap-1.5 truncate">
                       <Users className="w-3.5 h-3.5 text-primary shrink-0" />
                       <span className="font-semibold text-foreground truncate">
@@ -544,7 +645,7 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
                   </div>
 
                   {/* Mentor Info */}
-                  <div className="flex items-center justify-between text-xs">
+                  <div className="flex items-center justify-between text-xs mt-3">
                     <div className="flex items-center gap-1.5 text-muted-foreground truncate">
                       <GraduationCap className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="text-[11px]">{t('roles.ROLE_MENTOR')}:</span>
@@ -556,43 +657,45 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
 
                   {/* Cancellation Reason alert if cancelled */}
                   {session.cancellationReason && (
-                    <div className="p-2 rounded-lg bg-destructive/10 text-destructive text-[11px] border border-destructive/20">
+                    <div className="p-2.5 rounded-xl bg-destructive/10 text-destructive text-[11px] mt-2.5">
                       <span className="font-bold">{t('schedule.cancelReason')}: </span>
                       {session.cancellationReason}
                     </div>
                   )}
 
-                  {/* Attendance Summary Badge / Progress */}
-                  {hasAttendance ? (
-                    <div className="flex items-center gap-2 text-xs pt-1">
-                      <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[11px] font-bold">
-                        ✓ {t('schedule.presentCount', { count: presentRecs })}
-                      </Badge>
-                      {absentRecs > 0 && (
-                        <Badge variant="outline" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 text-[11px] font-bold">
-                          ✕ {t('schedule.absentCount', { count: absentRecs })}
-                        </Badge>
-                      )}
-                      <span className="text-[10px] text-muted-foreground ml-auto font-mono">
-                        {Math.round((presentRecs / totalRoster) * 100)}%
-                      </span>
-                    </div>
-                  ) : !isCancelled ? (
-                    <div className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-medium pt-1">
-                      <AlertCircle className="w-3.5 h-3.5" />
-                      <span>Davomat kutilmoqda</span>
-                    </div>
-                  ) : null}
-                </CardContent>
+                  {/* Attendance Summary Badge */}
+                  <div className="mt-3">
+                    {hasAttendance ? (
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[11px] font-bold">
+                          ✓ {t('schedule.presentCount', { count: presentRecs })}
+                        </span>
+                        {absentRecs > 0 && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-600 dark:text-rose-400 text-[11px] font-bold">
+                            ✕ {t('schedule.absentCount', { count: absentRecs })}
+                          </span>
+                        )}
+                        <span className="text-[10px] text-muted-foreground ml-auto font-mono font-semibold">
+                          {Math.round((presentRecs / totalRoster) * 100)}%
+                        </span>
+                      </div>
+                    ) : !isCancelled ? (
+                      <div className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-medium">
+                        <AlertCircle className="w-3.5 h-3.5" />
+                        <span>Davomat kutilmoqda</span>
+                      </div>
+                    ) : null}
+                  </div>
+                </div>
 
                 {/* Footer Controls */}
                 {canManageAttendance && (
-                  <CardFooter className="p-4 pt-2 border-t border-border/40 flex items-center justify-between gap-2">
+                  <div className="pt-3 mt-4 border-t border-border/15 flex items-center justify-between gap-2">
                     <Button
-                      variant={hasAttendance ? 'outline' : 'default'}
+                      variant={hasAttendance ? 'secondary' : 'default'}
                       size="sm"
                       onClick={(e) => handleOpenAttendance(session, e)}
-                      className="text-xs h-8 gap-1 font-semibold"
+                      className="text-xs h-8 gap-1 font-semibold rounded-xl border-0 shadow-xs"
                     >
                       <CheckCheck className="w-3.5 h-3.5" />
                       <span>{hasAttendance ? t('schedule.editAttendance') : t('schedule.takeAttendance')}</span>
@@ -604,7 +707,7 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
                           variant="ghost"
                           size="sm"
                           onClick={(e) => handleOpenReschedule(session, e)}
-                          className="h-8 text-xs text-muted-foreground hover:text-foreground"
+                          className="h-8 text-xs text-muted-foreground hover:text-foreground rounded-xl"
                           title={t('schedule.reschedule')}
                         >
                           {t('schedule.reschedule')}
@@ -614,16 +717,16 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
                           variant="ghost"
                           size="sm"
                           onClick={(e) => handleCancelSession(session, e)}
-                          className="h-8 text-xs text-destructive hover:bg-destructive/10"
+                          className="h-8 text-xs text-destructive hover:bg-destructive/10 rounded-xl"
                           title={t('common.cancel')}
                         >
                           {t('common.cancel')}
                         </Button>
                       </div>
                     )}
-                  </CardFooter>
+                  </div>
                 )}
-              </Card>
+              </div>
             );
           })}
         </div>

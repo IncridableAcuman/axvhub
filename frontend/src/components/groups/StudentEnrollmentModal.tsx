@@ -1,8 +1,15 @@
 import React, { useState } from 'react';
 import { UserPlus } from 'lucide-react';
-import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { Button } from '@/shared/ui/button/Button';
-import { FormField } from '@/shared/ui/form/FormField';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { groupStructureApi } from '@/api';
 import type { Student } from '@/types';
@@ -41,8 +48,10 @@ export const StudentEnrollmentModal: React.FC<StudentEnrollmentModalProps> = ({
       toast.success('Muvaffaqiyatli', 'O‘quvchi guruhga muvaffaqiyatli a’zo qilindi');
       onSuccess();
       onClose();
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Biriktirishda xatolik yuz berdi';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Biriktirishda xatolik yuz berdi';
       toast.error('Xatolik', msg);
     } finally {
       setIsLoading(false);
@@ -50,43 +59,67 @@ export const StudentEnrollmentModal: React.FC<StudentEnrollmentModalProps> = ({
   };
 
   return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onClose}
-      size="sm"
-      title={
-        <div className="flex items-center gap-2">
-          <UserPlus className="w-5 h-5 text-[var(--brand-primary)]" />
-          <span>O‘quvchi Biriktirish</span>
-        </div>
-      }
-      description={`${groupCode} guruhiga o‘quvchini ro‘yxatdan o‘tkazing`}
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <FormField label="O‘quvchini tanlang" required>
-          <select
-            value={selectedStudentId}
-            onChange={(e) => setSelectedStudentId(e.target.value)}
-            className="w-full text-xs sm:text-sm rounded-lg border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--text-primary)] h-9 px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-          >
-            <option value="">O‘quvchini tanlang...</option>
-            {allStudents.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.fullName} ({s.gradeLevel}) {s.studyGroup ? `[Hozirgi: ${s.studyGroup.groupCode}]` : '[Guruhsiz]'}
-              </option>
-            ))}
-          </select>
-        </FormField>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md border-0 shadow-2xl rounded-2xl bg-card text-card-foreground">
+        <DialogHeader>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <UserPlus className="w-5 h-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-bold">O‘quvchi Biriktirish</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                <span className="font-semibold text-foreground">{groupCode}</span> guruhiga yangi o‘quvchini ro‘yxatdan o‘tkazing
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
 
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border-subtle)]">
-          <Button variant="outline" size="sm" type="button" onClick={onClose} disabled={isLoading}>
-            Bekor qilish
-          </Button>
-          <Button variant="primary" size="sm" type="submit" isLoading={isLoading} disabled={!selectedStudentId}>
-            Biriktirish
-          </Button>
-        </div>
-      </form>
+        <form onSubmit={handleSubmit} className="space-y-4 pt-1">
+          <div className="space-y-1.5">
+            <Label htmlFor="enroll-student-select" className="text-xs font-semibold text-foreground">
+              O‘quvchini tanlang <span className="text-destructive">*</span>
+            </Label>
+            <select
+              id="enroll-student-select"
+              value={selectedStudentId}
+              onChange={(e) => setSelectedStudentId(e.target.value)}
+              aria-label="O‘quvchini tanlang"
+              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">O‘quvchini tanlang...</option>
+              {allStudents.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.fullName} ({s.gradeLevel}) {s.studyGroup ? `[Hozirgi: ${s.studyGroup.groupCode}]` : '[Guruhsiz]'}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <DialogFooter className="pt-3 gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              disabled={isLoading}
+              className="rounded-lg text-xs"
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              type="submit"
+              variant="default"
+              size="sm"
+              isLoading={isLoading}
+              disabled={!selectedStudentId || isLoading}
+              className="rounded-lg text-xs"
+            >
+              Biriktirish
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

@@ -10,8 +10,18 @@ import {
   AlertCircle,
   Lock,
 } from 'lucide-react';
-import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { Button } from '@/shared/ui/button/Button';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { MentorProfileDto, PublicMentorProfileDto } from '@/types';
 
 interface MentorProfileModalProps {
@@ -27,258 +37,275 @@ export const MentorProfileModal: React.FC<MentorProfileModalProps> = ({
 }) => {
   if (!profile) return null;
 
-  const phone = 'publicPhone' in profile && profile.publicPhone ? profile.publicPhone : 'phone' in profile ? profile.phone : undefined;
-  const email = 'publicEmail' in profile && profile.publicEmail ? profile.publicEmail : 'email' in profile ? profile.email : undefined;
+  const phone =
+    'publicPhone' in profile && profile.publicPhone
+      ? profile.publicPhone
+      : 'phone' in profile
+      ? profile.phone
+      : undefined;
+  const email =
+    'publicEmail' in profile && profile.publicEmail
+      ? profile.publicEmail
+      : 'email' in profile
+      ? profile.email
+      : undefined;
   const status = 'publicationStatus' in profile ? profile.publicationStatus : 'PUBLISHED';
   const rejectionReason = 'rejectionReason' in profile ? profile.rejectionReason : null;
-  const isContactPublic = 'isContactPublic' in profile ? Boolean(profile.isContactPublic) : Boolean(phone || email);
+  const isContactPublic =
+    'isContactPublic' in profile ? Boolean(profile.isContactPublic) : Boolean(phone || email);
+
+  const getStatusBadge = (st?: string) => {
+    switch (st) {
+      case 'PUBLISHED':
+        return <Badge variant="success">Tasdiqlangan & Ommaviy</Badge>;
+      case 'PENDING_REVIEW':
+        return <Badge variant="warning">Moderatsiyada</Badge>;
+      case 'REJECTED':
+        return <Badge variant="destructive">Rad etilgan</Badge>;
+      case 'DRAFT':
+        return <Badge variant="secondary">Qoralama</Badge>;
+      default:
+        return st ? <Badge variant="secondary">{st}</Badge> : null;
+    }
+  };
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title="Mentor Profili" size="xl">
-      <div className="space-y-6">
-        {/* Header with Avatar and Basic Info */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 to-indigo-50/60 dark:from-slate-900/60 dark:to-blue-950/20 border border-blue-100 dark:border-blue-900/40">
-          <div className="relative">
-            {profile.profilePhotoUrl ? (
-              <img
-                src={profile.profilePhotoUrl}
-                alt={profile.displayName}
-                className="w-20 h-20 rounded-2xl object-cover border-2 border-white dark:border-slate-800 shadow-md"
-              />
-            ) : (
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-2xl flex items-center justify-center shadow-md">
-                {profile.displayName?.charAt(0) || 'M'}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-2xl max-h-[88vh] overflow-y-auto bg-card text-card-foreground border-border/30 rounded-3xl p-6 sm:p-7 shadow-2xl">
+        <DialogHeader className="sr-only">
+          <DialogTitle>Mentor Profili</DialogTitle>
+          <DialogDescription>Mentorning to'liq ma'lumotlari va tajribasi</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-6">
+          {/* Header Hero with Avatar and Profile Highlights */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-5 rounded-3xl bg-muted/40">
+            <div className="relative">
+              <Avatar className="w-20 h-20 rounded-2xl shadow-sm ring-2 ring-background">
+                {profile.profilePhotoUrl && (
+                  <AvatarImage
+                    src={profile.profilePhotoUrl}
+                    alt={profile.displayName}
+                    className="object-cover rounded-2xl"
+                  />
+                )}
+                <AvatarFallback className="rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white font-bold text-2xl">
+                  {profile.displayName?.charAt(0) || 'M'}
+                </AvatarFallback>
+              </Avatar>
+              <div className="absolute -bottom-1 -right-1 p-1 bg-background rounded-full shadow-xs">
+                <ShieldCheck className="w-4 h-4 text-emerald-500" />
               </div>
-            )}
-            <div className="absolute -bottom-1 -right-1 p-1 bg-white dark:bg-slate-900 rounded-full shadow-xs">
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            </div>
-          </div>
-
-          <div className="flex-1 text-center sm:text-left">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                {profile.displayName}
-              </h2>
-              {status && (
-                <span
-                  className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full inline-block self-center sm:self-auto ${
-                    status === 'PUBLISHED'
-                      ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
-                      : status === 'PENDING_REVIEW'
-                      ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300'
-                      : status === 'REJECTED'
-                      ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300'
-                      : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                  }`}
-                >
-                  {status === 'PUBLISHED'
-                    ? 'Tasdiqlangan & Ommaviy'
-                    : status === 'PENDING_REVIEW'
-                    ? 'Moderatsiyada'
-                    : status === 'REJECTED'
-                    ? 'Rad etilgan'
-                    : 'Qoralama'}
-                </span>
-              )}
             </div>
 
-            <p className="text-xs font-semibold text-blue-600 dark:text-blue-400 mt-0.5">
-              {profile.headline || 'IT Murabbiy & Mentor'}
-            </p>
-
-            {/* Social & Portfolio links */}
-            <div className="flex items-center justify-center sm:justify-start gap-2 mt-3">
-              {profile.githubUrl && (
-                <a
-                  href={profile.githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-blue-600 border border-slate-200 dark:border-slate-700 transition flex items-center space-x-1 text-xs"
-                  title="GitHub profil"
-                >
-                  <Code2 className="w-4 h-4" />
-                  <span>GitHub</span>
-                </a>
-              )}
-              {profile.linkedinUrl && (
-                <a
-                  href={profile.linkedinUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-blue-600 border border-slate-200 dark:border-slate-700 transition flex items-center space-x-1 text-xs"
-                  title="LinkedIn profil"
-                >
-                  <Share2 className="w-4 h-4" />
-                  <span>LinkedIn</span>
-                </a>
-              )}
-              {profile.portfolioUrl && (
-                <a
-                  href={profile.portfolioUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-blue-600 border border-slate-200 dark:border-slate-700 transition flex items-center space-x-1 text-xs"
-                  title="Portfolio sayt"
-                >
-                  <Globe className="w-4 h-4" />
-                  <span>Portfolio</span>
-                </a>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* Rejection Reason Notice if rejected */}
-        {rejectionReason && (
-          <div className="p-3 rounded-xl bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-900 flex items-start space-x-2 text-xs">
-            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
-            <div>
-              <span className="font-bold">Moderator izohi (Rad etish sababi): </span>
-              {rejectionReason}
-            </div>
-          </div>
-        )}
-
-        {/* Bio */}
-        {profile.bio && (
-          <div>
-            <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
-              Murabbiy haqida (Biografiya)
-            </h4>
-            <p className="text-xs text-slate-700 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/60 p-3.5 rounded-xl border border-slate-100 dark:border-slate-800 whitespace-pre-line">
-              {profile.bio}
-            </p>
-          </div>
-        )}
-
-        {/* Technical Skills */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2.5 flex items-center space-x-1.5">
-            <Award className="w-3.5 h-3.5 text-blue-600" />
-            <span>Texnik Ko'nikmalar & Malaka</span>
-          </h4>
-          {profile.skills && profile.skills.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {profile.skills.map((skill) => (
-                <div
-                  key={skill.id || skill.skillName}
-                  className="flex items-center space-x-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200"
-                >
-                  <span>{skill.skillName}</span>
-                  {skill.proficiencyLevel && (
-                    <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50 px-1.5 py-0.5 rounded-md">
-                      {skill.proficiencyLevel}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400 italic">Ko'nikmalar hali kiritilmagan</p>
-          )}
-        </div>
-
-        {/* Professional Experience Timeline */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center space-x-1.5">
-            <Briefcase className="w-3.5 h-3.5 text-indigo-600" />
-            <span>Ish Tajribasi & Loyihalar</span>
-          </h4>
-          {profile.experiences && profile.experiences.length > 0 ? (
-            <div className="space-y-3">
-              {profile.experiences.map((exp, idx) => (
-                <div
-                  key={exp.id || idx}
-                  className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-xs"
-                >
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <h5 className="font-bold text-slate-900 dark:text-slate-100">{exp.roleTitle}</h5>
-                      <p className="text-blue-600 font-medium">{exp.companyName}</p>
-                    </div>
-                    <span className="text-[10px] text-slate-400 font-medium">
-                      {exp.startDate} — {exp.isCurrent ? 'Hozirgi vaqtgacha' : exp.endDate || 'Noma\'lum'}
-                    </span>
-                  </div>
-                  {exp.description && (
-                    <p className="text-slate-600 dark:text-slate-400 mt-2 text-[11px] leading-relaxed">
-                      {exp.description}
-                    </p>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400 italic">Ish tajribasi ma'lumotlari kiritilmagan</p>
-          )}
-        </div>
-
-        {/* Education & Certifications */}
-        <div>
-          <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3 flex items-center space-x-1.5">
-            <GraduationCap className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Ta'lim & Sertifikatlar</span>
-          </h4>
-          {profile.educations && profile.educations.length > 0 ? (
-            <div className="space-y-2.5">
-              {profile.educations.map((edu, idx) => (
-                <div
-                  key={edu.id || idx}
-                  className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-100 dark:border-slate-800 text-xs flex items-start justify-between"
-                >
-                  <div>
-                    <h5 className="font-bold text-slate-900 dark:text-slate-100">{edu.institution}</h5>
-                    <p className="text-slate-500">
-                      {edu.degreeOrCertificate} {edu.fieldOfStudy ? `— ${edu.fieldOfStudy}` : ''}
-                    </p>
-                  </div>
-                  {edu.issueYear && (
-                    <span className="text-[11px] font-semibold text-slate-400 bg-slate-200/60 dark:bg-slate-800 px-2 py-0.5 rounded-md">
-                      {edu.issueYear}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-xs text-slate-400 italic">Ta'lim ma'lumotlari kiritilmagan</p>
-          )}
-        </div>
-
-        {/* Contact Privacy Protection Info */}
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 text-xs flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            {isContactPublic ? (
-              <ShieldCheck className="w-4 h-4 text-emerald-500" />
-            ) : (
-              <Lock className="w-4 h-4 text-amber-500" />
-            )}
-            <div>
-              <div className="font-semibold text-slate-800 dark:text-slate-200">
-                {isContactPublic
-                  ? "Aloqa ma'lumotlari ochiq (Public)"
-                  : "Aloqa ma'lumotlari himoyalangan (Xususiy)"}
+            <div className="flex-1 text-center sm:text-left min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h2 className="text-xl font-bold text-foreground truncate">
+                  {profile.displayName}
+                </h2>
+                {getStatusBadge(status)}
               </div>
-              <div className="text-[10px] text-slate-500">
-                {phone || email ? (
-                  <span>
-                    {phone && `Tel: ${phone}`} {email && `| Email: ${email}`}
-                  </span>
-                ) : (
-                  <span>Maxfiylik siyosatiga ko'ra raqam va email yashiringan</span>
+
+              <p className="text-xs font-semibold text-primary mt-1">
+                {profile.headline || 'IT Murabbiy & Mentor'}
+              </p>
+
+              {/* Social & Portfolio links */}
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mt-3">
+                {profile.githubUrl && (
+                  <a
+                    href={profile.githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background/80 hover:bg-background text-foreground text-xs font-medium transition-colors shadow-2xs"
+                    title="GitHub profil"
+                  >
+                    <Code2 className="w-3.5 h-3.5 text-primary" />
+                    <span>GitHub</span>
+                  </a>
+                )}
+                {profile.linkedinUrl && (
+                  <a
+                    href={profile.linkedinUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background/80 hover:bg-background text-foreground text-xs font-medium transition-colors shadow-2xs"
+                    title="LinkedIn profil"
+                  >
+                    <Share2 className="w-3.5 h-3.5 text-primary" />
+                    <span>LinkedIn</span>
+                  </a>
+                )}
+                {profile.portfolioUrl && (
+                  <a
+                    href={profile.portfolioUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background/80 hover:bg-background text-foreground text-xs font-medium transition-colors shadow-2xs"
+                    title="Portfolio sayt"
+                  >
+                    <Globe className="w-3.5 h-3.5 text-primary" />
+                    <span>Portfolio</span>
+                  </a>
                 )}
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="flex justify-end pt-2">
-          <Button variant="outline" size="sm" onClick={onClose}>
-            Yopish
-          </Button>
+          {/* Rejection Notice if rejected */}
+          {rejectionReason && (
+            <Alert variant="destructive" className="rounded-2xl">
+              <AlertCircle className="w-4 h-4" />
+              <AlertDescription className="text-xs">
+                <span className="font-bold">Moderator izohi (Rad etish sababi): </span>
+                {rejectionReason}
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Bio */}
+          {profile.bio && (
+            <div className="space-y-2">
+              <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                Murabbiy haqida (Biografiya)
+              </h4>
+              <p className="text-xs text-foreground/90 leading-relaxed bg-muted/30 p-4 rounded-2xl whitespace-pre-line">
+                {profile.bio}
+              </p>
+            </div>
+          )}
+
+          {/* Technical Skills */}
+          <div className="space-y-2.5">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Award className="w-3.5 h-3.5 text-primary" />
+              <span>Texnik Ko'nikmalar & Malaka</span>
+            </h4>
+            {profile.skills && profile.skills.length > 0 ? (
+              <div className="flex flex-wrap gap-2">
+                {profile.skills.map((skill) => (
+                  <Badge
+                    key={skill.id || skill.skillName}
+                    variant="secondary"
+                    className="px-3 py-1.5 rounded-xl text-xs font-medium gap-1.5 bg-muted/60"
+                  >
+                    <span>{skill.skillName}</span>
+                    {skill.proficiencyLevel && (
+                      <span className="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-md">
+                        {skill.proficiencyLevel}
+                      </span>
+                    )}
+                  </Badge>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">Ko'nikmalar hali kiritilmagan</p>
+            )}
+          </div>
+
+          {/* Professional Experience Timeline */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <Briefcase className="w-3.5 h-3.5 text-primary" />
+              <span>Ish Tajribasi & Loyihalar</span>
+            </h4>
+            {profile.experiences && profile.experiences.length > 0 ? (
+              <div className="space-y-2.5">
+                {profile.experiences.map((exp, idx) => (
+                  <div
+                    key={exp.id || idx}
+                    className="p-4 rounded-2xl bg-muted/30 text-xs space-y-1.5"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div>
+                        <h5 className="font-bold text-foreground text-sm">{exp.roleTitle}</h5>
+                        <p className="text-primary font-medium text-xs mt-0.5">{exp.companyName}</p>
+                      </div>
+                      <span className="text-[11px] text-muted-foreground font-medium shrink-0">
+                        {exp.startDate} — {exp.isCurrent ? 'Hozirgi vaqtgacha' : exp.endDate || 'Noma\'lum'}
+                      </span>
+                    </div>
+                    {exp.description && (
+                      <p className="text-muted-foreground text-xs leading-relaxed pt-1">
+                        {exp.description}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">Ish tajribasi ma'lumotlari kiritilmagan</p>
+            )}
+          </div>
+
+          {/* Education & Certifications */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+              <GraduationCap className="w-3.5 h-3.5 text-primary" />
+              <span>Ta'lim & Sertifikatlar</span>
+            </h4>
+            {profile.educations && profile.educations.length > 0 ? (
+              <div className="space-y-2.5">
+                {profile.educations.map((edu, idx) => (
+                  <div
+                    key={edu.id || idx}
+                    className="p-3.5 rounded-2xl bg-muted/30 text-xs flex items-start justify-between gap-3"
+                  >
+                    <div>
+                      <h5 className="font-bold text-foreground">{edu.institution}</h5>
+                      <p className="text-muted-foreground text-xs mt-0.5">
+                        {edu.degreeOrCertificate} {edu.fieldOfStudy ? `— ${edu.fieldOfStudy}` : ''}
+                      </p>
+                    </div>
+                    {edu.issueYear && (
+                      <span className="text-[11px] font-semibold text-muted-foreground bg-muted px-2 py-0.5 rounded-lg shrink-0">
+                        {edu.issueYear}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground italic">Ta'lim ma'lumotlari kiritilmagan</p>
+            )}
+          </div>
+
+          {/* Contact Privacy Protection Info */}
+          <div className="p-3.5 rounded-2xl bg-muted/40 text-xs flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-background flex items-center justify-center shrink-0 shadow-2xs">
+                {isContactPublic ? (
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                ) : (
+                  <Lock className="w-4 h-4 text-amber-500" />
+                )}
+              </div>
+              <div>
+                <div className="font-semibold text-foreground">
+                  {isContactPublic
+                    ? "Aloqa ma'lumotlari ochiq (Public)"
+                    : "Aloqa ma'lumotlari himoyalangan (Xususiy)"}
+                </div>
+                <div className="text-[11px] text-muted-foreground mt-0.5">
+                  {phone || email ? (
+                    <span>
+                      {phone && `Tel: ${phone}`} {email && `| Email: ${email}`}
+                    </span>
+                  ) : (
+                    <span>Maxfiylik siyosatiga ko'ra raqam va email yashirilgan</span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter className="pt-2">
+            <Button variant="outline" size="sm" onClick={onClose} className="rounded-xl text-xs">
+              Yopish
+            </Button>
+          </DialogFooter>
         </div>
-      </div>
+      </DialogContent>
     </Dialog>
   );
 };

@@ -18,17 +18,11 @@ import {
   HelpCircle,
   FileText,
   Hash,
+  ArrowRight,
+  TrendingUp,
+  Activity,
 } from 'lucide-react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
@@ -357,160 +351,297 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
     });
   }, [assignments, searchQuery, selectedGrade]);
 
+  // Executive KPI stats list (matches Dashboard style)
+  const kpis = useMemo(
+    () => [
+      {
+        id: 'quizzes',
+        title: 'Mavjud Testlar',
+        value: `${assessments.length} ta`,
+        subtitle: 'Ob’ektiv avtomatik tekshiruv',
+        trend: '100% ob’ektiv',
+        icon: CheckSquare,
+        iconBg: 'bg-purple-500/10 text-purple-600 dark:text-purple-400',
+        badge: 'Avto-tekshiruv',
+        onClick: () => setActiveSubTab('QUIZZES'),
+        actionText: 'Barcha testlar',
+      },
+      {
+        id: 'assignments',
+        title: 'Amaliy Topshiriqlar',
+        value: `${assignments.length} ta`,
+        subtitle: 'Mentor tekshiruvi va loyihalar',
+        trend: 'Real amaliyot',
+        icon: FileQuestion,
+        iconBg: 'bg-blue-500/10 text-blue-600 dark:text-blue-400',
+        badge: 'Mentor tekshiruvi',
+        onClick: () => setActiveSubTab('ASSIGNMENTS'),
+        actionText: 'Topshiriqlar',
+      },
+      {
+        id: 'passing',
+        title: 'O‘tish Standarti',
+        value: '60%',
+        subtitle: 'Minimal saralash mezoni',
+        trend: 'Vazirlik mezoni',
+        icon: Award,
+        iconBg: 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400',
+        badge: 'Minimal ball',
+        onClick: undefined,
+        actionText: 'Talablar',
+      },
+      {
+        id: 'ranking',
+        title: 'Audit & Baholash',
+        value: '100%',
+        subtitle: 'Shaffof ballar va reyting',
+        trend: 'XP integratsiyasi',
+        icon: Trophy,
+        iconBg: 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+        badge: 'Shaffof reyting',
+        onClick: undefined,
+        actionText: 'Baholash',
+      },
+    ],
+    [assessments.length, assignments.length]
+  );
+
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
+    <div className="space-y-7 animate-in fade-in duration-300">
       {/* ========================================================
-          HERO BANNER (shadcn Card based)
+          1. HERO EXECUTIVE BANNER (Borderless, Luxury Ambient Style)
       ======================================================== */}
-      <Card className="relative overflow-hidden border-border/60 bg-gradient-to-r from-card via-card to-purple-500/5 dark:to-purple-950/20 shadow-sm">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-purple-500/5 dark:bg-purple-500/10 rounded-full blur-3xl pointer-events-none -mr-20 -mt-20" />
-        <CardContent className="p-6 sm:p-8 relative z-10">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            <div className="space-y-3 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-700 dark:text-purple-300 text-xs font-semibold">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Modul 10 — Testlar, Viktorinalar & Uy Vazifalari</span>
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-xl border-0">
+        {/* Soft Ambient Glows */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-purple-500/15 rounded-full blur-3xl pointer-events-none -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-1/3 w-[350px] h-[350px] bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="p-7 sm:p-9 lg:p-11 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="max-w-2xl space-y-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 backdrop-blur-md text-cyan-300 text-xs font-semibold border-0">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Modul 10 — Testlar, Viktorinalar & Uy Vazifalari</span>
+                </span>
+
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-slate-200 text-xs font-medium border-0">
+                  <Clock className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>Real-vaqt nazorati</span>
+                </span>
+
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/20 text-indigo-300 text-[11px] font-semibold border-0">
+                  <Award className="w-3 h-3" />
+                  <span>IT & Dasturlash Standarti</span>
+                </span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                Baholash & Mustaqil Mashqlar Markazi
-              </h1>
-              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Yagona yoki ko‘p tanlovli savollar, server-side vaqt nazorati, avtomatik ob’ektiv baholash hamda uyga vazifalarni tekshirish platformasi.
-              </p>
+
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+                  Baholash & Mustaqil Mashqlar Markazi
+                </h1>
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mt-2">
+                  Yagona yoki ko‘p tanlovli savollar, server-side vaqt nazorati, avtomatik ob’ektiv baholash hamda amaliy uyga vazifalarni tekshirish platformasi.
+                </p>
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <Button
+                  onClick={() => {
+                    loadAssessments();
+                    loadAssignments();
+                    toast.info('Yangilandi', 'Testlar va topshiriqlar ro‘yxati qayta yuklandi');
+                  }}
+                  size="default"
+                  className="bg-white/10 hover:bg-white/15 text-white border-0 font-medium rounded-xl backdrop-blur-md"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2 text-cyan-300" />
+                  <span>Yangilash</span>
+                </Button>
+
+                {canManage && (
+                  <>
+                    <Button
+                      onClick={() => setIsCreateQuizOpen(true)}
+                      size="default"
+                      className="bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white shadow-lg shadow-purple-600/30 font-semibold border-0 rounded-xl"
+                    >
+                      <Plus className="w-4 h-4 mr-1.5 text-cyan-200" />
+                      <span>Yangi Test Tuzish</span>
+                    </Button>
+
+                    <Button
+                      onClick={() => setIsCreateAssignmentOpen(true)}
+                      variant="secondary"
+                      className="bg-white/10 hover:bg-white/15 text-white border-0 font-medium rounded-xl backdrop-blur-md"
+                    >
+                      <Plus className="w-4 h-4 mr-1.5 text-blue-300" />
+                      <span>Yangi Topshiriq</span>
+                    </Button>
+                  </>
+                )}
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  loadAssessments();
-                  loadAssignments();
-                  toast.info('Yangilandi', 'Testlar va topshiriqlar ro‘yxati qayta yuklandi');
-                }}
-                leftIcon={<RefreshCw className="w-3.5 h-3.5" />}
-                className="cursor-pointer"
-              >
-                <span>Yangilash</span>
-              </Button>
+            {/* Quick Metrics Pillar in Hero */}
+            <div className="lg:shrink-0 grid grid-cols-2 gap-3 bg-white/5 backdrop-blur-xl rounded-2xl p-4 sm:p-5 text-center border-0">
+              <div className="p-4 rounded-xl bg-white/5 border-0">
+                <span className="text-[10px] uppercase font-bold text-cyan-300 block tracking-wider">
+                  STANDART VAQT
+                </span>
+                <span className="text-2xl font-black text-white font-mono mt-1 block">
+                  30–45 min
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  Avto-taymer nazorati
+                </span>
+              </div>
 
-              {canManage && (
-                <>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsCreateAssignmentOpen(true)}
-                    leftIcon={<Plus className="w-3.5 h-3.5 text-blue-500" />}
-                    className="cursor-pointer"
-                  >
-                    <span>Yangi Topshiriq</span>
-                  </Button>
+              <div className="p-4 rounded-xl bg-white/5 border-0">
+                <span className="text-[10px] uppercase font-bold text-emerald-300 block tracking-wider">
+                  O‘TISH STANDARTI
+                </span>
+                <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+                  60%
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  Minimal o‘tish bali
+                </span>
+              </div>
 
-                  <Button
-                    variant="default"
-                    size="sm"
-                    onClick={() => setIsCreateQuizOpen(true)}
-                    leftIcon={<Plus className="w-3.5 h-3.5" />}
-                    className="shadow-sm shadow-purple-500/20 cursor-pointer"
-                  >
-                    <span>Yangi Test Tuzish</span>
-                  </Button>
-                </>
-              )}
+              <div className="col-span-2 p-3 rounded-xl bg-indigo-500/20 text-[11px] text-indigo-200 flex items-center justify-center gap-2 border-0">
+                <Activity className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Server-side tekshiruv & Shaffof baholash faol</span>
+              </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* ========================================================
-          STATS SUMMARY ROW (4 Shadcn Cards)
-      ======================================================== */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="border-border/50 bg-card/75 backdrop-blur-xs">
-          <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
-            <span className="text-xs font-medium text-muted-foreground">Mavjud Testlar</span>
-            <div className="w-8 h-8 rounded-lg bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-              <CheckSquare className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 pt-1">
-            <div className="text-2xl font-bold text-foreground">{assessments.length} ta</div>
-            <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-purple-500/30 text-purple-600 dark:text-purple-400">
-                Avto-tekshiruv
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50 bg-card/75 backdrop-blur-xs">
-          <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
-            <span className="text-xs font-medium text-muted-foreground">Amaliy Topshiriqlar</span>
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <FileQuestion className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 pt-1">
-            <div className="text-2xl font-bold text-foreground">{assignments.length} ta</div>
-            <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-1">
-              <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-blue-500/30 text-blue-600 dark:text-blue-400">
-                Mentor tekshiruvi
-              </Badge>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50 bg-card/75 backdrop-blur-xs">
-          <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
-            <span className="text-xs font-medium text-muted-foreground">O‘tish Standarti</span>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <Award className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 pt-1">
-            <div className="text-2xl font-bold text-foreground">60%</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              <span className="text-emerald-600 dark:text-emerald-400 font-medium">Minimal o‘tish bali</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50 bg-card/75 backdrop-blur-xs">
-          <CardHeader className="p-4 pb-2 flex flex-row items-center justify-between space-y-0">
-            <span className="text-xs font-medium text-muted-foreground">Audit & Baholash</span>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-              <Trophy className="w-4 h-4" />
-            </div>
-          </CardHeader>
-          <CardContent className="p-4 pt-1">
-            <div className="text-2xl font-bold text-foreground">100%</div>
-            <div className="text-[11px] text-muted-foreground mt-1">
-              <span className="text-amber-600 dark:text-amber-400 font-medium">Shaffof reyting</span>
-            </div>
-          </CardContent>
-        </Card>
+        </div>
       </div>
 
       {/* ========================================================
-          TOOLBAR: SUBTABS SWITCHER & SEARCH / FILTERS
+          2. EXECUTIVE KPI CARDS (Soft, Modern, Borderless Design)
       ======================================================== */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 pb-2 border-b border-border">
-        {/* Subtabs Button Group (Maintains role="button" and exact names for tests) */}
-        <div className="inline-flex items-center rounded-xl bg-muted p-1 text-muted-foreground">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        {kpis.map((kpi) => {
+          const Icon = kpi.icon;
+          return (
+            <div
+              key={kpi.id}
+              onClick={kpi.onClick}
+              className={`bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between group ${
+                kpi.onClick ? 'cursor-pointer' : ''
+              }`}
+              role={kpi.onClick ? 'button' : undefined}
+              tabIndex={kpi.onClick ? 0 : undefined}
+              onKeyDown={(e) => {
+                if (kpi.onClick && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault();
+                  kpi.onClick();
+                }
+              }}
+              aria-label={`${kpi.title}: ${kpi.value}`}
+            >
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <div
+                    className={`w-12 h-12 rounded-2xl ${kpi.iconBg} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}
+                  >
+                    <Icon className="w-6 h-6" />
+                  </div>
+
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0">
+                    <TrendingUp className="w-3 h-3" />
+                    <span>{kpi.badge}</span>
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-foreground">
+                      {kpi.value}
+                    </span>
+                    <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                      {kpi.trend}
+                    </span>
+                  </div>
+
+                  <h3 className="text-sm font-bold text-foreground">
+                    {kpi.title}
+                  </h3>
+                  <p className="text-xs text-muted-foreground">
+                    {kpi.subtitle}
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-4 mt-3 border-t border-border/10 flex items-center justify-between text-[11px] text-muted-foreground group-hover:text-primary transition-colors">
+                <span className="font-medium">{kpi.actionText}</span>
+                <div className="w-6 h-6 rounded-full bg-muted/60 group-hover:bg-primary/10 flex items-center justify-center transition-colors">
+                  <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* ========================================================
+          3. PRESIDENTIAL / METHODOLOGY BANNER (Luxurious, Borderless)
+      ======================================================== */}
+      <div className="relative overflow-hidden rounded-2xl p-6 bg-gradient-to-r from-purple-500/10 via-indigo-500/5 to-cyan-500/5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.03)] dark:shadow-none border-0">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/25">
+              <Sparkles className="w-6 h-6" />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="px-2.5 py-0.5 rounded-full bg-purple-500/20 text-purple-800 dark:text-purple-300 text-[10px] font-bold uppercase tracking-wider border-0">
+                  Davlat Standarti & Imtihon Nizomi
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">
+                  8–11-sinflar IT Dasturi
+                </span>
+              </div>
+              <h2 className="text-base font-bold text-foreground">
+                Ob’ektiv Savollar & Amaliy Kod Tekshiruvi Metodikasi
+              </h2>
+              <p className="text-xs text-muted-foreground leading-relaxed max-w-4xl">
+                Barcha testlar avtomatlashtirilgan tarzda server-side nazorati bilan baholanadi va talabaning reytingiga (XP) qo‘shiladi. Amaliy topshiriqlar esa mentor tomonidan kod tozaligi va loyiha arxitekturasi bo‘yicha tekshirilib, qayta aloqa taqdim etiladi.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <div className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-purple-500/15 text-purple-700 dark:text-purple-300 font-bold text-xs border-0">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Avto-Baholash Faol</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================
+          4. TOOLBAR: SUBTABS SWITCHER & SEARCH / FILTERS (Borderless)
+      ======================================================== */}
+      <div className="bg-card text-card-foreground rounded-2xl p-4 sm:p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Subtabs Button Group (Maintains role="button" for tests) */}
+        <div className="inline-flex items-center rounded-xl bg-muted/60 p-1 text-muted-foreground border-0">
           <button
             type="button"
             role="button"
             onClick={() => setActiveSubTab('QUIZZES')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer border-0 ${
               activeSubTab === 'QUIZZES'
-                ? 'bg-background text-foreground shadow-xs'
+                ? 'bg-background text-foreground shadow-sm font-bold'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <CheckSquare className="w-4 h-4 text-purple-500" />
             <span>Testlar & Viktorinalar</span>
-            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-purple-500/15 text-purple-600 dark:text-purple-400 font-bold">
-              {assessments.length}
+            <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-purple-500/15 text-purple-600 dark:text-purple-400 font-bold border-0">
+              {filteredAssessments.length}
             </span>
           </button>
 
@@ -518,30 +649,30 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
             type="button"
             role="button"
             onClick={() => setActiveSubTab('ASSIGNMENTS')}
-            className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+            className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-all cursor-pointer border-0 ${
               activeSubTab === 'ASSIGNMENTS'
-                ? 'bg-background text-foreground shadow-xs'
+                ? 'bg-background text-foreground shadow-sm font-bold'
                 : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             <Calendar className="w-4 h-4 text-blue-500" />
             <span>Uy Vazifalari & Topshiriqlar</span>
-            <span className="ml-1 px-1.5 py-0.2 rounded-full text-[10px] bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold">
-              {assignments.length}
+            <span className="ml-1 px-2 py-0.5 rounded-full text-[10px] bg-blue-500/15 text-blue-600 dark:text-blue-400 font-bold border-0">
+              {filteredAssignments.length}
             </span>
           </button>
         </div>
 
         {/* Search & Grade Filter Controls */}
-        <div className="flex items-center gap-2.5">
-          <div className="relative flex-1 sm:w-64">
-            <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="relative w-full sm:w-64">
+            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
               type="text"
               placeholder="Qidirish (nomi, fan)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 h-9 text-xs"
+              className="pl-9 h-9 text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
             />
             {searchQuery && (
               <button
@@ -554,15 +685,15 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
             )}
           </div>
 
-          <div className="flex items-center gap-1 bg-muted p-1 rounded-lg">
+          <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl border-0 overflow-x-auto">
             {['ALL', '8-sinf', '9-sinf', '10-sinf', '11-sinf'].map((grade) => (
               <button
                 key={grade}
                 type="button"
                 onClick={() => setSelectedGrade(grade)}
-                className={`px-2 py-1 rounded-md text-[11px] font-medium transition cursor-pointer ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition cursor-pointer whitespace-nowrap border-0 ${
                   selectedGrade === grade
-                    ? 'bg-background text-foreground shadow-xs font-bold'
+                    ? 'bg-background text-foreground shadow-sm font-bold'
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
@@ -574,38 +705,37 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       </div>
 
       {/* ========================================================
-          SUBTAB 1: QUIZZES & ASSESSMENTS
+          5. SUBTAB 1: QUIZZES & ASSESSMENTS (Clean, Borderless Cards)
       ======================================================== */}
       {activeSubTab === 'QUIZZES' && (
         <div className="space-y-6">
           {loadingAssessments ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {[1, 2, 3, 4, 5, 6].map((i) => (
-                <Card key={i} className="border-border/60">
-                  <CardHeader className="p-5 pb-3 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Skeleton className="h-5 w-16 rounded-md" />
-                      <Skeleton className="h-5 w-14 rounded-full" />
-                    </div>
-                    <Skeleton className="h-6 w-4/5 rounded-md" />
-                    <Skeleton className="h-4 w-32 rounded" />
-                  </CardHeader>
-                  <CardContent className="p-5 pt-0 space-y-3">
-                    <Skeleton className="h-14 w-full rounded-xl" />
-                  </CardContent>
-                  <CardFooter className="p-5 pt-3 border-t border-border/40 flex items-center justify-between">
-                    <Skeleton className="h-4 w-24 rounded" />
-                    <Skeleton className="h-8 w-28 rounded-lg" />
-                  </CardFooter>
-                </Card>
+                <div
+                  key={i}
+                  className="bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 space-y-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                    <Skeleton className="h-5 w-16 rounded-full" />
+                  </div>
+                  <Skeleton className="h-6 w-4/5 rounded-xl" />
+                  <Skeleton className="h-4 w-32 rounded-lg" />
+                  <Skeleton className="h-16 w-full rounded-xl" />
+                  <div className="pt-4 border-t border-border/10 flex items-center justify-between">
+                    <Skeleton className="h-4 w-24 rounded-lg" />
+                    <Skeleton className="h-9 w-28 rounded-xl" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : filteredAssessments.length === 0 ? (
-            <Card className="border-dashed p-10 text-center">
-              <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center text-muted-foreground mb-3">
-                <HelpCircle className="w-6 h-6" />
+            <div className="bg-card text-card-foreground rounded-2xl p-12 text-center shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0">
+              <div className="w-14 h-14 rounded-2xl bg-muted/60 mx-auto flex items-center justify-center text-muted-foreground mb-3 border-0">
+                <HelpCircle className="w-7 h-7" />
               </div>
-              <h3 className="font-bold text-foreground text-sm">Testlar topilmadi</h3>
+              <h3 className="font-bold text-foreground text-base">Testlar topilmadi</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
                 Qidiruv so‘rovingiz yoki tanlangan filtrlar bo‘yicha mos keluvchi testlar mavjud emas.
               </p>
@@ -613,7 +743,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mt-4"
+                  className="mt-4 rounded-xl border-0 bg-muted/60 hover:bg-muted"
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedGrade('ALL');
@@ -622,76 +752,73 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   Filtrlarni tozalash
                 </Button>
               )}
-            </Card>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
               {filteredAssessments.map((quiz) => (
-                <Card
+                <div
                   key={quiz.id}
-                  className="border-border/60 hover:border-purple-500/50 hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
+                  className="bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group border-0"
                 >
                   <div>
-                    <CardHeader className="p-5 pb-3">
-                      <div className="flex items-start justify-between gap-2 mb-2">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <Badge variant="outline" className="border-purple-500/30 text-purple-600 dark:text-purple-400 bg-purple-500/10 text-[10px]">
-                            {quiz.gradeLevel}
-                          </Badge>
-                          <Badge variant="secondary" className="text-[10px]">
-                            {quiz.assessmentType || 'QUIZ'}
-                          </Badge>
-                        </div>
-                        <Badge variant="success" className="text-[10px]">
-                          Faol
-                        </Badge>
+                    <div className="flex items-start justify-between gap-2 mb-3">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-purple-500/10 text-purple-600 dark:text-purple-400 border-0">
+                          {quiz.gradeLevel}
+                        </span>
+                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-muted/70 text-foreground border-0">
+                          {quiz.assessmentType || 'QUIZ'}
+                        </span>
                       </div>
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        Faol
+                      </span>
+                    </div>
 
-                      <CardTitle className="text-base font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 leading-snug">
-                        {quiz.title}
-                      </CardTitle>
-                      <CardDescription className="text-xs text-muted-foreground mt-1">
-                        {quiz.subject}
-                      </CardDescription>
-                    </CardHeader>
+                    <h3 className="text-base font-bold text-foreground group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors line-clamp-2 leading-snug">
+                      {quiz.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground mt-1 mb-4">
+                      {quiz.subject}
+                    </p>
 
-                    <CardContent className="p-5 pt-0">
-                      <div className="grid grid-cols-2 gap-2 text-[11px] p-3 rounded-xl bg-muted/40 border border-border/40 mb-2">
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <Clock className="w-3.5 h-3.5 text-purple-500 shrink-0" />
-                          <span>{quiz.durationMinutes} daqiqa</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                          <span>{quiz.totalPoints} umumiy ball</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                          <span>O‘tish: {quiz.passingScore || 60}%</span>
-                        </div>
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <Hash className="w-3.5 h-3.5 text-blue-500 shrink-0" />
-                          <span>Urinish: {quiz.maxAttempts || 2} ta</span>
-                        </div>
+                    <div className="grid grid-cols-2 gap-2 text-[11px] p-3.5 rounded-xl bg-muted/30 mb-2 border-0">
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Clock className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                        <span className="font-medium text-foreground">{quiz.durationMinutes} daqiqa</span>
                       </div>
-                    </CardContent>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Award className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+                        <span className="font-medium text-foreground">{quiz.totalPoints} umumiy ball</span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                        <span>O‘tish: <strong className="text-foreground">{quiz.passingScore || 60}%</strong></span>
+                      </div>
+                      <div className="flex items-center gap-2 text-muted-foreground">
+                        <Hash className="w-3.5 h-3.5 text-blue-500 shrink-0" />
+                        <span>Urinish: <strong className="text-foreground">{quiz.maxAttempts || 2} ta</strong></span>
+                      </div>
+                    </div>
                   </div>
 
-                  <CardFooter className="p-5 pt-3 border-t border-border/50 flex items-center justify-between">
+                  <div className="pt-4 mt-3 border-t border-border/10 flex items-center justify-between">
                     <span className="text-[11px] text-muted-foreground font-medium">
-                      O‘tish bali: {quiz.passingScore || 60}%
+                      O‘tish bali: <strong className="text-foreground">{quiz.passingScore || 60}%</strong>
                     </span>
 
                     <Button
                       variant="default"
                       size="sm"
                       onClick={() => handleStartTest(quiz)}
-                      leftIcon={<Play className="w-3.5 h-3.5" />}
-                      className="cursor-pointer shadow-xs"
+                      className="cursor-pointer bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold rounded-xl border-0 shadow-sm transition-all"
                     >
+                      <Play className="w-3.5 h-3.5 mr-1.5" />
                       <span>Testni Boshlash</span>
                     </Button>
-                  </CardFooter>
-                </Card>
+                  </div>
+                </div>
               ))}
             </div>
           )}
@@ -699,35 +826,36 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       )}
 
       {/* ========================================================
-          SUBTAB 2: ASSIGNMENTS & HOMEWORK
+          6. SUBTAB 2: ASSIGNMENTS & HOMEWORK (Clean, Borderless Cards)
       ======================================================== */}
       {activeSubTab === 'ASSIGNMENTS' && (
         <div className="space-y-6">
           {loadingAssignments ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {[1, 2, 3, 4].map((i) => (
-                <Card key={i} className="border-border/60">
-                  <CardHeader className="p-5 pb-3 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <Skeleton className="h-5 w-20 rounded-md" />
-                      <Skeleton className="h-4 w-24 rounded" />
-                    </div>
-                    <Skeleton className="h-6 w-3/4 rounded-md" />
-                    <Skeleton className="h-4 w-full rounded" />
-                  </CardHeader>
-                  <CardFooter className="p-5 pt-3 border-t border-border/40 flex items-center justify-between">
-                    <Skeleton className="h-4 w-28 rounded" />
-                    <Skeleton className="h-8 w-32 rounded-lg" />
-                  </CardFooter>
-                </Card>
+                <div
+                  key={i}
+                  className="bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 space-y-4"
+                >
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-24 rounded-full" />
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                  </div>
+                  <Skeleton className="h-6 w-3/4 rounded-xl" />
+                  <Skeleton className="h-12 w-full rounded-xl" />
+                  <div className="pt-4 border-t border-border/10 flex items-center justify-between">
+                    <Skeleton className="h-4 w-28 rounded-lg" />
+                    <Skeleton className="h-9 w-32 rounded-xl" />
+                  </div>
+                </div>
               ))}
             </div>
           ) : filteredAssignments.length === 0 ? (
-            <Card className="border-dashed p-10 text-center">
-              <div className="w-12 h-12 rounded-full bg-muted mx-auto flex items-center justify-center text-muted-foreground mb-3">
-                <FileText className="w-6 h-6" />
+            <div className="bg-card text-card-foreground rounded-2xl p-12 text-center shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0">
+              <div className="w-14 h-14 rounded-2xl bg-muted/60 mx-auto flex items-center justify-center text-muted-foreground mb-3 border-0">
+                <FileText className="w-7 h-7" />
               </div>
-              <h3 className="font-bold text-foreground text-sm">Topshiriqlar topilmadi</h3>
+              <h3 className="font-bold text-foreground text-base">Topshiriqlar topilmadi</h3>
               <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
                 Qidiruv so‘rovingiz yoki sinf tanlovingiz bo‘yicha topshiriqlar mavjud emas.
               </p>
@@ -735,7 +863,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  className="mt-4"
+                  className="mt-4 rounded-xl border-0 bg-muted/60 hover:bg-muted"
                   onClick={() => {
                     setSearchQuery('');
                     setSelectedGrade('ALL');
@@ -744,7 +872,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   Filtrlarni tozalash
                 </Button>
               )}
-            </Card>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               {filteredAssignments.map((item) => {
@@ -758,54 +886,50 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   100;
 
                 return (
-                  <Card
+                  <div
                     key={item.id}
-                    className="border-border/60 hover:border-blue-500/50 hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
+                    className="bg-card text-card-foreground rounded-2xl p-6 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group border-0"
                   >
                     <div>
-                      <CardHeader className="p-5 pb-3">
-                        <div className="flex items-start justify-between gap-2 mb-2">
-                          <div className="flex items-center gap-1.5 flex-wrap">
-                            <Badge variant="outline" className="border-blue-500/30 text-blue-600 dark:text-blue-400 bg-blue-500/10 text-[10px]">
-                              {item.subject}
-                            </Badge>
-                            {item.gradeLevel && (
-                              <Badge variant="secondary" className="text-[10px]">
-                                {item.gradeLevel}
-                              </Badge>
-                            )}
-                          </div>
-
-                          <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                            <Clock className="w-3 h-3" />
-                            <span>
-                              {item.deadline
-                                ? new Date(item.deadline).toLocaleDateString()
-                                : 'Muddati belgilanmagan'}
-                            </span>
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-500/10 text-blue-600 dark:text-blue-400 border-0">
+                            {item.subject}
                           </span>
+                          {item.gradeLevel && (
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-semibold bg-muted/70 text-foreground border-0">
+                              {item.gradeLevel}
+                            </span>
+                          )}
                         </div>
 
-                        <CardTitle className="text-base font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                          {item.title}
-                        </CardTitle>
-                      </CardHeader>
+                        <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400 flex items-center gap-1.5 bg-amber-500/10 px-2.5 py-1 rounded-full border-0">
+                          <Clock className="w-3 h-3" />
+                          <span>
+                            {item.deadline
+                              ? new Date(item.deadline).toLocaleDateString()
+                              : 'Muddati belgilanmagan'}
+                          </span>
+                        </span>
+                      </div>
 
-                      <CardContent className="p-5 pt-0">
-                        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3 mb-4">
-                          {instructions}
-                        </p>
+                      <h3 className="text-base font-bold text-foreground group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {item.title}
+                      </h3>
 
-                        <div className="flex items-center gap-2">
-                          <Badge variant="secondary" className="text-[11px] py-1 font-semibold flex items-center gap-1">
-                            <Award className="w-3.5 h-3.5 text-amber-500" />
-                            <span>Maksimal ball: {maxPoints}</span>
-                          </Badge>
-                        </div>
-                      </CardContent>
+                      <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3 my-3">
+                        {instructions}
+                      </p>
+
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="inline-flex items-center gap-1.5 text-[11px] py-1 px-3 rounded-full bg-muted/60 text-foreground font-semibold border-0">
+                          <Award className="w-3.5 h-3.5 text-amber-500" />
+                          <span>Maksimal ball: {maxPoints}</span>
+                        </span>
+                      </div>
                     </div>
 
-                    <CardFooter className="p-5 pt-3 border-t border-border/50 flex items-center justify-between">
+                    <div className="pt-4 mt-3 border-t border-border/10 flex items-center justify-between">
                       <span className="text-xs text-muted-foreground">
                         Status: <span className="font-semibold text-emerald-600 dark:text-emerald-400">Faol topshirish</span>
                       </span>
@@ -817,13 +941,13 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                           setSelectedAssignmentForSubmit(item);
                           setIsSubmitHomeworkOpen(true);
                         }}
-                        leftIcon={<Send className="w-3.5 h-3.5" />}
-                        className="cursor-pointer shadow-xs"
+                        className="cursor-pointer bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl border-0 shadow-sm transition-all"
                       >
+                        <Send className="w-3.5 h-3.5 mr-1.5" />
                         <span>Vazifani Topshirish</span>
                       </Button>
-                    </CardFooter>
-                  </Card>
+                    </div>
+                  </div>
                 );
               })}
             </div>
@@ -832,14 +956,14 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       )}
 
       {/* ========================================================
-          FULL-SCREEN ACTIVE TEST TAKING WORKSPACE
+          7. FULL-SCREEN ACTIVE TEST TAKING WORKSPACE (Borderless)
       ======================================================== */}
       {isTestTaking && selectedAssessment && (
         <div className="fixed inset-0 z-50 bg-background/95 backdrop-blur-md flex flex-col animate-in fade-in duration-200">
           {/* Header Bar with Countdown */}
-          <header className="h-16 px-6 border-b border-border bg-card flex items-center justify-between shrink-0 shadow-xs">
+          <header className="h-16 px-6 bg-card flex items-center justify-between shrink-0 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none border-0">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center font-bold">
                 <CheckSquare className="w-5 h-5" />
               </div>
               <div>
@@ -858,10 +982,10 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
 
             <div className="flex items-center gap-3">
               <div
-                className={`px-3 py-1.5 rounded-xl font-mono text-sm font-bold flex items-center gap-2 transition-all ${
+                className={`px-3.5 py-1.5 rounded-xl font-mono text-sm font-bold flex items-center gap-2 border-0 transition-all ${
                   secondsRemaining < 300
-                    ? 'bg-destructive/10 text-destructive animate-pulse border border-destructive/30'
-                    : 'bg-primary/10 text-primary border border-primary/20'
+                    ? 'bg-destructive/10 text-destructive animate-pulse'
+                    : 'bg-primary/10 text-primary'
                 }`}
               >
                 <Clock className="w-4 h-4" />
@@ -872,7 +996,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                 variant="default"
                 size="sm"
                 onClick={handleSubmitTest}
-                className="cursor-pointer font-bold shadow-sm"
+                className="cursor-pointer font-bold shadow-sm rounded-xl border-0 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white"
               >
                 <span>Testni Yakunlash</span>
               </Button>
@@ -884,80 +1008,76 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
             {testQuestions[currentQuestionIndex] && (
               <div className="space-y-6">
                 {/* Progress bar across total questions */}
-                <div className="space-y-1.5">
+                <div className="space-y-2">
                   <div className="flex items-center justify-between text-xs text-muted-foreground">
                     <span>O‘tish jarayoni: {Math.round(((currentQuestionIndex + 1) / testQuestions.length) * 100)}%</span>
                     <span>{Object.keys(studentAnswers).length} ta javob berildi</span>
                   </div>
-                  <Progress value={((currentQuestionIndex + 1) / testQuestions.length) * 100} className="h-1.5" />
+                  <Progress value={((currentQuestionIndex + 1) / testQuestions.length) * 100} className="h-2 rounded-full" />
                 </div>
 
                 {/* Main Question Card */}
-                <Card className="border-border/80 shadow-md">
-                  <CardHeader className="p-6 pb-4">
-                    <div className="flex items-center justify-between gap-2 mb-2">
-                      <Badge variant="secondary" className="text-xs font-semibold px-2.5 py-0.5">
-                        {currentQuestionIndex + 1}-Savol
-                      </Badge>
-                      <Badge variant="outline" className="text-xs text-purple-600 dark:text-purple-400 border-purple-500/30 font-bold">
-                        {testQuestions[currentQuestionIndex].points || 10} ball
-                      </Badge>
-                    </div>
+                <div className="bg-card text-card-foreground rounded-2xl p-6 sm:p-8 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none border-0 space-y-5">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-3 py-1 rounded-full bg-muted/60 text-xs font-semibold text-foreground border-0">
+                      {currentQuestionIndex + 1}-Savol
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-purple-500/10 text-xs text-purple-600 dark:text-purple-400 font-bold border-0">
+                      {testQuestions[currentQuestionIndex].points || 10} ball
+                    </span>
+                  </div>
 
-                    <CardTitle className="text-base sm:text-lg font-bold text-foreground leading-relaxed pt-1">
-                      {testQuestions[currentQuestionIndex].questionText}
-                    </CardTitle>
-                  </CardHeader>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground leading-relaxed">
+                    {testQuestions[currentQuestionIndex].questionText}
+                  </h3>
 
-                  <CardContent className="p-6 pt-2">
-                    {/* Multiple Choice Options List */}
-                    <div className="space-y-3">
-                      {(() => {
-                        let opts: string[] = ['A', 'B', 'C', 'D'];
-                        try {
-                          if (testQuestions[currentQuestionIndex].optionsJson) {
-                            opts = JSON.parse(testQuestions[currentQuestionIndex].optionsJson!);
-                          }
-                        } catch {
-                          opts = ['A', 'B', 'C', 'D'];
+                  {/* Multiple Choice Options List */}
+                  <div className="space-y-3 pt-2">
+                    {(() => {
+                      let opts: string[] = ['A', 'B', 'C', 'D'];
+                      try {
+                        if (testQuestions[currentQuestionIndex].optionsJson) {
+                          opts = JSON.parse(testQuestions[currentQuestionIndex].optionsJson!);
                         }
+                      } catch {
+                        opts = ['A', 'B', 'C', 'D'];
+                      }
 
-                        return opts.map((opt, oIdx) => {
-                          const qId = testQuestions[currentQuestionIndex].id || currentQuestionIndex;
-                          const isSelected = studentAnswers[qId] === String(oIdx);
+                      return opts.map((opt, oIdx) => {
+                        const qId = testQuestions[currentQuestionIndex].id || currentQuestionIndex;
+                        const isSelected = studentAnswers[qId] === String(oIdx);
 
-                          return (
-                            <div
-                              key={oIdx}
-                              onClick={() => {
-                                setStudentAnswers({
-                                  ...studentAnswers,
-                                  [qId]: String(oIdx),
-                                });
-                              }}
-                              className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center gap-3.5 select-none ${
+                        return (
+                          <div
+                            key={oIdx}
+                            onClick={() => {
+                              setStudentAnswers({
+                                ...studentAnswers,
+                                [qId]: String(oIdx),
+                              });
+                            }}
+                            className={`p-4 rounded-xl transition-all cursor-pointer flex items-center gap-3.5 select-none border-0 ${
+                              isSelected
+                                ? 'bg-purple-500/15 text-foreground font-semibold shadow-sm ring-2 ring-purple-500/60'
+                                : 'bg-muted/40 hover:bg-muted/70 text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            <span
+                              className={`w-8 h-8 rounded-xl flex items-center justify-center text-xs font-bold shrink-0 transition-colors border-0 ${
                                 isSelected
-                                  ? 'bg-purple-500/10 border-purple-500 text-foreground font-semibold shadow-xs ring-1 ring-purple-500'
-                                  : 'bg-card hover:bg-muted/50 border-border text-muted-foreground hover:text-foreground'
+                                  ? 'bg-gradient-to-tr from-purple-600 to-indigo-600 text-white shadow-sm'
+                                  : 'bg-muted/80 text-muted-foreground'
                               }`}
                             >
-                              <span
-                                className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
-                                  isSelected
-                                    ? 'bg-purple-600 text-white'
-                                    : 'bg-muted text-muted-foreground'
-                                }`}
-                              >
-                                {String.fromCharCode(65 + oIdx)}
-                              </span>
-                              <span className="text-sm leading-relaxed">{opt}</span>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-                  </CardContent>
-                </Card>
+                              {String.fromCharCode(65 + oIdx)}
+                            </span>
+                            <span className="text-sm leading-relaxed">{opt}</span>
+                          </div>
+                        );
+                      });
+                    })()}
+                  </div>
+                </div>
 
                 {/* Bottom Navigation Toolbar */}
                 <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
@@ -966,13 +1086,13 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                     size="sm"
                     disabled={currentQuestionIndex === 0}
                     onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
-                    className="cursor-pointer"
+                    className="cursor-pointer rounded-xl border-0 bg-muted/50 hover:bg-muted"
                   >
                     Oldingi savol
                   </Button>
 
                   {/* Question number jump buttons */}
-                  <div className="flex items-center gap-1.5 overflow-x-auto max-w-full p-1 bg-muted/40 rounded-xl border border-border/40">
+                  <div className="flex items-center gap-1.5 overflow-x-auto max-w-full p-1.5 bg-muted/40 rounded-xl border-0">
                     {testQuestions.map((_, idx) => {
                       const isAnswered = studentAnswers[testQuestions[idx].id || idx] !== undefined;
                       const isCurrent = currentQuestionIndex === idx;
@@ -982,11 +1102,11 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                           key={idx}
                           type="button"
                           onClick={() => setCurrentQuestionIndex(idx)}
-                          className={`w-7 h-7 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
+                          className={`w-8 h-8 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center justify-center border-0 ${
                             isCurrent
                               ? 'bg-purple-600 text-white shadow-xs'
                               : isAnswered
-                              ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30'
+                              ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 font-bold'
                               : 'text-muted-foreground hover:text-foreground hover:bg-muted'
                           }`}
                         >
@@ -1001,7 +1121,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                       variant="default"
                       size="sm"
                       onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
-                      className="cursor-pointer"
+                      className="cursor-pointer rounded-xl border-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-sm"
                     >
                       <span>Keyingi savol</span>
                       <ChevronRight className="w-4 h-4 ml-1" />
@@ -1011,7 +1131,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                       variant="default"
                       size="sm"
                       onClick={handleSubmitTest}
-                      className="cursor-pointer font-bold shadow-sm"
+                      className="cursor-pointer font-bold shadow-sm rounded-xl border-0 bg-gradient-to-r from-purple-600 to-indigo-600 text-white"
                     >
                       <span>Natijani topshirish</span>
                     </Button>
@@ -1024,16 +1144,16 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       )}
 
       {/* ========================================================
-          TEST RESULT MODAL (shadcn Dialog)
+          8. TEST RESULT MODAL (Borderless, Modern Dialog)
       ======================================================== */}
       <Dialog open={!!testResult} onOpenChange={(open) => !open && setTestResult(null)}>
-        <DialogContent className="sm:max-w-md text-center">
+        <DialogContent className="sm:max-w-md text-center border-0 rounded-2xl shadow-2xl bg-card p-6 sm:p-8">
           <DialogHeader className="space-y-3">
             <div
-              className={`w-16 h-16 rounded-full mx-auto flex items-center justify-center ${
+              className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center border-0 ${
                 (testResult?.percentage || 0) >= 60
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
-                  : 'bg-destructive/10 text-destructive border border-destructive/20'
+                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                  : 'bg-destructive/10 text-destructive'
               }`}
             >
               {(testResult?.percentage || 0) >= 60 ? (
@@ -1048,36 +1168,36 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                 ? 'Tabriklaymiz! Testdan o‘tdingiz'
                 : 'Qayta urinib ko‘ring'}
             </DialogTitle>
-            <DialogDescription className="text-xs">
+            <DialogDescription className="text-xs text-muted-foreground">
               Sizning javoblaringiz server-side tahlil qilinib baholandi.
             </DialogDescription>
           </DialogHeader>
 
           {testResult && (
             <div className="space-y-4 py-2">
-              <div className="p-4 rounded-2xl bg-muted/40 border border-border/50 space-y-2">
-                <div className="text-4xl font-black text-purple-600 dark:text-purple-400">
+              <div className="p-5 rounded-2xl bg-muted/40 border-0 space-y-2">
+                <div className="text-4xl font-black text-purple-600 dark:text-purple-400 font-mono">
                   {testResult.percentage}%
                 </div>
-                <Progress value={testResult.percentage} className="h-2" />
+                <Progress value={testResult.percentage} className="h-2 rounded-full" />
                 <div className="text-xs text-muted-foreground font-medium pt-1">
                   To‘plangan ball: <span className="font-bold text-foreground">{testResult.totalScore}</span> / {testResult.maxPossibleScore}
                 </div>
               </div>
 
               {testResult.mentorFeedback && (
-                <div className="p-3 rounded-xl bg-card border border-border/60 text-xs text-muted-foreground italic leading-relaxed">
+                <div className="p-3.5 rounded-xl bg-muted/30 border-0 text-xs text-muted-foreground italic leading-relaxed">
                   &ldquo;{testResult.mentorFeedback}&rdquo;
                 </div>
               )}
             </div>
           )}
 
-          <DialogFooter className="sm:justify-center">
+          <DialogFooter className="sm:justify-center pt-2">
             <Button
               variant="default"
               size="md"
-              className="w-full cursor-pointer font-semibold"
+              className="w-full cursor-pointer font-semibold rounded-xl border-0 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-md"
               onClick={() => setTestResult(null)}
             >
               Tushundim
@@ -1087,13 +1207,13 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       </Dialog>
 
       {/* ========================================================
-          SUBMIT HOMEWORK MODAL (shadcn Dialog)
+          9. SUBMIT HOMEWORK MODAL (Borderless Dialog)
       ======================================================== */}
       <Dialog
         open={isSubmitHomeworkOpen && !!selectedAssignmentForSubmit}
         onOpenChange={(open) => !open && setIsSubmitHomeworkOpen(false)}
       >
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg border-0 rounded-2xl shadow-2xl bg-card p-6 sm:p-7">
           <DialogHeader>
             <DialogTitle className="text-base font-bold text-foreground">
               Uy vazifasini topshirish
@@ -1105,7 +1225,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
 
           {selectedAssignmentForSubmit && (
             <form onSubmit={handleHomeworkSubmit} className="space-y-4 pt-1">
-              <div className="p-3 rounded-xl bg-muted/50 border border-border/40 text-xs text-muted-foreground space-y-1">
+              <div className="p-3.5 rounded-xl bg-muted/40 border-0 text-xs text-muted-foreground space-y-1">
                 <div>
                   <span className="font-bold text-foreground">Topshiriq:</span>{' '}
                   {selectedAssignmentForSubmit.title}
@@ -1126,7 +1246,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   value={homeworkText}
                   onChange={(e) => setHomeworkText(e.target.value)}
                   placeholder="Yozgan kodingiz haqida xulosa, o‘rganilgan tajriba..."
-                  className="text-xs"
+                  className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                 />
               </div>
 
@@ -1140,7 +1260,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   value={homeworkUrl}
                   onChange={(e) => setHomeworkUrl(e.target.value)}
                   placeholder="https://github.com/username/project-repo"
-                  className="text-xs"
+                  className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                 />
               </div>
 
@@ -1150,7 +1270,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   size="sm"
                   type="button"
                   onClick={() => setIsSubmitHomeworkOpen(false)}
-                  className="cursor-pointer"
+                  className="cursor-pointer rounded-xl border-0 bg-muted/50 hover:bg-muted"
                 >
                   Bekor qilish
                 </Button>
@@ -1159,7 +1279,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   size="sm"
                   type="submit"
                   disabled={submittingHomework}
-                  className="cursor-pointer font-semibold"
+                  className="cursor-pointer font-semibold rounded-xl border-0 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-sm"
                 >
                   {submittingHomework ? 'Yuborilmoqda...' : 'Topshirish'}
                 </Button>
@@ -1170,11 +1290,11 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       </Dialog>
 
       {/* ========================================================
-          CREATE QUIZ MODAL (shadcn Dialog, Mentor & Admin)
+          10. CREATE QUIZ MODAL (Borderless Dialog, Mentor & Admin)
       ======================================================== */}
       {canManage && (
         <Dialog open={isCreateQuizOpen} onOpenChange={setIsCreateQuizOpen}>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-lg border-0 rounded-2xl shadow-2xl bg-card p-6 sm:p-7">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-foreground">
                 Yangi Test / Viktorina Tuzish
@@ -1195,7 +1315,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   value={newQuizTitle}
                   onChange={(e) => setNewQuizTitle(e.target.value)}
                   placeholder="Masalan: JavaScript DOM & Events Nazorati"
-                  className="text-xs"
+                  className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                 />
               </div>
 
@@ -1209,7 +1329,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   value={newQuizSubject}
                   onChange={(e) => setNewQuizSubject(e.target.value)}
                   placeholder="Masalan: Web Full-Stack Development"
-                  className="text-xs"
+                  className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                 />
               </div>
 
@@ -1222,7 +1342,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                     id="quiz-grade"
                     value={newQuizGrade}
                     onChange={(e) => setNewQuizGrade(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-input bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                    className="w-full h-9 px-3 rounded-xl border-0 !border-0 bg-muted/30 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   >
                     <option value="8-sinf">8-sinf</option>
                     <option value="9-sinf">9-sinf</option>
@@ -1240,7 +1360,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                     type="number"
                     value={newQuizDuration}
                     onChange={(e) => setNewQuizDuration(Number(e.target.value))}
-                    className="text-xs"
+                    className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                     min={5}
                     max={180}
                   />
@@ -1256,13 +1376,13 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   type="number"
                   value={newQuizPassingScore}
                   onChange={(e) => setNewQuizPassingScore(Number(e.target.value))}
-                  className="text-xs"
+                  className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                   min={10}
                   max={100}
                 />
               </div>
 
-              <div className="p-3 rounded-xl bg-muted/40 border border-border/40 text-xs text-muted-foreground space-y-1">
+              <div className="p-3.5 rounded-xl bg-muted/40 border-0 text-xs text-muted-foreground space-y-1">
                 <div className="font-bold text-foreground flex items-center gap-1.5">
                   <CheckSquare className="w-3.5 h-3.5 text-purple-500" />
                   <span>Savollar to‘plami:</span>
@@ -1276,7 +1396,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   size="sm"
                   type="button"
                   onClick={() => setIsCreateQuizOpen(false)}
-                  className="cursor-pointer"
+                  className="cursor-pointer rounded-xl border-0 bg-muted/50 hover:bg-muted"
                 >
                   Bekor qilish
                 </Button>
@@ -1285,7 +1405,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   size="sm"
                   type="button"
                   onClick={handleCreateQuizSubmit}
-                  className="cursor-pointer font-semibold shadow-xs"
+                  className="cursor-pointer font-semibold rounded-xl border-0 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-sm"
                 >
                   Chop etish (Publish)
                 </Button>
@@ -1296,11 +1416,11 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
       )}
 
       {/* ========================================================
-          CREATE ASSIGNMENT MODAL (shadcn Dialog, Mentor & Admin)
+          11. CREATE ASSIGNMENT MODAL (Borderless Dialog, Mentor & Admin)
       ======================================================== */}
       {canManage && (
         <Dialog open={isCreateAssignmentOpen} onOpenChange={setIsCreateAssignmentOpen}>
-          <DialogContent className="sm:max-w-lg">
+          <DialogContent className="sm:max-w-lg border-0 rounded-2xl shadow-2xl bg-card p-6 sm:p-7">
             <DialogHeader>
               <DialogTitle className="text-base font-bold text-foreground">
                 Yangi Amaliy Topshiriq E’lon Qilish
@@ -1322,7 +1442,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   value={newAssignmentTitle}
                   onChange={(e) => setNewAssignmentTitle(e.target.value)}
                   placeholder="Masalan: Flexbox yordamida Portfolio sahifasini yaratish"
-                  className="text-xs"
+                  className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                 />
               </div>
 
@@ -1336,7 +1456,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   value={newAssignmentDesc}
                   onChange={(e) => setNewAssignmentDesc(e.target.value)}
                   placeholder="Topshiriq maqsadi, talab qilinadigan texnologiyalar va topshirish shartlari..."
-                  className="text-xs"
+                  className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                 />
               </div>
 
@@ -1350,7 +1470,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                     type="text"
                     value={newAssignmentSubject}
                     onChange={(e) => setNewAssignmentSubject(e.target.value)}
-                    className="text-xs"
+                    className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                   />
                 </div>
 
@@ -1362,7 +1482,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                     id="assign-grade"
                     value={newAssignmentGrade}
                     onChange={(e) => setNewAssignmentGrade(e.target.value)}
-                    className="w-full h-9 px-3 rounded-lg border border-input bg-background text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                    className="w-full h-9 px-3 rounded-xl border-0 !border-0 bg-muted/30 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-ring"
                   >
                     <option value="8-sinf">8-sinf</option>
                     <option value="9-sinf">9-sinf</option>
@@ -1382,7 +1502,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                     type="number"
                     value={newAssignmentMaxPoints}
                     onChange={(e) => setNewAssignmentMaxPoints(Number(e.target.value))}
-                    className="text-xs"
+                    className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                     min={10}
                     max={100}
                   />
@@ -1397,7 +1517,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                     type="date"
                     value={newAssignmentDeadline}
                     onChange={(e) => setNewAssignmentDeadline(e.target.value)}
-                    className="text-xs"
+                    className="text-xs bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                   />
                 </div>
               </div>
@@ -1408,7 +1528,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   size="sm"
                   type="button"
                   onClick={() => setIsCreateAssignmentOpen(false)}
-                  className="cursor-pointer"
+                  className="cursor-pointer rounded-xl border-0 bg-muted/50 hover:bg-muted"
                 >
                   Bekor qilish
                 </Button>
@@ -1417,7 +1537,7 @@ export const AssessmentEngine: React.FC<AssessmentEngineProps> = ({
                   size="sm"
                   type="submit"
                   disabled={creatingAssignment}
-                  className="cursor-pointer font-semibold shadow-xs"
+                  className="cursor-pointer font-semibold rounded-xl border-0 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-sm"
                 >
                   {creatingAssignment ? 'Saqlanmoqda...' : 'Topshiriqni E’lon Qilish'}
                 </Button>

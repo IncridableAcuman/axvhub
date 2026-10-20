@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, AlertCircle, ArrowLeft, RefreshCw, LogIn, ShieldAlert, Mail } from 'lucide-react';
-import { Button } from '@/shared/ui/button/Button';
-import { Input } from '@/shared/ui/input/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { ThemeToggle } from '@/shared/ui/theme-toggle/ThemeToggle';
 import { LanguageSwitcher } from '@/shared/i18n/LanguageSwitcher';
 import { useTranslation } from '@/shared/i18n';
@@ -85,7 +85,7 @@ export const VerifyEmailPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[var(--bg-canvas)] text-[var(--text-primary)] p-6 sm:p-12 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-between bg-background text-foreground p-6 sm:p-12 relative overflow-hidden">
       {/* Ambient subtle light blobs */}
       <div className="absolute top-10 right-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -94,140 +94,130 @@ export const VerifyEmailPage: React.FC = () => {
       <div className="relative z-10 flex items-center justify-between max-w-md w-full mx-auto pb-6">
         <Link
           to="/"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-muted-foreground hover:text-primary transition"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>{t('auth.backToHome')}</span>
         </Link>
         <div className="flex items-center gap-2">
-          <LanguageSwitcher compact={true} />
+          <LanguageSwitcher />
           <ThemeToggle variant="compact" />
         </div>
       </div>
 
-      {/* Main Container */}
-      <div className="relative z-10 w-full max-w-md mx-auto my-auto p-6 sm:p-8 glass-panel border border-[var(--border-default)] rounded-3xl shadow-xl space-y-6 text-center animate-scale-in">
+      {/* Main Status Container */}
+      <div className="relative z-10 w-full max-w-md mx-auto my-auto p-6 sm:p-8 bg-card/90 dark:bg-card/75 backdrop-blur-xl border-0 rounded-3xl shadow-2xl space-y-6 animate-scale-in text-center">
         {status === 'verifying' && (
-          <div className="py-8 space-y-4">
-            <div className="w-14 h-14 border-4 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin mx-auto" />
-            <h2 className="text-xl font-bold text-[var(--text-primary)]">
-              {t('auth.verifyingTitle')}
-            </h2>
-            <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-              {t('auth.verifyingDesc')}
+          <div className="space-y-4 py-6">
+            <div className="w-14 h-14 rounded-2xl bg-primary/10 text-primary mx-auto flex items-center justify-center animate-spin">
+              <RefreshCw className="w-7 h-7" />
+            </div>
+            <h1 className="text-xl font-extrabold text-foreground tracking-tight">
+              {t('auth.verifyingHeading')}
+            </h1>
+            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+              {t('auth.verifyingWait')}
             </p>
           </div>
         )}
 
         {status === 'success' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto ring-8 ring-emerald-500/5">
-              <CheckCircle2 className="w-9 h-9" />
+          <div className="space-y-4 animate-in fade-in">
+            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 mx-auto flex items-center justify-center border-0 shadow-lg shadow-emerald-500/20">
+              <CheckCircle2 className="w-7 h-7" />
             </div>
-
-            <div className="space-y-2">
-              <h2 className="text-2xl font-extrabold text-[var(--text-primary)]">
-                {t('auth.accountVerifiedTitle')}
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                {t('auth.accountVerifiedDesc')}
+            <div className="space-y-1">
+              <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
+                Hisobingiz muvaffaqiyatli tasdiqlandi!
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                {t('auth.verifiedSuccessDesc')}
               </p>
             </div>
 
-            <Link to="/login" className="block w-full">
-              <Button
-                variant="primary"
-                size="lg"
-                className="w-full font-semibold shadow-md shadow-[var(--brand-primary)]/20"
-                leftIcon={<LogIn className="w-4 h-4" />}
-              >
-                <span>{t('auth.loginAction')}</span>
-              </Button>
-            </Link>
+            <div className="pt-2">
+              <Link to="/app" className="block w-full">
+                <Button
+                  variant="default"
+                  size="default"
+                  className="w-full rounded-xl border-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold shadow-lg shadow-indigo-600/25"
+                  leftIcon={<LogIn className="w-4 h-4" />}
+                >
+                  <span>{t('auth.openDashboard')}</span>
+                </Button>
+              </Link>
+            </div>
           </div>
         )}
 
         {status === 'error' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="w-16 h-16 rounded-2xl bg-red-500/10 text-red-600 dark:text-red-400 flex items-center justify-center mx-auto ring-8 ring-red-500/5">
-              <AlertCircle className="w-9 h-9" />
+          <div className="space-y-4 animate-in fade-in">
+            <div className="w-14 h-14 rounded-2xl bg-destructive/10 text-destructive mx-auto flex items-center justify-center border-0 shadow-lg shadow-destructive/20">
+              <AlertCircle className="w-7 h-7" />
             </div>
-
-            <div className="space-y-2">
-              <h2 className="text-xl font-extrabold text-[var(--text-primary)]">
-                {t('auth.verifyErrorTitle')}
-              </h2>
-              <p className="text-xs sm:text-sm text-red-500 bg-red-500/10 border border-red-500/20 p-3 rounded-xl">
-                {errorMessage || t('auth.verifyErrorDefault')}
+            <div className="space-y-1">
+              <h1 className="text-xl font-extrabold text-foreground tracking-tight">
+                {t('auth.verifyFailedTitle')}
+              </h1>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {errorMessage || t('auth.tokenExpiredError')}
               </p>
             </div>
 
-            {/* Option to resend */}
-            <form onSubmit={handleResend} className="space-y-3 pt-2 text-left">
-              <label className="text-xs font-semibold text-[var(--text-secondary)]">
-                {t('auth.resendPrompt')}
-              </label>
-              <Input
-                type="email"
-                leftIcon={<Mail className="w-4 h-4" />}
-                placeholder="sizning.emailingiz@axm-nexus.uz"
-                value={resendEmail}
-                onChange={(e) => setResendEmail(e.target.value)}
-                required
-              />
+            <form onSubmit={handleResend} className="space-y-3 pt-3 text-left">
+              <div className="space-y-1.5">
+                <Input
+                  type="email"
+                  required
+                  placeholder={t('auth.identifierPlaceholder')}
+                  value={resendEmail}
+                  onChange={(e) => setResendEmail(e.target.value)}
+                  leftIcon={<Mail className="w-4 h-4 text-muted-foreground" />}
+                  className="bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1 text-xs"
+                />
+              </div>
+
               <Button
                 type="submit"
-                variant="outline"
-                size="md"
-                isLoading={isResending}
+                variant="default"
+                size="default"
                 disabled={isResending || cooldown > 0}
-                className="w-full"
-                leftIcon={<RefreshCw className={`w-4 h-4 ${cooldown > 0 ? 'animate-spin' : ''}`} />}
+                className="w-full rounded-xl border-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold shadow-md shadow-indigo-600/20"
+                leftIcon={<RefreshCw className={`w-4 h-4 ${isResending ? 'animate-spin' : ''}`} />}
               >
                 <span>
                   {cooldown > 0
-                    ? t('auth.resendCountdown', { cooldown })
-                    : t('auth.resendButton')}
+                    ? t('auth.resendCooldown', { seconds: cooldown })
+                    : t('auth.resendLinkBtn')}
                 </span>
               </Button>
             </form>
-
-            <div className="pt-2 border-t border-[var(--border-default)]">
-              <Link to="/login" className="text-xs font-semibold text-[var(--brand-primary)] hover:underline">
-                {t('auth.backToLogin')}
-              </Link>
-            </div>
           </div>
         )}
 
         {status === 'no-token' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="w-16 h-16 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto ring-8 ring-amber-500/5">
-              <ShieldAlert className="w-9 h-9" />
+          <div className="space-y-4 animate-in fade-in">
+            <div className="w-14 h-14 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 mx-auto flex items-center justify-center border-0 shadow-lg shadow-amber-500/20">
+              <ShieldAlert className="w-7 h-7" />
             </div>
-
-            <div className="space-y-2">
-              <h2 className="text-xl font-extrabold text-[var(--text-primary)]">
-                {t('auth.noTokenTitle')}
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
-                {t('auth.noTokenDesc')}
+            <div className="space-y-1.5">
+              <h1 className="text-xl font-extrabold text-foreground tracking-tight">
+                Maxsus havola talab qilinadi
+              </h1>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Hisobni tasdiqlash faqat ro‘yxatdan o‘tish paytida pochtangizga yuborilgan maxsus havola orqali amalga oshiriladi.
               </p>
             </div>
 
-            <div className="p-3.5 bg-[var(--bg-subtle)] border border-[var(--border-default)] rounded-xl text-xs text-[var(--text-secondary)] text-left">
-              {t('auth.noTokenNotice')}
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
-              <Link to="/login" className="flex-1">
-                <Button variant="primary" size="md" className="w-full">
+            <div className="pt-2">
+              <Link to="/login" className="block w-full">
+                <Button
+                  variant="default"
+                  size="default"
+                  className="w-full rounded-xl border-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold shadow-lg shadow-indigo-600/25"
+                  leftIcon={<LogIn className="w-4 h-4" />}
+                >
                   <span>{t('auth.loginTab')}</span>
-                </Button>
-              </Link>
-              <Link to="/register" className="flex-1">
-                <Button variant="outline" size="md" className="w-full">
-                  <span>{t('auth.register')}</span>
                 </Button>
               </Link>
             </div>
@@ -236,8 +226,8 @@ export const VerifyEmailPage: React.FC = () => {
       </div>
 
       {/* Footer */}
-      <div className="text-center text-xs text-[var(--text-muted)] pt-8">
-        <span>{t('auth.footerSecure')}</span>
+      <div className="text-center text-xs text-muted-foreground py-4">
+        <span>© 2026 AXM Nexus. O‘zbekiston Respublikasi Raqamli Texnologiyalar Vazirligi</span>
       </div>
     </div>
   );

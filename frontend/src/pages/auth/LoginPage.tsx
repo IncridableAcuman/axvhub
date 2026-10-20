@@ -9,10 +9,12 @@ import {
   RefreshCw,
   ShieldCheck,
   UserCheck,
+  Eye,
+  EyeOff,
 } from 'lucide-react';
-import { FormField } from '@/shared/ui/form/FormField';
-import { Input } from '@/shared/ui/input/Input';
-import { Button } from '@/shared/ui/button/Button';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { ThemeToggle } from '@/shared/ui/theme-toggle/ThemeToggle';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -29,6 +31,7 @@ export const LoginPage: React.FC = () => {
 
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [captcha, setCaptcha] = useState<CaptchaResponse | null>(null);
   const [captchaCode, setCaptchaCode] = useState('');
   const [isCaptchaLoading, setIsCaptchaLoading] = useState(false);
@@ -101,23 +104,23 @@ export const LoginPage: React.FC = () => {
         'HEMIS ID yoki parol noto‘g‘ri kiritildi';
       setErrors({ form: serverMsg });
       toast.error('Kirish xatosi', serverMsg);
-      loadCaptcha(); // Bot hujumidan himoya: har bir xatoda kod yangilanadi
+      loadCaptcha();
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[var(--bg-canvas)] text-[var(--text-primary)]">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-background text-foreground">
       {/* Left Column: Branding, visuals & Presidential initiative statement */}
-      <div className="relative hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 text-white p-12 flex-col justify-between overflow-hidden">
+      <div className="relative hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white p-12 flex-col justify-between overflow-hidden border-0">
         {/* Glow backdrop effects */}
-        <div className="absolute top-0 -left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 -left-20 w-[500px] h-[500px] bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
 
         {/* Top Header */}
         <div className="relative z-10 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-blue-500/30">
+          <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-blue-500 to-cyan-400 flex items-center justify-center font-black text-xl text-white shadow-lg shadow-blue-500/30">
             A
           </div>
           <div>
@@ -132,12 +135,13 @@ export const LoginPage: React.FC = () => {
 
         {/* Center message */}
         <div className="relative z-10 space-y-6 my-auto max-w-lg">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-xs font-semibold text-cyan-300">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border-0 text-xs font-semibold text-cyan-300">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <Sparkles className="w-3.5 h-3.5" />
             <span>Yangi O‘zbekiston Raqamli Kelajagi</span>
           </div>
 
-          <h1 className="text-3xl xl:text-4xl font-extrabold leading-tight text-white">
+          <h1 className="text-3xl xl:text-4xl font-extrabold leading-tight text-white tracking-tight">
             Kelajak IT yetakchilari va intellektual monitoring platformasi
           </h1>
 
@@ -173,7 +177,7 @@ export const LoginPage: React.FC = () => {
       </div>
 
       {/* Right Column: Login Form */}
-      <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 lg:p-16 relative overflow-hidden">
+      <div className="flex-1 flex flex-col justify-between p-6 sm:p-12 lg:p-16 relative overflow-hidden bg-background">
         {/* Ambient subtle light blobs */}
         <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-10 left-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -182,7 +186,7 @@ export const LoginPage: React.FC = () => {
         <div className="relative z-10 flex items-center justify-between pb-8">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition"
+            className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-muted-foreground hover:text-primary transition"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Asosiy sahifaga qaytish</span>
@@ -194,32 +198,33 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Center Card */}
-        <div className="relative z-10 w-full max-w-md mx-auto my-auto space-y-6 glass-panel rounded-3xl p-6 sm:p-8 border border-[var(--border-default)] shadow-xl animate-scale-in">
+        <div className="relative z-10 w-full max-w-md mx-auto my-auto space-y-6 bg-card/90 dark:bg-card/75 backdrop-blur-xl rounded-3xl p-6 sm:p-8 shadow-2xl border-0 animate-scale-in">
           <div className="space-y-2 text-left">
-            <div className="inline-flex p-2.5 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] mb-2">
+            <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-1">
               <LogIn className="w-6 h-6" />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[var(--text-primary)]">
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
               Tizimga kirish
             </h2>
-            <p className="text-sm text-[var(--text-secondary)]">
+            <p className="text-sm text-muted-foreground">
               HEMIS ID raqamingiz va xavfsizlik kodini kiriting
             </p>
           </div>
 
           {errors.form && (
-            <div className="p-3.5 text-xs sm:text-sm rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
+            <div className="p-3.5 text-xs sm:text-sm rounded-xl bg-destructive/10 text-destructive border-0">
               {errors.form}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <FormField
-              label="HEMIS ID raqami yoki Login"
-              htmlFor="login-ident"
-              required
-              error={errors.identifier}
-            >
+            <div className="space-y-1.5">
+              <Label
+                htmlFor="login-ident"
+                className="text-xs font-semibold text-foreground"
+              >
+                HEMIS ID raqami yoki Login <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="login-ident"
                 type="text"
@@ -229,58 +234,72 @@ export const LoginPage: React.FC = () => {
                   setIdentifier(e.target.value);
                   if (errors.identifier) setErrors((prev) => ({ ...prev, identifier: '' }));
                 }}
-                leftIcon={<UserCheck className="w-4 h-4" />}
+                leftIcon={<UserCheck className="w-4 h-4 text-muted-foreground" />}
                 autoComplete="username"
                 error={Boolean(errors.identifier)}
+                className="bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1 text-xs"
               />
-            </FormField>
+              {errors.identifier && (
+                <p className="text-xs text-destructive font-medium">{errors.identifier}</p>
+              )}
+            </div>
 
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <label
+                <Label
                   htmlFor="login-pwd"
-                  className="text-xs font-semibold text-[var(--text-primary)]"
+                  className="text-xs font-semibold text-foreground"
                 >
-                  Parol <span className="text-red-500">*</span>
-                </label>
+                  Parol <span className="text-destructive">*</span>
+                </Label>
                 <Link
                   to="/forgot-password"
-                  className="text-xs font-semibold text-[var(--brand-primary)] hover:underline"
+                  className="text-xs font-semibold text-primary hover:underline"
                 >
                   Parolni unutdingizmi?
                 </Link>
               </div>
               <Input
                 id="login-pwd"
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => {
                   setPassword(e.target.value);
                   if (errors.password) setErrors((prev) => ({ ...prev, password: '' }));
                 }}
-                leftIcon={<Lock className="w-4 h-4" />}
-                showPasswordToggle
+                leftIcon={<Lock className="w-4 h-4 text-muted-foreground" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-muted-foreground hover:text-foreground cursor-pointer focus:outline-none"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
                 autoComplete="current-password"
                 error={Boolean(errors.password)}
+                className="bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1 text-xs"
               />
               {errors.password && (
-                <p className="text-xs text-red-500 mt-1">{errors.password}</p>
+                <p className="text-xs text-destructive font-medium">{errors.password}</p>
               )}
             </div>
 
             {/* Bot Protection / CAPTCHA */}
             <div className="space-y-1.5 pt-1">
               <div className="flex items-center justify-between">
-                <label htmlFor="captcha-input" className="text-xs font-semibold text-[var(--text-primary)] flex items-center gap-1.5">
+                <Label htmlFor="captcha-input" className="text-xs font-semibold text-foreground flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                  <span>Botlardan himoya (Xavfsizlik kodi)</span> <span className="text-red-500">*</span>
-                </label>
+                  <span>Botlardan himoya (Xavfsizlik kodi)</span> <span className="text-destructive">*</span>
+                </Label>
                 <button
                   type="button"
                   onClick={loadCaptcha}
                   disabled={isCaptchaLoading}
-                  className="text-xs font-semibold text-[var(--brand-primary)] hover:underline inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                  className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1 cursor-pointer disabled:opacity-50"
                   title="Yangi kod olish"
                 >
                   <RefreshCw className={`w-3 h-3 ${isCaptchaLoading ? 'animate-spin' : ''}`} />
@@ -291,7 +310,7 @@ export const LoginPage: React.FC = () => {
               <div className="flex items-center gap-3">
                 {/* SVG Captcha Box */}
                 <div
-                  className="shrink-0 h-[48px] rounded-xl overflow-hidden border border-slate-700 bg-slate-950 flex items-center justify-center shadow-xs"
+                  className="shrink-0 h-[48px] rounded-xl overflow-hidden bg-slate-950 text-white border-0 shadow-xs flex items-center justify-center"
                   dangerouslySetInnerHTML={{
                     __html: captcha?.captchaSvg || '<div class="w-[170px] h-[48px] flex items-center justify-center text-xs text-slate-500 font-mono">Yuklanmoqda...</div>',
                   }}
@@ -309,24 +328,24 @@ export const LoginPage: React.FC = () => {
                       setCaptchaCode(e.target.value.toUpperCase());
                       if (errors.captcha) setErrors((prev) => ({ ...prev, captcha: '' }));
                     }}
-                    className="font-mono text-center tracking-widest text-base font-bold uppercase"
+                    className="font-mono text-center tracking-widest text-base font-bold uppercase bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1"
                     error={Boolean(errors.captcha)}
                     autoComplete="off"
                   />
                 </div>
               </div>
               {errors.captcha && (
-                <p className="text-xs text-red-500 mt-1">{errors.captcha}</p>
+                <p className="text-xs text-destructive font-medium">{errors.captcha}</p>
               )}
             </div>
 
             <div className="pt-2">
               <Button
                 type="submit"
-                variant="primary"
+                variant="default"
                 size="lg"
                 isLoading={isLoading}
-                className="w-full font-semibold shadow-md shadow-[var(--brand-primary)]/20"
+                className="w-full font-semibold rounded-xl border-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-600/25"
                 leftIcon={<LogIn className="w-4 h-4" />}
               >
                 <span>Tizimga kirish</span>
@@ -335,36 +354,36 @@ export const LoginPage: React.FC = () => {
           </form>
 
           {/* Real Credentials Guide */}
-          <div className="p-3.5 bg-[var(--bg-subtle)] border border-[var(--border-default)] rounded-2xl text-xs space-y-1.5">
-            <div className="flex items-center gap-1.5 font-bold text-[var(--text-primary)]">
+          <div className="p-4 bg-muted/40 rounded-2xl text-xs space-y-2 border-0">
+            <div className="flex items-center gap-1.5 font-bold text-foreground">
               <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
               <span>Al-Xorazmiy Vorislari hisoblari:</span>
             </div>
-            <p className="text-[11px] leading-relaxed text-[var(--text-muted)]">
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
               Tizimga kirish Admin va Mentorlar tomonidan berilgan HEMIS ID raqamlari orqali amalga oshiriladi:
             </p>
-            <div className="grid grid-cols-1 gap-1 font-mono text-[11px] pt-1 border-t border-[var(--border-default)]">
+            <div className="grid grid-cols-1 gap-1 font-mono text-[11px] pt-1.5 border-t border-border/10">
               <div className="flex justify-between py-0.5">
-                <span className="text-[var(--text-muted)]">Admin hisobi:</span>
-                <span className="font-semibold text-[var(--text-primary)]">admin / admin123</span>
+                <span className="text-muted-foreground">Admin hisobi:</span>
+                <span className="font-semibold text-foreground">admin / admin123</span>
               </div>
               <div className="flex justify-between py-0.5">
-                <span className="text-[var(--text-muted)]">IT Mentor ID:</span>
+                <span className="text-muted-foreground">IT Mentor ID:</span>
                 <span className="font-semibold text-indigo-500">32600001 / AxmMentor2026!</span>
               </div>
               <div className="flex justify-between py-0.5">
-                <span className="text-[var(--text-muted)]">O‘quvchi ID:</span>
+                <span className="text-muted-foreground">O‘quvchi ID:</span>
                 <span className="font-semibold text-blue-500">42600001 / Student2026!</span>
               </div>
             </div>
           </div>
 
           <div className="text-center pt-1">
-            <p className="text-xs text-[var(--text-secondary)]">
+            <p className="text-xs text-muted-foreground">
               Hisobingiz yo‘qmi?{' '}
               <Link
                 to="/register"
-                className="font-bold text-[var(--brand-primary)] hover:underline ml-1"
+                className="font-bold text-primary hover:underline ml-1"
               >
                 Kirish tartibi bilan tanishish
               </Link>
@@ -373,7 +392,7 @@ export const LoginPage: React.FC = () => {
         </div>
 
         {/* Footer */}
-        <div className="text-center text-xs text-[var(--text-muted)] pt-8">
+        <div className="text-center text-xs text-muted-foreground pt-8">
           <span>O‘zbekiston Respublikasi Raqamli Texnologiyalar Vazirligi</span>
         </div>
       </div>

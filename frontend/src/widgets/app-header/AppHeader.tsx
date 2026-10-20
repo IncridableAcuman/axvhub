@@ -14,8 +14,17 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { Breadcrumbs } from '@/shared/ui/breadcrumbs/Breadcrumbs'
 import { ThemeToggle } from '@/shared/ui/theme-toggle/ThemeToggle'
-import { Button } from '@/shared/ui/button/Button'
-import { DropdownMenu } from '@/shared/ui/dropdown/DropdownMenu'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import { HealthBadge } from '@/widgets/health-badge/HealthBadge'
 import { useAuth } from '@/features/auth/AuthContext'
 import { GlobalSearchModal } from '@/features/search/GlobalSearchModal'
@@ -127,193 +136,209 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
     return t('roles.ROLE_STUDENT')
   }
 
-  const userMenuItems = [
-    {
-      id: 'dashboard',
-      label: t('nav.dashboard'),
-      icon: <Home className="w-4 h-4" />,
-      onClick: () => onNavigateTab('dashboard'),
-    },
-    {
-      id: 'profile',
-      label: t('nav.profile'),
-      icon: <User className="w-4 h-4" />,
-      onClick: () => onNavigateTab('profile'),
-    },
-    {
-      id: 'sep',
-      label: '',
-      divider: true,
-    },
-    {
-      id: 'logout',
-      label: t('auth.logout'),
-      icon: <LogOut className="w-4 h-4" />,
-      destructive: true,
-      onClick: () => {
-        logout()
-      },
-    },
-  ]
-
   return (
     <>
-      <header className="sticky top-0 z-40 h-16 border-b border-[var(--border-default)] bg-[var(--bg-surface)]/90 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shadow-xs">
-        {/* Left side: Mobile menu toggle & Breadcrumbs */}
+      <header className="sticky top-0 z-40 h-16 border-b border-border/40 bg-background/80 backdrop-blur-md px-4 sm:px-6 flex items-center justify-between shadow-xs transition-colors">
+        {/* Left side: Mobile menu toggle, Breadcrumbs & Spotlight Search Button */}
         <div className="flex items-center gap-3">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={onOpenMobileSidebar}
-            className="p-2 -ml-2 rounded-lg text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] md:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ring)] cursor-pointer"
+            className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground md:hidden cursor-pointer"
             aria-label={t('nav.openSidebar')}
           >
             <Menu className="w-5 h-5" />
-          </button>
+          </Button>
 
           <div className="hidden sm:block">
             <Breadcrumbs items={breadcrumbs} onHomeClick={() => onNavigateTab('dashboard')} />
           </div>
 
-          {/* Global Quick Search Spotlight Button */}
-          <button
-            type="button"
+          {/* Global Quick Search Spotlight Button (Shadcn UI Command trigger style) */}
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setIsSearchOpen(true)}
-            className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] border border-[var(--border-default)] hover:border-[var(--brand-primary)] text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer transition select-none shadow-2xs ml-2 group"
+            className="hidden md:inline-flex items-center gap-2 h-9 px-3 rounded-xl bg-muted/40 hover:bg-muted/70 border-border/40 hover:border-border text-xs text-muted-foreground hover:text-foreground transition-all shadow-xs cursor-pointer group ml-2"
             title={t('common.quickSearchTooltip')}
             aria-label={t('common.quickSearch')}
           >
-            <Search className="w-3.5 h-3.5 text-[var(--brand-primary)] group-hover:scale-110 transition-transform" />
-            <span className="hidden lg:inline text-[11px] font-medium">{t('common.quickSearch')}</span>
-            <kbd className="font-mono text-[9px] bg-[var(--bg-surface)] px-1.5 py-0.5 rounded border border-[var(--border-subtle)] font-bold text-[var(--text-secondary)] shadow-2xs">
-              ⌘K
+            <Search className="w-3.5 h-3.5 text-primary group-hover:scale-110 transition-transform" />
+            <span className="hidden lg:inline text-xs font-medium text-muted-foreground group-hover:text-foreground">
+              {t('common.quickSearch')}
+            </span>
+            <kbd className="pointer-events-none inline-flex h-5 select-none items-center gap-1 rounded bg-background px-1.5 font-mono text-[10px] font-bold text-muted-foreground border border-border/40 shadow-xs ml-1.5">
+              <span className="text-[11px]">⌘</span>K
             </kbd>
-          </button>
+          </Button>
 
-          <span className="sm:hidden text-sm font-bold text-[var(--text-primary)] truncate max-w-[160px]">
+          <span className="sm:hidden text-sm font-bold text-foreground truncate max-w-[160px]">
             {getTabLabel(activeTab)}
           </span>
         </div>
 
-      {/* Right side: Filial badge, Health, Quick Actions, Theme, User */}
-      <div className="flex items-center gap-2 sm:gap-3">
-        {/* Location badge with live beacon */}
-        <div className="hidden lg:flex items-center gap-2 text-xs text-[var(--text-secondary)] bg-[var(--bg-subtle)] px-2.5 py-1 rounded-full border border-[var(--border-default)] shadow-2xs">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse shrink-0" />
-          <MapPin className="w-3.5 h-3.5 text-[var(--brand-primary)] shrink-0" />
-          <span className="font-semibold text-[var(--text-primary)]">IT Park Yangiariq</span>
-        </div>
-
-        {/* Backend Health Badge */}
-        <div className="hidden md:block">
-          <HealthBadge />
-        </div>
-
-        {/* Mobile Search Trigger Icon */}
-        <button
-          type="button"
-          onClick={() => setIsSearchOpen(true)}
-          className="p-2 rounded-xl text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] md:hidden transition cursor-pointer"
-          title={t('common.quickSearchTooltip')}
-          aria-label={t('common.quickSearch')}
-        >
-          <Search className="w-4 h-4 text-[var(--brand-primary)]" />
-        </button>
-
-        {/* Notification Center Dropdown (Modul 14) */}
-        <NotificationDropdown onNavigateTab={onNavigateTab} />
-
-        {/* Action Buttons (Faqat Admin va Mentorlar uchun) */}
-        {canManageSchedules && onOpenManualModal && (
-          <Button
+        {/* Right side: Filial badge, Health, Quick Actions, Theme, User */}
+        <div className="flex items-center gap-2 sm:gap-2.5">
+          {/* Location badge with live beacon */}
+          <Badge
             variant="outline"
-            size="sm"
-            onClick={onOpenManualModal}
-            leftIcon={<Plus className="w-3.5 h-3.5" />}
-            className="hidden sm:inline-flex"
+            className="hidden lg:inline-flex items-center gap-2 px-3 py-1 rounded-full border-border/40 bg-muted/30 text-xs font-medium text-foreground shadow-xs"
           >
-            <span>{t('common.add')}</span>
-          </Button>
-        )}
+            <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse shrink-0" />
+            <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+            <span className="font-semibold text-foreground">IT Park Yangiariq</span>
+          </Badge>
 
-        {canManageSchedules && onOpenAiModal && (
+          {/* Backend Health Badge */}
+          <div className="hidden md:block">
+            <HealthBadge />
+          </div>
+
+          {/* Mobile Search Trigger Icon */}
           <Button
-            variant="primary"
-            size="sm"
-            onClick={onOpenAiModal}
-            leftIcon={<Sparkles className="w-3.5 h-3.5 text-sky-200 animate-spin-slow" />}
-            className="btn-shimmer"
+            variant="ghost"
+            size="icon"
+            onClick={() => setIsSearchOpen(true)}
+            className="h-9 w-9 rounded-xl text-muted-foreground hover:text-foreground md:hidden cursor-pointer"
+            title={t('common.quickSearchTooltip')}
+            aria-label={t('common.quickSearch')}
           >
-            <span className="hidden sm:inline">AI Import</span>
-            <span className="sm:hidden">AI</span>
+            <Search className="w-4 h-4 text-primary" />
           </Button>
-        )}
 
-        {/* Multi-language Selector (Modul 15) */}
-        <LanguageSwitcher />
+          {/* Notification Center Dropdown (Modul 14) */}
+          <NotificationDropdown onNavigateTab={onNavigateTab} />
 
-        {/* Theme Toggle */}
-        <ThemeToggle variant="compact" />
-
-        {/* User profile or Auth buttons */}
-        {isAuthenticated && user ? (
-          <DropdownMenu
-            trigger={
-              <div
-                className="flex items-center gap-2 p-1 rounded-xl hover:bg-[var(--bg-subtle)] transition-colors select-none cursor-pointer"
-                title="Profil menyusi"
-              >
-                <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs ring-2 ring-indigo-500/20">
-                    {getInitials(user.fullName)}
-                  </div>
-                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-[var(--bg-surface)]" />
-                </div>
-                <div className="hidden xl:flex flex-col text-left leading-tight">
-                  <span className="text-xs font-semibold text-[var(--text-primary)] truncate max-w-[120px]">
-                    {user.fullName}
-                  </span>
-                  <span className="text-[10px] text-[var(--text-muted)]">
-                    {getRoleLabel(user.roles)}
-                  </span>
-                </div>
-              </div>
-            }
-            items={userMenuItems}
-          />
-        ) : (
-          <div className="flex items-center gap-1.5">
+          {/* Action Buttons (Faqat Admin va Mentorlar uchun) */}
+          {canManageSchedules && onOpenManualModal && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => navigate('/login')}
-              leftIcon={<LogIn className="w-3.5 h-3.5" />}
-              className="text-xs hidden sm:inline-flex"
+              onClick={onOpenManualModal}
+              className="hidden sm:inline-flex items-center gap-1.5 h-9 rounded-xl border-border/50 text-xs font-semibold hover:bg-muted/50 cursor-pointer"
             >
-              <span>{t('auth.login')}</span>
+              <Plus className="w-3.5 h-3.5" />
+              <span>{t('common.add')}</span>
             </Button>
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => navigate('/register')}
-              leftIcon={<UserPlus className="w-3.5 h-3.5" />}
-              className="text-xs"
-            >
-              <span className="hidden xs:inline">{t('auth.register')}</span>
-              <span className="xs:hidden">{t('landing.hero.startCta')}</span>
-            </Button>
-          </div>
-        )}
-      </div>
-    </header>
+          )}
 
-    {/* Executive Global Spotlight Search Dialog */}
-    <GlobalSearchModal
-      isOpen={isSearchOpen}
-      onClose={() => setIsSearchOpen(false)}
-      onNavigateTab={onNavigateTab}
-      onOpenManualModal={onOpenManualModal}
-      onOpenAiModal={onOpenAiModal}
-    />
-  </>
+          {canManageSchedules && onOpenAiModal && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={onOpenAiModal}
+              className="hidden sm:inline-flex items-center gap-1.5 h-9 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-md shadow-indigo-600/25 text-xs font-semibold border-0 cursor-pointer btn-shimmer"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-cyan-200 animate-spin-slow" />
+              <span className="hidden sm:inline">AI Import</span>
+              <span className="sm:hidden">AI</span>
+            </Button>
+          )}
+
+          {/* Multi-language Selector (Modul 15) */}
+          <LanguageSwitcher />
+
+          {/* Theme Toggle */}
+          <ThemeToggle variant="compact" />
+
+          {/* User profile dropdown or Auth buttons (Shadcn DropdownMenu) */}
+          {isAuthenticated && user ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="relative flex items-center gap-2.5 p-1 h-auto rounded-2xl hover:bg-muted/50 transition-colors select-none cursor-pointer focus-visible:ring-1 focus-visible:ring-ring"
+                >
+                  <div className="relative">
+                    <Avatar className="w-8 h-8 rounded-full border border-primary/20 shadow-xs ring-2 ring-primary/10">
+                      <AvatarFallback className="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white font-bold text-xs">
+                        {getInitials(user.fullName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-background" />
+                  </div>
+                  <div className="hidden xl:flex flex-col text-left leading-tight">
+                    <span className="text-xs font-bold text-foreground truncate max-w-[120px]">
+                      {user.fullName}
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {getRoleLabel(user.roles)}
+                    </span>
+                  </div>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                align="end"
+                className="w-56 p-1.5 rounded-2xl shadow-xl border border-border/50 bg-popover backdrop-blur-md"
+              >
+                <DropdownMenuLabel className="px-3 py-2 font-normal">
+                  <div className="flex flex-col space-y-0.5">
+                    <p className="text-xs font-bold text-foreground leading-none">{user.fullName}</p>
+                    <p className="text-[11px] text-muted-foreground truncate pt-0.5">
+                      {user.email || user.username || getRoleLabel(user.roles)}
+                    </p>
+                  </div>
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator className="my-1 bg-border/40" />
+                <DropdownMenuItem
+                  onClick={() => onNavigateTab('dashboard')}
+                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl cursor-pointer hover:bg-muted focus:bg-muted transition-colors"
+                >
+                  <Home className="w-4 h-4 text-primary" />
+                  <span>{t('nav.dashboard')}</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => onNavigateTab('profile')}
+                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl cursor-pointer hover:bg-muted focus:bg-muted transition-colors"
+                >
+                  <User className="w-4 h-4 text-primary" />
+                  <span>{t('nav.profile')}</span>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator className="my-1 bg-border/40" />
+                <DropdownMenuItem
+                  onClick={() => logout()}
+                  className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium rounded-xl cursor-pointer text-destructive focus:text-destructive focus:bg-destructive/10 hover:bg-destructive/10 transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>{t('auth.logout')}</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <div className="flex items-center gap-1.5">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/login')}
+                className="text-xs h-9 rounded-xl border-border/50 hidden sm:inline-flex items-center gap-1.5 cursor-pointer"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                <span>{t('auth.login')}</span>
+              </Button>
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => navigate('/register')}
+                className="text-xs h-9 rounded-xl bg-primary text-primary-foreground shadow-xs items-center gap-1.5 cursor-pointer"
+              >
+                <UserPlus className="w-3.5 h-3.5" />
+                <span className="hidden xs:inline">{t('auth.register')}</span>
+                <span className="xs:hidden">{t('landing.hero.startCta')}</span>
+              </Button>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {/* Executive Global Spotlight Search Dialog */}
+      <GlobalSearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        onNavigateTab={onNavigateTab}
+        onOpenManualModal={onOpenManualModal}
+        onOpenAiModal={onOpenAiModal}
+      />
+    </>
   )
 }

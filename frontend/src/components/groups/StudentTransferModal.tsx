@@ -1,9 +1,17 @@
 import React, { useState } from 'react';
 import { ArrowRightLeft } from 'lucide-react';
-import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { Button } from '@/shared/ui/button/Button';
-import { FormField } from '@/shared/ui/form/FormField';
-import { Textarea } from '@/shared/ui/input/Textarea';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { groupStructureApi } from '@/api';
 import type { GroupMembershipDto, StudyGroup } from '@/types';
@@ -56,8 +64,10 @@ export const StudentTransferModal: React.FC<StudentTransferModalProps> = ({
       );
       onSuccess();
       onClose();
-    } catch (err: any) {
-      const msg = err.response?.data?.message || 'Ko‘chirishda xatolik yuz berdi';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Ko‘chirishda xatolik yuz berdi';
       toast.error('Xatolik', msg);
     } finally {
       setIsLoading(false);
@@ -65,59 +75,91 @@ export const StudentTransferModal: React.FC<StudentTransferModalProps> = ({
   };
 
   return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onClose}
-      size="md"
-      title={
-        <div className="flex items-center gap-2">
-          <ArrowRightLeft className="w-5 h-5 text-[var(--brand-primary)]" />
-          <span>O‘quvchini Boshqa Guruhga Ko‘chirish (Transfer)</span>
-        </div>
-      }
-      description={`${membership.studentName} uchun yangi guruh va ko‘chirish sababini ko‘rsating`}
-    >
-      <form onSubmit={handleTransfer} className="space-y-4">
-        <div className="p-3 rounded-lg bg-[var(--bg-subtle)] border border-[var(--border-default)] text-xs space-y-1">
-          <div className="text-[var(--text-muted)]">Joriy guruh:</div>
-          <div className="font-bold text-[var(--text-primary)]">
-            {membership.groupCode} ({membership.studentGrade})
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md border-0 shadow-2xl rounded-2xl bg-card text-card-foreground">
+        <DialogHeader>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+              <ArrowRightLeft className="w-5 h-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-bold">O‘quvchini Ko‘chirish</DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                <span className="font-semibold text-foreground">{membership.studentName}</span> uchun yangi guruh va ko‘chirish sababini ko‘rsating
+              </DialogDescription>
+            </div>
           </div>
-        </div>
+        </DialogHeader>
 
-        <FormField label="Maqsadli yangi guruh" required>
-          <select
-            value={targetGroupId}
-            onChange={(e) => setTargetGroupId(e.target.value)}
-            className="w-full text-xs sm:text-sm rounded-lg border border-[var(--border-strong)] bg-[var(--bg-surface)] text-[var(--text-primary)] h-9 px-3 focus:outline-none focus:ring-2 focus:ring-[var(--ring)]"
-          >
-            <option value="">Guruhni tanlang...</option>
-            {validGroups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.groupCode} — {g.gradeLevel} ({g.subject}) [Sig‘im: {g.studentCount || 0}/{16}]
-              </option>
-            ))}
-          </select>
-        </FormField>
+        <form onSubmit={handleTransfer} className="space-y-4 pt-1">
+          <div className="p-3 rounded-xl bg-muted/40 border-0 text-xs space-y-1">
+            <div className="text-[11px] font-medium text-muted-foreground">Joriy guruh:</div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-foreground text-sm">{membership.groupCode}</span>
+              <Badge variant="secondary" className="text-[10px] rounded-full">
+                {membership.studentGrade}
+              </Badge>
+            </div>
+          </div>
 
-        <FormField label="Ko‘chirish sababi (tarix uchun qayd etiladi)">
-          <Textarea
-            placeholder="Masalan: Dars vaqti to‘g‘ri kelmaganligi sababli boshqa guruhga ko‘chirildi..."
-            value={reason}
-            onChange={(e) => setReason(e.target.value)}
-            rows={3}
-          />
-        </FormField>
+          <div className="space-y-1.5">
+            <Label htmlFor="target-group-select" className="text-xs font-semibold text-foreground">
+              Maqsadli yangi guruh <span className="text-destructive">*</span>
+            </Label>
+            <select
+              id="target-group-select"
+              value={targetGroupId}
+              onChange={(e) => setTargetGroupId(e.target.value)}
+              aria-label="Maqsadli yangi guruh"
+              className="flex h-10 w-full rounded-lg border border-input bg-background px-3 py-1 text-xs text-foreground shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <option value="">Guruhni tanlang...</option>
+              {validGroups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.groupCode} — {g.gradeLevel} ({g.subject || 'Dasturlash'}) [Sig‘im: {g.studentCount || 0}/{g.maxCapacity || 16}]
+                </option>
+              ))}
+            </select>
+          </div>
 
-        <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border-subtle)]">
-          <Button variant="outline" size="sm" type="button" onClick={onClose} disabled={isLoading}>
-            Bekor qilish
-          </Button>
-          <Button variant="primary" size="sm" type="submit" isLoading={isLoading} disabled={!targetGroupId}>
-            Ko‘chirishni tasdiqlash
-          </Button>
-        </div>
-      </form>
+          <div className="space-y-1.5">
+            <Label htmlFor="transfer-reason" className="text-xs font-semibold text-foreground">
+              Ko‘chirish sababi (tarix uchun qayd etiladi)
+            </Label>
+            <Textarea
+              id="transfer-reason"
+              placeholder="Masalan: Dars vaqti to‘g‘ri kelmaganligi sababli boshqa guruhga ko‘chirildi..."
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              rows={3}
+              className="text-xs resize-none bg-background border-input focus-visible:ring-primary rounded-lg"
+            />
+          </div>
+
+          <DialogFooter className="pt-3 gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={onClose}
+              disabled={isLoading}
+              className="rounded-lg text-xs"
+            >
+              Bekor qilish
+            </Button>
+            <Button
+              type="submit"
+              variant="default"
+              size="sm"
+              isLoading={isLoading}
+              disabled={!targetGroupId || isLoading}
+              className="rounded-lg text-xs"
+            >
+              Ko‘chirishni tasdiqlash
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

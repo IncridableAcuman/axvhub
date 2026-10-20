@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import { Lock, ArrowLeft, KeyRound, CheckCircle2, ShieldCheck } from 'lucide-react';
-import { FormField } from '@/shared/ui/form/FormField';
-import { Input } from '@/shared/ui/input/Input';
-import { Button } from '@/shared/ui/button/Button';
+import { Lock, ArrowLeft, KeyRound, CheckCircle2, ShieldCheck, Eye, EyeOff } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { ThemeToggle } from '@/shared/ui/theme-toggle/ThemeToggle';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -18,6 +18,8 @@ export const ResetPasswordPage: React.FC = () => {
   const [token, setToken] = useState(tokenFromUrl);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -98,7 +100,7 @@ export const ResetPasswordPage: React.FC = () => {
   const strength = getPasswordStrength(newPassword);
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[var(--bg-canvas)] text-[var(--text-primary)] p-6 sm:p-12 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-between bg-background text-foreground p-6 sm:p-12 relative overflow-hidden">
       {/* Ambient subtle light blobs */}
       <div className="absolute top-10 right-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -107,7 +109,7 @@ export const ResetPasswordPage: React.FC = () => {
       <div className="relative z-10 flex items-center justify-between max-w-md w-full mx-auto pb-6">
         <Link
           to="/login"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-muted-foreground hover:text-primary transition"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kirish sahifasiga qaytish</span>
@@ -115,47 +117,43 @@ export const ResetPasswordPage: React.FC = () => {
         <ThemeToggle variant="compact" />
       </div>
 
-      {/* Main Card */}
-      <div className="relative z-10 w-full max-w-md mx-auto my-auto p-6 sm:p-8 glass-panel border border-[var(--border-default)] rounded-3xl shadow-xl space-y-6 animate-scale-in">
+      {/* Center Card */}
+      <div className="relative z-10 w-full max-w-md mx-auto my-auto p-6 sm:p-8 bg-card/90 dark:bg-card/75 backdrop-blur-xl border-0 rounded-3xl shadow-2xl space-y-6 animate-scale-in">
         <div className="text-left space-y-2">
-          <div className="inline-flex p-3 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] mb-1">
-            <Lock className="w-6 h-6" />
+          <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-1">
+            <KeyRound className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-extrabold text-[var(--text-primary)]">
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
             Yangi parol o‘rnatish
           </h1>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-            Hisobingiz xavfsizligini ta’minlash uchun mustahkam parol tanlang
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+            Iltimos, hisobingiz uchun yangi va mustahkam parol o‘rnating.
           </p>
         </div>
 
         {errors.form && (
-          <div className="p-3 text-xs rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
+          <div className="p-3.5 text-xs rounded-xl bg-destructive/10 text-destructive border-0">
             {errors.form}
           </div>
         )}
 
         {isSuccess ? (
-          <div className="space-y-6 animate-in fade-in text-center">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center mx-auto ring-8 ring-emerald-500/5">
-              <ShieldCheck className="w-8 h-8" />
-            </div>
-
-            <div className="space-y-2">
-              <h2 className="text-xl font-bold text-[var(--text-primary)]">
-                Parol muvaffaqiyatli o‘zgartirildi!
-              </h2>
-              <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
-                Endi yangi parolingiz yordamida AXM Nexus tizimiga kirishingiz mumkin.
+          <div className="space-y-5 animate-in fade-in">
+            <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm space-y-2 border-0">
+              <div className="flex items-center gap-2 font-bold">
+                <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
+                <span>Parol muvaffaqiyatli o‘zgartirildi!</span>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Yangi parolingiz muvaffaqiyatli saqlandi. Endi yangi parolingiz yordamida tizimga kirishingiz mumkin.
               </p>
             </div>
 
             <Button
-              type="button"
-              variant="primary"
-              size="lg"
+              variant="default"
+              size="default"
+              className="w-full rounded-xl border-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 text-white font-semibold shadow-lg shadow-indigo-600/25"
               onClick={() => navigate('/login')}
-              className="w-full font-semibold"
             >
               <span>Tizimga kirish</span>
             </Button>
@@ -163,88 +161,68 @@ export const ResetPasswordPage: React.FC = () => {
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             {!tokenFromUrl && (
-              <FormField
-                label="Tiklash tokeni"
-                htmlFor="reset-token"
-                required
-                error={errors.token}
-                description="Emailingizga kelgan maxsus token kodi"
-              >
+              <div className="space-y-1.5">
+                <Label htmlFor="reset-token" className="text-xs font-semibold text-foreground">
+                  Xavfsizlik tokeni <span className="text-destructive">*</span>
+                </Label>
                 <Input
                   id="reset-token"
                   type="text"
-                  placeholder="masalan: 3f8a92b1-..."
+                  placeholder="Email orqali kelgan maxsus token"
                   value={token}
                   onChange={(e) => {
                     setToken(e.target.value);
                     if (errors.token) setErrors((prev) => ({ ...prev, token: '' }));
                   }}
-                  leftIcon={<KeyRound className="w-4 h-4" />}
+                  className="bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1 text-xs font-mono"
                   error={Boolean(errors.token)}
                 />
-              </FormField>
+                {errors.token && (
+                  <p className="text-xs text-destructive font-medium">{errors.token}</p>
+                )}
+              </div>
             )}
 
-            <FormField
-              label="Yangi parol"
-              htmlFor="reset-new-pwd"
-              required
-              error={errors.newPassword}
-            >
+            <div className="space-y-1.5">
+              <Label htmlFor="new-password" className="text-xs font-semibold text-foreground">
+                Yangi parol <span className="text-destructive">*</span>
+              </Label>
               <Input
-                id="reset-new-pwd"
-                type="password"
+                id="new-password"
+                type={showPassword ? 'text' : 'password'}
                 placeholder="••••••••"
                 value={newPassword}
                 onChange={(e) => {
                   setNewPassword(e.target.value);
                   if (errors.newPassword) setErrors((prev) => ({ ...prev, newPassword: '' }));
                 }}
-                leftIcon={<Lock className="w-4 h-4" />}
-                showPasswordToggle
+                leftIcon={<Lock className="w-4 h-4 text-muted-foreground" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="text-muted-foreground hover:text-foreground cursor-pointer focus:outline-none"
+                    tabIndex={-1}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
                 autoComplete="new-password"
                 error={Boolean(errors.newPassword)}
+                className="bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1 text-xs"
               />
-            </FormField>
+              {errors.newPassword && (
+                <p className="text-xs text-destructive font-medium">{errors.newPassword}</p>
+              )}
+            </div>
 
-            <FormField
-              label="Yangi parolni tasdiqlash"
-              htmlFor="reset-confirm-pwd"
-              required
-              error={
-                confirmPassword && newPassword !== confirmPassword
-                  ? 'Parollar bir-biriga mos kelmadi'
-                  : errors.confirmPassword
-              }
-            >
-              <Input
-                id="reset-confirm-pwd"
-                type="password"
-                placeholder="••••••••"
-                value={confirmPassword}
-                onChange={(e) => {
-                  setConfirmPassword(e.target.value);
-                  if (errors.confirmPassword)
-                    setErrors((prev) => ({ ...prev, confirmPassword: '' }));
-                }}
-                leftIcon={<Lock className="w-4 h-4" />}
-                showPasswordToggle
-                autoComplete="new-password"
-                error={Boolean(
-                  errors.confirmPassword ||
-                    (confirmPassword && newPassword !== confirmPassword)
-                )}
-              />
-            </FormField>
-
-            {/* Password strength */}
             {newPassword && (
               <div className="space-y-1">
-                <div className="flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-                  <span>Parol murakkabligi:</span>
-                  <span className="font-semibold">{strength.label}</span>
+                <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+                  <span>Parol kuchi:</span>
+                  <span className="font-semibold text-foreground">{strength.label}</span>
                 </div>
-                <div className="h-1.5 w-full bg-[var(--bg-subtle)] rounded-full overflow-hidden flex gap-1">
+                <div className="h-1.5 w-full bg-muted/60 rounded-full overflow-hidden flex gap-1 border-0">
                   <div
                     className={`h-full flex-1 rounded-full transition-all ${
                       strength.level >= 1 ? strength.color : 'bg-transparent'
@@ -264,23 +242,58 @@ export const ResetPasswordPage: React.FC = () => {
               </div>
             )}
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              isLoading={isLoading}
-              className="w-full font-semibold"
-              leftIcon={<CheckCircle2 className="w-4 h-4" />}
-            >
-              <span>Parolni saqlash</span>
-            </Button>
+            <div className="space-y-1.5">
+              <Label htmlFor="confirm-password" className="text-xs font-semibold text-foreground">
+                Yangi parolni tasdiqlang <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="confirm-password"
+                type={showConfirm ? 'text' : 'password'}
+                placeholder="••••••••"
+                value={confirmPassword}
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  if (errors.confirmPassword) setErrors((prev) => ({ ...prev, confirmPassword: '' }));
+                }}
+                leftIcon={<Lock className="w-4 h-4 text-muted-foreground" />}
+                rightIcon={
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    className="text-muted-foreground hover:text-foreground cursor-pointer focus:outline-none"
+                    tabIndex={-1}
+                  >
+                    {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                }
+                autoComplete="new-password"
+                error={Boolean(errors.confirmPassword)}
+                className="bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1 text-xs"
+              />
+              {errors.confirmPassword && (
+                <p className="text-xs text-destructive font-medium">{errors.confirmPassword}</p>
+              )}
+            </div>
+
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="default"
+                size="default"
+                isLoading={isLoading}
+                className="w-full rounded-xl border-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-semibold shadow-lg shadow-indigo-600/25"
+                leftIcon={<ShieldCheck className="w-4 h-4" />}
+              >
+                <span>Parolni saqlash</span>
+              </Button>
+            </div>
           </form>
         )}
       </div>
 
-      {/* Bottom Footer */}
-      <div className="text-center text-xs text-[var(--text-muted)] pt-8">
-        <span>Muhammad Al-Xorazmiy Vorislari • Xavfsiz Autentifikatsiya</span>
+      {/* Footer */}
+      <div className="text-center text-xs text-muted-foreground py-4">
+        <span>© 2026 AXM Nexus. O‘zbekiston Respublikasi Raqamli Texnologiyalar Vazirligi</span>
       </div>
     </div>
   );

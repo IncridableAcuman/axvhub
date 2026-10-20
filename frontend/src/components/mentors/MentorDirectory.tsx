@@ -10,11 +10,27 @@ import {
   ArrowRight,
   UserPlus,
   KeyRound,
-  X,
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button/Button';
-import { Input } from '@/shared/ui/input/Input';
-import { FormField } from '@/shared/ui/form/FormField';
+import {
+  Card,
+  CardFooter,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Skeleton } from '@/components/ui/skeleton';
 import { mentorProfileApi, mentorApi } from '@/api';
 import { CredentialSlipModal } from '@/components/common/CredentialSlipModal';
 import { MentorProfileModal } from './MentorProfileModal';
@@ -157,8 +173,10 @@ export const MentorDirectory: React.FC = () => {
         branchLocation: prov.branchLocation,
       });
       setIsCredentialModalOpen(true);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Mentor yaratishda xatolik yuz berdi';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Mentor yaratishda xatolik yuz berdi';
       alert(msg);
     } finally {
       setSavingMentor(false);
@@ -180,160 +198,200 @@ export const MentorDirectory: React.FC = () => {
         isReset: true,
       });
       setIsCredentialModalOpen(true);
-    } catch (err: any) {
-      const msg = err?.response?.data?.message || 'Parolni yangilashda xatolik yuz berdi';
+    } catch (err: unknown) {
+      const msg =
+        (err as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        'Parolni yangilashda xatolik yuz berdi';
       alert(msg);
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'PUBLISHED':
+        return <Badge variant="success">Tasdiqlangan</Badge>;
+      case 'PENDING_REVIEW':
+        return <Badge variant="warning">Kutilmoqda</Badge>;
+      case 'REJECTED':
+        return <Badge variant="destructive">Rad etilgan</Badge>;
+      case 'DRAFT':
+        return <Badge variant="secondary">Qoralama</Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
   return (
     <div className="space-y-6 animate-fade-in-up">
       {/* Header Banner */}
-      <div className="glass-panel text-[var(--text-primary)] rounded-3xl p-6 border border-[var(--border-default)] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center space-x-3 mb-1">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-purple-500/20">
+      <Card className="rounded-3xl p-6 sm:p-7 border-border/30 bg-card/60 backdrop-blur-md shadow-xs">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-600 text-white flex items-center justify-center font-bold shadow-md shadow-purple-500/20 shrink-0">
               <Award className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)]">
+              <div className="flex items-center gap-2 flex-wrap">
+                <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">
                   Mentorlar Profillari & Professional Malaka
                 </h1>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse" />
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 beacon-pulse" />
               </div>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                 O‘quvchilar va dastur ishtirokchilari uchun tasdiqlangan mentor profillari, ko‘nikmalar va portfoliolar
               </p>
             </div>
           </div>
-        </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          {viewMode === 'admin' && (
+          <div className="flex flex-wrap items-center gap-2.5">
+            {viewMode === 'admin' && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => setIsAddMentorModalOpen(true)}
+                className="rounded-xl text-xs font-semibold h-9 shadow-sm"
+              >
+                <UserPlus className="w-4 h-4 mr-1.5" />
+                <span>Yangi mentor qo‘shish</span>
+              </Button>
+            )}
+
+            {/* View Mode Switcher */}
+            <Tabs
+              value={viewMode}
+              onValueChange={(val) => setViewMode(val as 'public' | 'admin')}
+            >
+              <TabsList className="bg-muted/70 p-1 rounded-xl h-9">
+                <TabsTrigger
+                  value="public"
+                  className="rounded-lg text-xs font-semibold px-3 py-1.5 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-2xs"
+                >
+                  Ommaviy katalog
+                </TabsTrigger>
+                <TabsTrigger
+                  value="admin"
+                  className="rounded-lg text-xs font-semibold px-3 py-1.5 data-[state=active]:bg-card data-[state=active]:text-primary data-[state=active]:shadow-2xs"
+                >
+                  Ma'muriy boshqaruv
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
+
             <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsAddMentorModalOpen(true)}
-              className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold flex items-center gap-1.5 cursor-pointer shadow-sm shadow-indigo-500/20"
+              variant="outline"
+              size="icon"
+              onClick={loadData}
+              disabled={loading}
+              title="Yangilash"
+              className="h-9 w-9 rounded-xl border-border/40"
             >
-              <UserPlus className="w-4 h-4" />
-              <span>Yangi mentor qo‘shish</span>
+              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </Button>
-          )}
-
-          {/* View Mode Toggle */}
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
-            <button
-              onClick={() => setViewMode('public')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                viewMode === 'public'
-                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-              }`}
-            >
-              Ommaviy katalog
-            </button>
-            <button
-              onClick={() => setViewMode('admin')}
-              className={`px-3 py-1.5 rounded-lg transition cursor-pointer ${
-                viewMode === 'admin'
-                  ? 'bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400 hover:text-slate-900'
-              }`}
-            >
-              Ma'muriy boshqaruv
-            </button>
           </div>
-
-          <Button variant="outline" size="sm" onClick={loadData} disabled={loading} title="Yangilash">
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Filter and Search Bar */}
-      <div className="bg-white dark:bg-[var(--bg-surface)] rounded-2xl p-4 border border-slate-200 dark:border-[var(--border-default)] shadow-xs flex flex-col md:flex-row gap-3 items-center justify-between">
-        <div className="flex-1 w-full md:w-auto relative">
-          <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Mentor ismi, ko'nikmasi (Java, Python...) yoki yo'nalishi bo'yicha qidirish..."
-            className="pl-10 text-xs w-full"
-          />
-        </div>
-
-        {viewMode === 'admin' && (
-          <div className="flex items-center gap-2">
-            <label className="text-xs text-slate-500 font-semibold">Holat:</label>
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              aria-label="Holat filtri"
-              className="text-xs rounded-xl border border-slate-300 dark:border-[var(--border-default)] bg-white dark:bg-[var(--bg-surface)] px-3 py-2 text-slate-700 dark:text-slate-200 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-            >
-              <option value="ALL">Barchasi</option>
-              <option value="PUBLISHED">Tasdiqlangan (Published)</option>
-              <option value="PENDING_REVIEW">Kutilmoqda (Pending)</option>
-              <option value="REJECTED">Rad etilgan (Rejected)</option>
-              <option value="DRAFT">Qoralama (Draft)</option>
-            </select>
+      <Card className="rounded-2xl p-3.5 border-border/30 bg-card shadow-2xs">
+        <div className="flex flex-col md:flex-row gap-3 items-center justify-between">
+          <div className="flex-1 w-full md:w-auto">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Mentor ismi, ko'nikmasi (Java, Python...) yoki yo'nalishi bo'yicha qidirish..."
+              leftIcon={<Search className="w-4 h-4 text-muted-foreground" />}
+              className="text-xs h-9 rounded-xl"
+            />
           </div>
-        )}
-      </div>
 
-      {/* Grid */}
+          {viewMode === 'admin' && (
+            <div className="flex items-center gap-2 self-end md:self-auto shrink-0">
+              <Label className="text-xs text-muted-foreground font-semibold">Holat:</Label>
+              <select
+                value={statusFilter}
+                onChange={(e) => setStatusFilter(e.target.value)}
+                aria-label="Holat filtri"
+                className="text-xs rounded-xl border border-input bg-background px-3 h-9 text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+              >
+                <option value="ALL">Barchasi</option>
+                <option value="PUBLISHED">Tasdiqlangan (Published)</option>
+                <option value="PENDING_REVIEW">Kutilmoqda (Pending)</option>
+                <option value="REJECTED">Rad etilgan (Rejected)</option>
+                <option value="DRAFT">Qoralama (Draft)</option>
+              </select>
+            </div>
+          )}
+        </div>
+      </Card>
+
+      {/* Grid Content */}
       {loading ? (
-        <div className="py-20 text-center">
-          <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-xs text-slate-500 font-medium">Mentorlar profillari yuklanmoqda...</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Card key={i} className="p-5 rounded-3xl border-border/30 bg-card space-y-4">
+              <div className="flex items-center gap-3">
+                <Skeleton className="w-14 h-14 rounded-2xl" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-4 w-3/4 rounded-sm" />
+                  <Skeleton className="h-3 w-1/2 rounded-sm" />
+                </div>
+              </div>
+              <Skeleton className="h-10 w-full rounded-xl" />
+              <div className="flex gap-1.5 pt-2">
+                <Skeleton className="h-6 w-16 rounded-md" />
+                <Skeleton className="h-6 w-16 rounded-md" />
+                <Skeleton className="h-6 w-16 rounded-md" />
+              </div>
+            </Card>
+          ))}
         </div>
       ) : viewMode === 'public' ? (
         filteredPublicProfiles.length === 0 ? (
-          <div className="bg-white dark:bg-[var(--bg-surface)] rounded-2xl p-12 text-center border border-slate-200 dark:border-[var(--border-default)]">
-            <Award className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+          <Card className="rounded-3xl p-12 text-center border-border/30 bg-card">
+            <Award className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+            <h3 className="text-sm font-bold text-foreground">
               Hech qanday ommaviy profil topilmadi
             </h3>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-muted-foreground mt-1 max-w-sm mx-auto">
               Faqat moderator tomonidan tasdiqlangan (PUBLISHED) profillar ommaviy ro'yxatda aks ettiriladi.
             </p>
-          </div>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredPublicProfiles.map((p) => (
-              <div
+              <Card
                 key={p.id}
                 onClick={() => handleOpenDetail(p)}
-                className="interactive-card shimmer-container group p-5 cursor-pointer flex flex-col justify-between"
+                className="group rounded-3xl border-border/30 bg-card hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer overflow-hidden"
               >
-                <div>
-                  <div className="flex items-start space-x-3 mb-3">
-                    {p.profilePhotoUrl ? (
-                      <img
-                        src={p.profilePhotoUrl}
-                        alt={p.displayName}
-                        className="w-14 h-14 rounded-xl object-cover border border-slate-200 dark:border-slate-700"
-                      />
-                    ) : (
-                      <div className="w-14 h-14 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white font-bold text-lg flex items-center justify-center shrink-0">
-                        {p.displayName.charAt(0)}
-                      </div>
-                    )}
+                <div className="p-5 pb-3">
+                  <div className="flex items-start gap-3.5 mb-3">
+                    <Avatar className="w-14 h-14 rounded-2xl shadow-xs ring-2 ring-background">
+                      {p.profilePhotoUrl && (
+                        <AvatarImage
+                          src={p.profilePhotoUrl}
+                          alt={p.displayName}
+                          className="object-cover rounded-2xl"
+                        />
+                      )}
+                      <AvatarFallback className="rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white font-bold text-lg">
+                        {p.displayName?.charAt(0) || 'M'}
+                      </AvatarFallback>
+                    </Avatar>
+
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-1.5">
-                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                      <div className="flex items-center gap-1.5">
+                        <h3 className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
                           {p.displayName}
                         </h3>
                         <span title="Tasdiqlangan profil">
                           <ShieldCheck className="w-4 h-4 text-emerald-500 shrink-0" />
                         </span>
                       </div>
-                      <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate mt-0.5">
+                      <p className="text-xs text-primary font-medium truncate mt-0.5">
                         {p.headline || 'IT Murabbiy & Mentor'}
                       </p>
-                      <div className="text-[10px] text-slate-400 mt-1 flex items-center space-x-2">
+                      <div className="text-[11px] text-muted-foreground mt-1 flex items-center gap-2">
                         {p.experiences && (
                           <span>{p.experiences.length} ta loyiha/ish joyi</span>
                         )}
@@ -342,37 +400,42 @@ export const MentorDirectory: React.FC = () => {
                   </div>
 
                   {p.bio && (
-                    <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-3 leading-relaxed">
+                    <p className="text-xs text-muted-foreground line-clamp-2 mb-3.5 leading-relaxed">
                       {p.bio}
                     </p>
                   )}
 
                   {/* Skills badges */}
-                  <div className="flex flex-wrap gap-1.5 mb-4">
-                    {p.skills && p.skills.slice(0, 3).map((s) => (
-                      <span
-                        key={s.id || s.skillName}
-                        className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                      >
-                        {s.skillName}
-                      </span>
-                    ))}
+                  <div className="flex flex-wrap gap-1.5">
+                    {p.skills &&
+                      p.skills.slice(0, 3).map((s) => (
+                        <Badge
+                          key={s.id || s.skillName}
+                          variant="secondary"
+                          className="text-[10px] font-medium px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground"
+                        >
+                          {s.skillName}
+                        </Badge>
+                      ))}
                     {p.skills && p.skills.length > 3 && (
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-md text-slate-400 bg-slate-50 dark:bg-slate-900">
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] font-medium px-1.5 py-0.5 rounded-lg bg-muted/40 text-muted-foreground"
+                      >
                         +{p.skills.length - 3}
-                      </span>
+                      </Badge>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                  <div className="flex items-center space-x-1.5 text-xs text-slate-500">
+                <CardFooter className="p-5 pt-3 border-t border-border/20 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
                     {p.publicPhone || p.publicEmail ? (
-                      <span className="text-emerald-600 text-[11px] font-semibold flex items-center">
+                      <span className="text-emerald-600 dark:text-emerald-400 text-[11px] font-semibold flex items-center">
                         <Globe className="w-3.5 h-3.5 mr-1" /> Aloqa ochiq
                       </span>
                     ) : (
-                      <span className="text-slate-400 text-[11px] flex items-center">
+                      <span className="text-muted-foreground text-[11px] flex items-center">
                         <Lock className="w-3.5 h-3.5 mr-1" /> Aloqa maxfiy
                       </span>
                     )}
@@ -382,129 +445,134 @@ export const MentorDirectory: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => handleOpenDetail(p)}
-                    className="text-xs font-semibold flex items-center space-x-1"
+                    className="h-8 rounded-xl text-xs font-semibold flex items-center gap-1 group-hover:bg-primary group-hover:text-primary-foreground group-hover:border-primary transition-all"
                   >
                     <span>Profilni ko'rish</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
-                </div>
-              </div>
+                </CardFooter>
+              </Card>
             ))}
           </div>
         )
       ) : (
         /* Admin View */
         filteredAdminProfiles.length === 0 ? (
-          <div className="bg-white dark:bg-[var(--bg-surface)] rounded-2xl p-12 text-center border border-slate-200 dark:border-[var(--border-default)]">
-            <Award className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-            <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+          <Card className="rounded-3xl p-12 text-center border-border/30 bg-card">
+            <Award className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+            <h3 className="text-sm font-bold text-foreground">
               Hech qanday mentor profili topilmadi
             </h3>
-          </div>
+          </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {filteredAdminProfiles.map((p) => {
               const mentorId = p.mentorId || p.id;
               return (
-                <div
+                <Card
                   key={p.id}
                   onClick={() => handleOpenDetail(p)}
-                  className="interactive-card shimmer-container group p-5 cursor-pointer flex flex-col justify-between"
+                  className="group rounded-3xl border-border/30 bg-card hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between cursor-pointer overflow-hidden"
                 >
-                  <div>
+                  <div className="p-5 pb-3">
                     <div className="flex items-center justify-between mb-3">
-                      <span
-                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                          p.publicationStatus === 'PUBLISHED'
-                            ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300'
-                            : p.publicationStatus === 'PENDING_REVIEW'
-                            ? 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300'
-                            : p.publicationStatus === 'REJECTED'
-                            ? 'bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:text-rose-300'
-                            : 'bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-300'
-                        }`}
-                      >
-                        {p.publicationStatus}
-                      </span>
-
-                      <span className="text-[10px] font-semibold text-slate-400">
+                      {getStatusBadge(p.publicationStatus)}
+                      <span className="text-[10px] font-mono font-semibold text-muted-foreground">
                         ID: #{p.id}
                       </span>
                     </div>
 
-                    <div className="flex items-start space-x-3 mb-3">
-                      <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white font-bold text-base flex items-center justify-center shrink-0">
-                        {p.displayName.charAt(0)}
-                      </div>
+                    <div className="flex items-start gap-3.5 mb-3">
+                      <Avatar className="w-12 h-12 rounded-2xl shadow-xs ring-2 ring-background">
+                        {p.profilePhotoUrl && (
+                          <AvatarImage
+                            src={p.profilePhotoUrl}
+                            alt={p.displayName}
+                            className="object-cover rounded-2xl"
+                          />
+                        )}
+                        <AvatarFallback className="rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-600 text-white font-bold text-base">
+                          {p.displayName?.charAt(0) || 'M'}
+                        </AvatarFallback>
+                      </Avatar>
+
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100 truncate">
+                        <h3 className="text-sm font-bold text-foreground truncate group-hover:text-primary transition-colors">
                           {p.displayName}
                         </h3>
-                        <p className="text-xs text-indigo-600 dark:text-indigo-400 font-medium truncate mt-0.5">
+                        <p className="text-xs text-primary font-medium truncate mt-0.5">
                           {p.headline || 'IT Mentor'}
                         </p>
-                        <div className="text-[11px] text-slate-500 truncate mt-1">
+                        <div className="text-[11px] text-muted-foreground truncate mt-1">
                           {p.email || p.publicEmail || 'Email yo‘q'}
                         </div>
                       </div>
                     </div>
 
                     {/* Skills badges */}
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      {p.skills && p.skills.slice(0, 3).map((s) => (
-                        <span
-                          key={s.id || s.skillName}
-                          className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-                        >
-                          {s.skillName}
-                        </span>
-                      ))}
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {p.skills &&
+                        p.skills.slice(0, 3).map((s) => (
+                          <Badge
+                            key={s.id || s.skillName}
+                            variant="secondary"
+                            className="text-[10px] font-medium px-2 py-0.5 rounded-lg bg-muted/60 text-muted-foreground"
+                          >
+                            {s.skillName}
+                          </Badge>
+                        ))}
                     </div>
                   </div>
 
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-                    <div className="flex items-center space-x-1">
-                      <button
+                  <CardFooter className="p-4 pt-3 border-t border-border/20 flex items-center justify-between gap-1.5">
+                    <div className="flex items-center gap-1 flex-wrap">
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={(e) => handleOpenEdit(mentorId, e)}
-                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 transition flex items-center space-x-1 cursor-pointer"
+                        className="h-8 px-2.5 rounded-xl text-xs font-semibold flex items-center gap-1"
                         title="Profilni tahrirlash"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
                         <span>Tahrir</span>
-                      </button>
+                      </Button>
 
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={(e) => handleOpenReview(p, e)}
-                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 transition flex items-center space-x-1 cursor-pointer"
+                        className="h-8 px-2.5 rounded-xl text-xs font-semibold text-primary bg-primary/10 hover:bg-primary/20 flex items-center gap-1"
                         title="Moderatsiya qilish"
                       >
                         <ShieldCheck className="w-3.5 h-3.5" />
                         <span>Moderatsiya</span>
-                      </button>
+                      </Button>
 
-                      <button
+                      <Button
+                        variant="secondary"
+                        size="sm"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleResetPassword(mentorId, p.displayName);
                         }}
-                        className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border border-amber-200/50 transition flex items-center space-x-1 cursor-pointer"
+                        className="h-8 px-2 rounded-xl text-xs font-semibold text-amber-700 dark:text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 flex items-center gap-1"
                         title="Yangi tasodifiy parol generatsiya qilish"
                       >
                         <KeyRound className="w-3.5 h-3.5" />
                         <span>Parol</span>
-                      </button>
+                      </Button>
                     </div>
 
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => handleOpenDetail(p)}
-                      className="text-xs font-semibold"
+                      className="h-8 rounded-xl text-xs font-semibold shrink-0"
                     >
                       Batafsil
                     </Button>
-                  </div>
-                </div>
+                  </CardFooter>
+                </Card>
               );
             })}
           </div>
@@ -545,127 +613,130 @@ export const MentorDirectory: React.FC = () => {
         }}
       />
 
-      {/* Add Mentor Modal */}
-      {isAddMentorModalOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsAddMentorModalOpen(false);
-          }}
-        >
-          <div
-            className="glass-panel bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-[var(--border-default)] animate-scale-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-subtle)] mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-purple-500/15 text-purple-600 dark:text-purple-400 flex items-center justify-center">
-                  <UserPlus className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-[var(--text-primary)]">Yangi mentor qo‘shish (HEMIS)</h3>
-                  <p className="text-xs text-[var(--text-muted)]">Faqat admin tomonidan HEMIS ID va tasodifiy parol bilan ta'minlanadi</p>
-                </div>
+      {/* Add Mentor Modal with Shadcn Dialog */}
+      <Dialog open={isAddMentorModalOpen} onOpenChange={setIsAddMentorModalOpen}>
+        <DialogContent className="max-w-lg bg-card text-card-foreground border-border/30 rounded-3xl p-6 sm:p-7 shadow-2xl">
+          <DialogHeader className="space-y-1.5 pb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <UserPlus className="w-5 h-5" />
               </div>
-              <button
-                onClick={() => setIsAddMentorModalOpen(false)}
-                className="w-8 h-8 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center justify-center transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div>
+                <DialogTitle className="text-base font-bold text-foreground">
+                  Yangi mentor qo‘shish (HEMIS)
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  HEMIS ID va tasodifiy parol avtomatik ravishda shakllantiriladi
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateMentor} className="space-y-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Mentor F.I.Sh *</Label>
+              <Input
+                type="text"
+                value={newFullName}
+                onChange={(e) => setNewFullName(e.target.value)}
+                placeholder="Masalan: Abdusharipov Izzatbek"
+                className="text-xs"
+                required
+              />
             </div>
 
-            <form onSubmit={handleCreateMentor} className="space-y-4">
-              <FormField label="Mentor F.I.Sh" required>
+            <div className="p-3.5 rounded-2xl bg-primary/10 text-primary text-xs flex items-start gap-2.5">
+              <KeyRound className="w-4 h-4 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-semibold block">HEMIS ID va Parol avtomatik shakllantiriladi</span>
+                <span className="text-[11px] opacity-80 leading-relaxed block mt-0.5">
+                  Mentorga maxsus 8 xonali HEMIS ID (32600001+) va 8 belgili xavfsiz tasodifiy parol beriladi.
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Yo‘nalish / Mutaxassislik *</Label>
                 <Input
                   type="text"
-                  value={newFullName}
-                  onChange={(e) => setNewFullName(e.target.value)}
-                  placeholder="Masalan: Abdusharipov Izzatbek"
+                  value={newRole}
+                  onChange={(e) => setNewRole(e.target.value)}
+                  placeholder="Masalan: Web Full-Stack mentori"
+                  className="text-xs"
                   required
                 />
-              </FormField>
-
-              <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-xs text-indigo-700 dark:text-indigo-300 flex items-start gap-2.5">
-                <KeyRound className="w-4 h-4 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold block">HEMIS ID va Parol avtomatik shakllantiriladi</span>
-                  <span className="text-[11px] opacity-80">
-                    Mentorga maxsus 8 xonali HEMIS ID (32600001+) va 8 belgili xavfsiz tasodifiy parol beriladi.
-                  </span>
-                </div>
               </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <FormField label="Yo‘nalish / Mutaxassislik" required>
-                  <Input
-                    type="text"
-                    value={newRole}
-                    onChange={(e) => setNewRole(e.target.value)}
-                    placeholder="Masalan: Web Full-Stack mentori"
-                    required
-                  />
-                </FormField>
-                <FormField label="Filial / Hudud" required>
-                  <Input
-                    type="text"
-                    value={newBranchLocation}
-                    onChange={(e) => setNewBranchLocation(e.target.value)}
-                    placeholder="IT Park Yangiariq"
-                    required
-                  />
-                </FormField>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <FormField label="Telefon raqam">
-                  <Input
-                    type="tel"
-                    value={newPhone}
-                    onChange={(e) => setNewPhone(e.target.value)}
-                    placeholder="+998 90 123 45 67"
-                  />
-                </FormField>
-                <FormField label="Email (Ixtiyoriy)">
-                  <Input
-                    type="email"
-                    value={newEmail}
-                    onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder="mentor@axm-nexus.uz"
-                  />
-                </FormField>
-              </div>
-
-              <FormField label="Qisqacha ma'lumot (Bio)">
-                <textarea
-                  value={newBio}
-                  onChange={(e) => setNewBio(e.target.value)}
-                  placeholder="Mentorning ish tajribasi va dars berish uslubi haqida..."
-                  rows={2}
-                  className="w-full px-3.5 py-2.5 text-xs font-medium rounded-xl border border-[var(--border-default)] bg-[var(--bg-canvas)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Filial / Hudud *</Label>
+                <Input
+                  type="text"
+                  value={newBranchLocation}
+                  onChange={(e) => setNewBranchLocation(e.target.value)}
+                  placeholder="IT Park Yangiariq"
+                  className="text-xs"
+                  required
                 />
-              </FormField>
-
-              <div className="pt-3 border-t border-[var(--border-subtle)] flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddMentorModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-secondary)] transition cursor-pointer"
-                >
-                  Bekor qilish
-                </button>
-                <button
-                  type="submit"
-                  disabled={savingMentor}
-                  className="btn-shimmer px-5 py-2 text-xs font-bold rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-500/20 transition cursor-pointer disabled:opacity-50"
-                >
-                  {savingMentor ? 'Yaratilmoqda...' : 'Mentorni ro‘yxatga olish'}
-                </button>
               </div>
-            </form>
-          </div>
-        </div>
-      )}
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Telefon raqam</Label>
+                <Input
+                  type="tel"
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value)}
+                  placeholder="+998 90 123 45 67"
+                  className="text-xs"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">Email (Ixtiyoriy)</Label>
+                <Input
+                  type="email"
+                  value={newEmail}
+                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="mentor@axm-nexus.uz"
+                  className="text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-foreground">Qisqacha ma'lumot (Bio)</Label>
+              <Textarea
+                value={newBio}
+                onChange={(e) => setNewBio(e.target.value)}
+                placeholder="Mentorning ish tajribasi va dars berish uslubi haqida..."
+                rows={2}
+                className="text-xs resize-none"
+              />
+            </div>
+
+            <DialogFooter className="pt-2 gap-2 sm:gap-0">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAddMentorModalOpen(false)}
+                className="rounded-xl text-xs"
+              >
+                Bekor qilish
+              </Button>
+              <Button
+                type="submit"
+                variant="default"
+                size="sm"
+                disabled={savingMentor}
+                className="rounded-xl text-xs font-bold"
+              >
+                {savingMentor ? 'Yaratilmoqda...' : 'Mentorni ro‘yxatga olish'}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
       {/* HEMIS Credential Slip Modal */}
       <CredentialSlipModal

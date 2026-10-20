@@ -17,14 +17,6 @@ import {
   List,
   FileText,
 } from 'lucide-react';
-import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
-} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -46,7 +38,6 @@ import {
   DialogDescription,
   DialogFooter,
 } from '@/components/ui/dialog';
-import { Separator } from '@/components/ui/separator';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { lessonPlanApi } from '@/api';
 import type { LessonPlanDto, StudyGroup, Mentor } from '@/types';
@@ -215,237 +206,285 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
   const getStatusBadge = (status?: string) => {
     switch (status) {
       case 'PUBLISHED':
-        return <Badge variant="success">Chop etilgan</Badge>;
+        return <Badge variant="success" className="border-0">Chop etilgan</Badge>;
       case 'COMPLETED':
-        return <Badge variant="primary">Yakunlangan</Badge>;
+        return <Badge variant="primary" className="border-0">Yakunlangan</Badge>;
       case 'REVIEW':
-        return <Badge variant="warning">Tekshiruvda</Badge>;
+        return <Badge variant="warning" className="border-0">Tekshiruvda</Badge>;
       case 'CANCELLED':
-        return <Badge variant="destructive">Bekor qilingan</Badge>;
+        return <Badge variant="destructive" className="border-0">Bekor qilingan</Badge>;
       case 'ARCHIVED':
-        return <Badge variant="neutral">Arxivlangan</Badge>;
+        return <Badge variant="neutral" className="border-0">Arxivlangan</Badge>;
       default:
-        return <Badge variant="neutral">Qoralama (Draft)</Badge>;
+        return <Badge variant="neutral" className="border-0">Qoralama (Draft)</Badge>;
     }
   };
 
   return (
-    <div className="space-y-6">
-      {/* 1. EXECUTIVE HERO BANNER */}
-      <div className="relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-r from-blue-600/10 via-indigo-600/5 to-cyan-500/10 dark:from-blue-950/40 dark:via-indigo-950/30 dark:to-slate-900/40 p-6 sm:p-8 backdrop-blur-md shadow-xl transition-all">
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-          <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Modul 08 — Darslarni Rejalashtirish & O‘tkazish</span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-              Dars Rejalari & Jonli O‘tkazish Boshqaruvi
-            </h1>
-            <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-              Muhammad Al-Xorazmiy Vorislari ta’lim standartiga mos 80 daqiqalik intensiv dars tuzilmasi: Nazariya (20 daq), Amaliyot (25 daq), Loyiha (25 daq) va Natija/Uy vazifasi (10 daq).
-            </p>
-            <div className="pt-2 flex flex-wrap items-center gap-3">
-              <Button
-                variant="default"
-                size="md"
-                onClick={handleOpenCreate}
-                leftIcon={<Plus className="w-4 h-4" />}
-                className="shadow-lg shadow-primary/25 font-semibold rounded-xl"
-              >
-                <span>Yangi Dars Rejasi</span>
-              </Button>
-            </div>
-          </div>
+    <div className="space-y-6 sm:space-y-7 animate-in fade-in duration-300">
+      {/* 1. EXECUTIVE HERO BANNER (Borderless Luxury Ambient Style like Dashboard) */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white shadow-xl">
+        {/* Soft Ambient Glows */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/15 rounded-full blur-3xl pointer-events-none -mr-32 -mt-32" />
+        <div className="absolute bottom-0 left-1/3 w-[350px] h-[350px] bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Quick Metrics Pillar in Hero */}
-          <div className="lg:shrink-0 grid grid-cols-2 gap-3 bg-card/60 dark:bg-card/40 border border-border/40 backdrop-blur-xl rounded-2xl p-4 sm:p-5 text-center shadow-xs">
-            <div className="p-3.5 rounded-xl bg-muted/50 border border-border/30">
-              <span className="text-[10px] uppercase font-bold text-primary block tracking-wider">
-                Dars Modeli
-              </span>
-              <span className="text-2xl font-black text-foreground font-mono mt-0.5 block">
-                80 min
-              </span>
-              <span className="text-[10px] text-muted-foreground mt-0.5 block">
-                Standart 4 bosqich
-              </span>
-            </div>
+        <div className="p-7 sm:p-9 lg:p-10 relative z-10">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+            <div className="max-w-2xl space-y-3.5">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 backdrop-blur-md text-cyan-300 text-xs font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Modul 08 — Darslarni Rejalashtirish & O‘tkazish</span>
+                </span>
 
-            <div className="p-3.5 rounded-xl bg-muted/50 border border-border/30">
-              <span className="text-[10px] uppercase font-bold text-emerald-600 dark:text-emerald-400 block tracking-wider">
-                Metodik Sifat
-              </span>
-              <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono mt-0.5 block">
-                100%
-              </span>
-              <span className="text-[10px] text-muted-foreground mt-0.5 block">
-                Al-Xorazmiy standarti
-              </span>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-slate-200 text-xs font-medium">
+                  <Clock className="w-3.5 h-3.5 text-cyan-300" />
+                  <span>80 daqiqalik dars standarti</span>
+                </span>
+              </div>
+
+              <div>
+                <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+                  Dars Rejalari & Jonli O‘tkazish Boshqaruvi
+                </h1>
+                <p className="text-slate-300 text-xs sm:text-sm leading-relaxed max-w-xl mt-1.5">
+                  Muhammad Al-Xorazmiy Vorislari ta’lim standartiga mos 80 daqiqalik intensiv dars tuzilmasi: Nazariya (20 daq), Amaliyot (25 daq), Loyiha (25 daq) va Natija/Uy vazifasi (10 daq).
+                </p>
+              </div>
+
+              <div className="pt-2 flex flex-wrap items-center gap-3">
+                <Button
+                  variant="default"
+                  size="md"
+                  onClick={handleOpenCreate}
+                  leftIcon={<Plus className="w-4 h-4 text-cyan-200" />}
+                  className="bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white shadow-lg shadow-indigo-600/30 font-semibold border-0 rounded-xl"
+                >
+                  <span>Yangi Dars Rejasi</span>
+                </Button>
+              </div>
             </div>
 
-            <div className="col-span-2 p-2.5 rounded-xl bg-primary/10 text-primary text-[11px] font-semibold flex items-center justify-center gap-2">
-              <Clock className="w-3.5 h-3.5" />
-              <span>Nazariya • Amaliyot • Loyiha • Natija</span>
+            {/* Quick Metrics Pillar in Hero */}
+            <div className="lg:shrink-0 grid grid-cols-2 gap-3 bg-white/5 backdrop-blur-xl rounded-2xl p-4 sm:p-5 text-center">
+              <div className="p-4 rounded-xl bg-white/5">
+                <span className="text-[10px] uppercase font-bold text-cyan-300 block tracking-wider">
+                  Dars Modeli
+                </span>
+                <span className="text-2xl font-black text-white font-mono mt-1 block">
+                  80 min
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  Standart 4 bosqich
+                </span>
+              </div>
+
+              <div className="p-4 rounded-xl bg-white/5">
+                <span className="text-[10px] uppercase font-bold text-emerald-300 block tracking-wider">
+                  Metodik Sifat
+                </span>
+                <span className="text-2xl font-black text-emerald-400 font-mono mt-1 block">
+                  100%
+                </span>
+                <span className="text-[10px] text-slate-400 mt-0.5 block">
+                  Al-Xorazmiy standarti
+                </span>
+              </div>
+
+              <div className="col-span-2 p-3 rounded-xl bg-indigo-500/20 text-[11px] text-indigo-200 flex items-center justify-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Nazariya • Amaliyot • Loyiha • Natija</span>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* 2. EXECUTIVE KPI CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="rounded-2xl border-border/40 shadow-xs hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-5">
-            <CardTitle className="text-xs font-semibold text-muted-foreground">
-              Jami Dars Rejalari
-            </CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <BookOpen className="w-4 h-4" />
+      {/* 2. EXECUTIVE KPI CARDS (Soft, Modern, Borderless Design like Dashboard) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                Jami
+              </span>
             </div>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="text-2xl font-bold font-mono">{stats.total}</div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Barcha sinflar bo‘yicha metodik rejalar
-            </p>
-          </CardContent>
-        </Card>
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-foreground">
+                  {stats.total}
+                </span>
+                <span className="text-xs font-semibold text-muted-foreground">reja</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                Jami Dars Rejalari
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Barcha sinflar bo‘yicha metodik rejalar
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <Card className="rounded-2xl border-border/40 shadow-xs hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-5">
-            <CardTitle className="text-xs font-semibold text-muted-foreground">
-              Chop Etilgan Darslar
-            </CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4" />
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+                <CheckCircle2 className="w-6 h-6" />
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                Faol
+              </span>
             </div>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="text-2xl font-bold font-mono text-emerald-600 dark:text-emerald-400">
-              {stats.published}
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-emerald-600 dark:text-emerald-400">
+                  {stats.published}
+                </span>
+                <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">chop etildi</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                Chop Etilgan Darslar
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Guruhlarga faol taqdim etilmoqda
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Guruhlarga faol taqdim etilmoqda
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="rounded-2xl border-border/40 shadow-xs hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-5">
-            <CardTitle className="text-xs font-semibold text-muted-foreground">
-              Qoralama & Tayyorlanmoqda
-            </CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-              <FileText className="w-4 h-4" />
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center">
+                <FileText className="w-6 h-6" />
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                Jarayonda
+              </span>
             </div>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="text-2xl font-bold font-mono text-amber-600 dark:text-amber-400">
-              {stats.draft}
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-amber-600 dark:text-amber-400">
+                  {stats.draft}
+                </span>
+                <span className="text-xs font-semibold text-amber-600 dark:text-amber-400">qoralama</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                Qoralama & Tayyorlanmoqda
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Mentorlar tomonidan to‘ldirilmoqda
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              Mentorlar tomonidan to‘ldirilmoqda
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="rounded-2xl border-border/40 shadow-xs hover:shadow-md transition-all">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0 p-5">
-            <CardTitle className="text-xs font-semibold text-muted-foreground">
-              80 Daqiqalik Format
-            </CardTitle>
-            <div className="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-              <Clock className="w-4 h-4" />
+        <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+                <Clock className="w-6 h-6" />
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2.5 py-1 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                Standart
+              </span>
             </div>
-          </CardHeader>
-          <CardContent className="px-5 pb-5">
-            <div className="text-2xl font-bold font-mono text-indigo-600 dark:text-indigo-400">
-              100%
+            <div className="space-y-1">
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl sm:text-4xl font-extrabold tracking-tight font-mono text-indigo-600 dark:text-indigo-400">
+                  100%
+                </span>
+                <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">moslik</span>
+              </div>
+              <h3 className="text-sm font-bold text-foreground">
+                80 Daqiqalik Format
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                4 bosqichli amaliy-nazariy taqsimot
+              </p>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              4 bosqichli amaliy-nazariy taqsimot
-            </p>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {/* 3. FILTER, SEARCH AND VIEW TOGGLE BAR */}
-      <Card className="rounded-2xl border-border/40 shadow-xs">
-        <CardContent className="p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="relative w-full sm:w-80">
-            <Input
-              type="text"
-              placeholder="Dars yoki mavzu bo‘yicha qidiruv..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              leftIcon={<Search className="w-4 h-4" />}
-              className="rounded-xl"
-            />
-          </div>
+      <div className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="relative w-full sm:w-80">
+          <Input
+            type="text"
+            placeholder="Dars yoki mavzu bo‘yicha qidiruv..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            leftIcon={<Search className="w-4 h-4 text-muted-foreground" />}
+            className="pl-9 h-9 text-xs bg-muted/30 border-0 rounded-xl focus-visible:ring-1"
+          />
+        </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-            <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1 shrink-0">
-              <Filter className="w-3.5 h-3.5" /> Filtr:
-            </span>
-            <select
-              value={selectedGrade}
-              onChange={(e) => setSelectedGrade(e.target.value)}
-              aria-label="Sinf filtri"
-              className="h-9 px-3 py-1.5 bg-background border border-input rounded-xl text-xs font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          <span className="text-xs font-semibold text-muted-foreground flex items-center gap-1 shrink-0">
+            <Filter className="w-3.5 h-3.5" /> Filtr:
+          </span>
+          <select
+            value={selectedGrade}
+            onChange={(e) => setSelectedGrade(e.target.value)}
+            aria-label="Sinf filtri"
+            className="h-9 px-3 py-1.5 bg-muted/30 border-0 rounded-xl text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer shadow-none"
+          >
+            <option value="ALL">Barcha sinflar (8–11)</option>
+            <option value="8">8-sinf</option>
+            <option value="9">9-sinf</option>
+            <option value="10">10-sinf</option>
+            <option value="11">11-sinf</option>
+          </select>
+
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            aria-label="Holat filtri"
+            className="h-9 px-3 py-1.5 bg-muted/30 border-0 rounded-xl text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer shadow-none"
+          >
+            <option value="ALL">Barcha holatlar</option>
+            <option value="DRAFT">Qoralama (Draft)</option>
+            <option value="PUBLISHED">Chop etilgan (Published)</option>
+            <option value="COMPLETED">Yakunlangan (Completed)</option>
+            <option value="ARCHIVED">Arxivlangan</option>
+          </select>
+
+          <div className="inline-flex rounded-xl bg-muted/50 p-1 border-0 ml-1">
+            <button
+              type="button"
+              onClick={() => setViewMode('grid')}
+              className={`p-1.5 rounded-lg text-xs font-medium transition cursor-pointer border-0 ${
+                viewMode === 'grid'
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Karta ko‘rinishi (Grid)"
+              aria-label="Grid view"
             >
-              <option value="ALL">Barcha sinflar (8–11)</option>
-              <option value="8">8-sinf</option>
-              <option value="9">9-sinf</option>
-              <option value="10">10-sinf</option>
-              <option value="11">11-sinf</option>
-            </select>
-
-            <select
-              value={selectedStatus}
-              onChange={(e) => setSelectedStatus(e.target.value)}
-              aria-label="Holat filtri"
-              className="h-9 px-3 py-1.5 bg-background border border-input rounded-xl text-xs font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              type="button"
+              onClick={() => setViewMode('table')}
+              className={`p-1.5 rounded-lg text-xs font-medium transition cursor-pointer border-0 ${
+                viewMode === 'table'
+                  ? 'bg-background text-foreground shadow-xs'
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+              title="Jadval ko‘rinishi (Table)"
+              aria-label="Table view"
             >
-              <option value="ALL">Barcha holatlar</option>
-              <option value="DRAFT">Qoralama (Draft)</option>
-              <option value="PUBLISHED">Chop etilgan (Published)</option>
-              <option value="COMPLETED">Yakunlangan (Completed)</option>
-              <option value="ARCHIVED">Arxivlangan</option>
-            </select>
-
-            <Separator orientation="vertical" className="h-6 mx-1 hidden sm:block" />
-
-            <div className="inline-flex rounded-xl bg-muted p-1 border border-border/40">
-              <button
-                type="button"
-                onClick={() => setViewMode('grid')}
-                className={`p-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
-                  viewMode === 'grid'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                title="Karta ko‘rinishi (Grid)"
-                aria-label="Grid view"
-              >
-                <LayoutGrid className="w-4 h-4" />
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('table')}
-                className={`p-1.5 rounded-lg text-xs font-medium transition cursor-pointer ${
-                  viewMode === 'table'
-                    ? 'bg-background text-foreground shadow-xs'
-                    : 'text-muted-foreground hover:text-foreground'
-                }`}
-                title="Jadval ko‘rinishi (Table)"
-                aria-label="Table view"
-              >
-                <List className="w-4 h-4" />
-              </button>
-            </div>
+              <List className="w-4 h-4" />
+            </button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       {/* 4. LESSON CONTENT (GRID / TABLE) */}
       {loading ? (
@@ -454,22 +493,22 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
           <p className="text-xs text-muted-foreground">Dars rejalari yuklanmoqda...</p>
         </div>
       ) : filteredLessons.length === 0 ? (
-        <Card className="p-12 text-center rounded-3xl border-dashed">
+        <div className="p-12 text-center rounded-3xl bg-card shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none border-0">
           <BookOpen className="w-12 h-12 text-muted-foreground mx-auto mb-3 opacity-40" />
           <h3 className="text-base font-bold text-foreground">Dars rejalari topilmadi</h3>
           <p className="text-xs text-muted-foreground mt-1 max-w-md mx-auto">
             Hozircha tanlangan parametrlar bo‘yicha darslar mavjud emas. Yangi dars rejasini yaratishingiz mumkin.
           </p>
-          <Button variant="outline" size="sm" onClick={handleOpenCreate} className="mt-4 rounded-xl">
+          <Button variant="outline" size="sm" onClick={handleOpenCreate} className="mt-4 rounded-xl border-0 bg-muted/40 hover:bg-muted/70">
             <Plus className="w-3.5 h-3.5 mr-1" /> Yangi dars yaratish
           </Button>
-        </Card>
+        </div>
       ) : viewMode === 'table' ? (
         /* TABLE VIEW */
-        <Card className="rounded-2xl border-border/40 shadow-xs overflow-hidden">
+        <div className="rounded-2xl shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none bg-card border-0 overflow-hidden">
           <Table>
             <TableHeader>
-              <TableRow className="bg-muted/40">
+              <TableRow className="bg-muted/40 border-b border-border/15 hover:bg-transparent">
                 <TableHead className="font-bold text-xs">Sinf & Fan</TableHead>
                 <TableHead className="font-bold text-xs">Dars nomi</TableHead>
                 <TableHead className="font-bold text-xs">80 Daqiqalik Taqsimot</TableHead>
@@ -481,10 +520,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
               {filteredLessons.map((lesson) => {
                 const duration = lesson.durationMinutes || (lesson as any).estimatedDurationMinutes || 80;
                 return (
-                  <TableRow key={lesson.id} className="hover:bg-muted/30 transition-colors">
+                  <TableRow key={lesson.id} className="border-b border-border/10 hover:bg-muted/30 transition-colors">
                     <TableCell className="align-top py-3.5">
                       <div className="space-y-1">
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+                        <Badge variant="outline" className="bg-primary/10 text-primary border-0 text-[10px]">
                           {lesson.gradeLevel}
                         </Badge>
                         <div className="text-[11px] text-muted-foreground font-medium truncate max-w-[150px]">
@@ -520,19 +559,19 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                           </span>
                         </div>
                         <div className="grid grid-cols-4 gap-1 text-center text-[10px]">
-                          <div className="bg-blue-500/10 text-blue-700 dark:text-blue-300 py-0.5 px-1 rounded border border-blue-500/20 font-medium">
+                          <div className="bg-blue-500/10 text-blue-700 dark:text-blue-300 py-1 px-1 rounded-lg border-0 font-medium">
                             <div>Nazariya</div>
                             <div className="text-[9px] opacity-80">{lesson.theoryDurationMinutes || 20} daq</div>
                           </div>
-                          <div className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 py-0.5 px-1 rounded border border-indigo-500/20 font-medium">
+                          <div className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 py-1 px-1 rounded-lg border-0 font-medium">
                             <div>Amaliyot</div>
                             <div className="text-[9px] opacity-80">{lesson.practicalDurationMinutes || 25} daq</div>
                           </div>
-                          <div className="bg-purple-500/10 text-purple-700 dark:text-purple-300 py-0.5 px-1 rounded border border-purple-500/20 font-medium">
+                          <div className="bg-purple-500/10 text-purple-700 dark:text-purple-300 py-1 px-1 rounded-lg border-0 font-medium">
                             <div>Loyiha</div>
                             <div className="text-[9px] opacity-80">25 daq</div>
                           </div>
-                          <div className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 py-0.5 px-1 rounded border border-emerald-500/20 font-medium">
+                          <div className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 py-1 px-1 rounded-lg border-0 font-medium">
                             <div>Natija</div>
                             <div className="text-[9px] opacity-80">10 daq</div>
                           </div>
@@ -545,14 +584,14 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                     <TableCell className="align-top py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1.5 flex-wrap">
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => {
                             setSelectedLesson(lesson);
                             setIsPreviewOpen(true);
                           }}
                           leftIcon={<Eye className="w-3.5 h-3.5" />}
-                          className="rounded-lg text-xs"
+                          className="rounded-xl text-xs bg-muted/30 hover:bg-muted/60 border-0"
                           title="Ko‘rish"
                         >
                           <span>Ko‘rish</span>
@@ -566,30 +605,30 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                             setIsDeliveryMode(true);
                           }}
                           leftIcon={<Play className="w-3.5 h-3.5" />}
-                          className="rounded-lg text-xs"
+                          className="rounded-xl text-xs font-semibold border-0 shadow-xs"
                           title="Jonli dars o‘tkazish"
                         >
                           <span>Darsni Boshlash</span>
                         </Button>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="sm"
                           onClick={() => {
                             setSelectedLesson(lesson);
                             setIsQualityModalOpen(true);
                           }}
                           leftIcon={<Award className="w-3.5 h-3.5 text-amber-500" />}
-                          className="rounded-lg text-xs"
+                          className="rounded-xl text-xs bg-muted/30 hover:bg-muted/60 border-0"
                           title="Sifat & Natijalar"
                         >
                           <span className="hidden xl:inline">Sifat</span>
                         </Button>
                         {lesson.status === 'DRAFT' && (
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleStatusTransition(lesson, 'PUBLISHED')}
-                            className="rounded-lg text-xs text-emerald-600 hover:text-emerald-700"
+                            className="rounded-xl text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border-0"
                             title="Chop etish"
                           >
                             <Send className="w-3.5 h-3.5 mr-1" />
@@ -598,10 +637,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                         )}
                         {lesson.status === 'PUBLISHED' && (
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
                             onClick={() => handleStatusTransition(lesson, 'COMPLETED')}
-                            className="rounded-lg text-xs text-blue-600 hover:text-blue-700"
+                            className="rounded-xl text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border-0"
                             title="Yakunlash"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
@@ -612,7 +651,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                           variant="ghost"
                           size="icon"
                           onClick={() => handleCloneLesson(lesson)}
-                          className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+                          className="h-8 w-8 rounded-xl text-muted-foreground hover:text-foreground border-0"
                           title="Nusxalash (Clone)"
                         >
                           <Copy className="w-3.5 h-3.5" />
@@ -621,7 +660,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                           variant="ghost"
                           size="icon"
                           onClick={() => handleOpenEdit(lesson)}
-                          className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+                          className="h-8 w-8 rounded-xl text-muted-foreground hover:text-foreground border-0"
                           title="Tahrirlash"
                         >
                           <Edit3 className="w-3.5 h-3.5" />
@@ -633,69 +672,67 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
               })}
             </TableBody>
           </Table>
-        </Card>
+        </div>
       ) : (
-        /* GRID VIEW (Modern shadcn Card Grid) */
+        /* GRID VIEW (Modern Card Grid without harsh borders) */
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {filteredLessons.map((lesson) => {
             const duration = lesson.durationMinutes || (lesson as any).estimatedDurationMinutes || 80;
             return (
-              <Card
+              <div
                 key={lesson.id}
-                className="rounded-2xl border-border/40 hover:border-primary/50 shadow-xs hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
+                className="bg-card text-card-foreground rounded-2xl p-5 shadow-[0_2px_14px_-2px_rgba(0,0,0,0.04)] dark:shadow-none hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-0 flex flex-col justify-between group"
               >
-                <CardHeader className="p-5 pb-3 space-y-2">
-                  <div className="flex items-start justify-between gap-3">
+                <div>
+                  <div className="flex items-start justify-between gap-3 mb-2">
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20 text-[10px]">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-primary/10 text-primary">
                           {lesson.gradeLevel}
-                        </Badge>
+                        </span>
                         <span className="text-[11px] font-semibold text-muted-foreground truncate max-w-[180px]">
                           {lesson.subject}
                         </span>
                       </div>
-                      <CardTitle className="text-base font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
+                      <h3 className="text-base font-bold text-foreground group-hover:text-primary transition-colors leading-snug">
                         {lesson.title}
-                      </CardTitle>
+                      </h3>
                     </div>
                     <div>{getStatusBadge(lesson.status)}</div>
                   </div>
 
                   {lesson.topic && (
-                    <CardDescription className="text-xs text-muted-foreground font-medium line-clamp-1">
+                    <p className="text-xs text-muted-foreground font-medium line-clamp-1 mt-1">
                       Mavzu: <span className="text-foreground font-semibold">{lesson.topic}</span>
-                    </CardDescription>
+                    </p>
                   )}
-                </CardHeader>
 
-                <CardContent className="px-5 pb-4 space-y-3.5">
-                  {/* 80-Minute Phase Indicator Bar */}
-                  <div className="p-3.5 rounded-xl bg-muted/50 border border-border/40">
+                  {/* 80-Minute Phase Indicator Bar (Borderless) */}
+                  <div className="p-3.5 rounded-2xl bg-muted/40 mt-3.5">
                     <div className="flex items-center justify-between text-[11px] font-bold text-muted-foreground mb-2">
                       <span className="flex items-center gap-1.5">
                         <Clock className="w-3.5 h-3.5 text-primary" />
                         <span>Standart 80 daqiqalik taqsimot</span>
                       </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
+                      <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold">
                         {duration} daqiqa
                       </span>
                     </div>
 
                     <div className="grid grid-cols-4 gap-1.5 text-center text-[10px]">
-                      <div className="bg-blue-500/10 text-blue-700 dark:text-blue-300 py-1.5 rounded-lg border border-blue-500/20">
+                      <div className="bg-blue-500/10 text-blue-700 dark:text-blue-300 py-1.5 rounded-xl">
                         <div className="font-bold">Nazariya</div>
                         <div className="text-[9px] opacity-80">{lesson.theoryDurationMinutes || 20} daq</div>
                       </div>
-                      <div className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 py-1.5 rounded-lg border border-indigo-500/20">
+                      <div className="bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 py-1.5 rounded-xl">
                         <div className="font-bold">Amaliyot</div>
                         <div className="text-[9px] opacity-80">{lesson.practicalDurationMinutes || 25} daq</div>
                       </div>
-                      <div className="bg-purple-500/10 text-purple-700 dark:text-purple-300 py-1.5 rounded-lg border border-purple-500/20">
+                      <div className="bg-purple-500/10 text-purple-700 dark:text-purple-300 py-1.5 rounded-xl">
                         <div className="font-bold">Loyiha</div>
                         <div className="text-[9px] opacity-80">25 daq</div>
                       </div>
-                      <div className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 py-1.5 rounded-lg border border-emerald-500/20">
+                      <div className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 py-1.5 rounded-xl">
                         <div className="font-bold">Natija</div>
                         <div className="text-[9px] opacity-80">10 daq</div>
                       </div>
@@ -704,23 +741,23 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
 
                   {/* Homework snippet */}
                   {lesson.homework && (
-                    <div className="text-xs text-muted-foreground line-clamp-1">
+                    <div className="text-xs text-muted-foreground line-clamp-1 mt-3">
                       <span className="font-semibold text-foreground">Uy vazifasi:</span> {lesson.homework}
                     </div>
                   )}
-                </CardContent>
+                </div>
 
-                <CardFooter className="px-5 py-3 border-t border-border/40 flex items-center justify-between gap-2 bg-muted/10 rounded-b-2xl">
-                  <div className="flex items-center gap-1.5">
+                <div className="pt-3 mt-4 border-t border-border/15 flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => {
                         setSelectedLesson(lesson);
                         setIsPreviewOpen(true);
                       }}
                       leftIcon={<Eye className="w-3.5 h-3.5" />}
-                      className="rounded-lg text-xs"
+                      className="rounded-xl text-xs bg-muted/40 hover:bg-muted/70 text-foreground border-0"
                       title="Dars rejasini ko‘rish"
                     >
                       <span>Ko‘rish</span>
@@ -735,21 +772,21 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                         setIsDeliveryMode(true);
                       }}
                       leftIcon={<Play className="w-3.5 h-3.5" />}
-                      className="rounded-lg text-xs font-semibold"
+                      className="rounded-xl text-xs font-semibold border-0 shadow-xs"
                       title="Jonli dars o‘tkazish rejimi"
                     >
                       <span>Darsni Boshlash</span>
                     </Button>
 
                     <Button
-                      variant="outline"
+                      variant="ghost"
                       size="sm"
                       onClick={() => {
                         setSelectedLesson(lesson);
                         setIsQualityModalOpen(true);
                       }}
                       leftIcon={<Award className="w-3.5 h-3.5 text-amber-500" />}
-                      className="rounded-lg text-xs"
+                      className="rounded-xl text-xs bg-muted/40 hover:bg-muted/70 text-foreground border-0"
                       title="Dars sifati, ta'lim natijalari va AI tavsiyalari"
                     >
                       <span className="hidden sm:inline">Sifat & Natijalar</span>
@@ -759,10 +796,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                   <div className="flex items-center gap-1">
                     {lesson.status === 'DRAFT' && (
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleStatusTransition(lesson, 'PUBLISHED')}
-                        className="rounded-lg text-xs text-emerald-600 hover:text-emerald-700"
+                        className="rounded-xl text-xs bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 border-0"
                         title="Guruhga e’lon qilish (Publish)"
                       >
                         <Send className="w-3.5 h-3.5 mr-1" />
@@ -772,10 +809,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
 
                     {lesson.status === 'PUBLISHED' && (
                       <Button
-                        variant="outline"
+                        variant="ghost"
                         size="sm"
                         onClick={() => handleStatusTransition(lesson, 'COMPLETED')}
-                        className="rounded-lg text-xs text-blue-600 hover:text-blue-700"
+                        className="rounded-xl text-xs bg-blue-500/10 text-blue-600 dark:text-blue-400 hover:bg-blue-500/20 border-0"
                         title="Darsni yakunlash"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
@@ -787,7 +824,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                       variant="ghost"
                       size="icon"
                       onClick={() => handleCloneLesson(lesson)}
-                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+                      className="h-8 w-8 rounded-xl text-muted-foreground hover:text-foreground border-0"
                       title="Nusxalash (Clone)"
                     >
                       <Copy className="w-4 h-4" />
@@ -797,14 +834,14 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                       variant="ghost"
                       size="icon"
                       onClick={() => handleOpenEdit(lesson)}
-                      className="h-8 w-8 rounded-lg text-muted-foreground hover:text-foreground"
+                      className="h-8 w-8 rounded-xl text-muted-foreground hover:text-foreground border-0"
                       title="Tahrirlash"
                     >
                       <Edit3 className="w-4 h-4" />
                     </Button>
                   </div>
-                </CardFooter>
-              </Card>
+                </div>
+              </div>
             );
           })}
         </div>
@@ -814,10 +851,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
           MODAL 1: Lesson Editor (Create / Edit via shadcn Dialog)
       ======================================================== */}
       <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto rounded-3xl p-6">
-          <DialogHeader className="border-b border-border/40 pb-4">
-            <div className="flex items-center gap-2">
-              <div className="p-2 rounded-xl bg-primary/10 text-primary">
+        <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto bg-card text-card-foreground border-0 rounded-3xl p-6 shadow-2xl">
+          <DialogHeader className="border-b border-border/15 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
                 <BookOpen className="w-5 h-5" />
               </div>
               <div>
@@ -834,7 +871,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
           <div className="py-4 space-y-4 text-xs sm:text-sm">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="sm:col-span-2 space-y-1.5">
-                <Label htmlFor="lesson-title" className="text-xs font-semibold">
+                <Label htmlFor="lesson-title" className="text-xs font-semibold text-foreground">
                   Dars nomi *
                 </Label>
                 <Input
@@ -843,19 +880,19 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                   value={formData.title || ''}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   placeholder="Masalan: JavaScript da Funksiyalar va Scope"
-                  className="rounded-xl"
+                  className="rounded-xl h-9 text-xs bg-muted/30 border-0 focus-visible:ring-1"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="lesson-grade" className="text-xs font-semibold">
+                <Label htmlFor="lesson-grade" className="text-xs font-semibold text-foreground">
                   Sinf bosqichi
                 </Label>
                 <select
                   id="lesson-grade"
                   value={formData.gradeLevel || '8-sinf'}
                   onChange={(e) => setFormData({ ...formData, gradeLevel: e.target.value })}
-                  className="h-9 w-full rounded-xl border border-input bg-background px-3 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                  className="h-9 w-full rounded-xl border-0 bg-muted/30 px-3 py-1.5 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer shadow-none"
                 >
                   <option value="8-sinf">8-sinf</option>
                   <option value="9-sinf">9-sinf</option>
@@ -867,7 +904,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="lesson-subject" className="text-xs font-semibold">
+                <Label htmlFor="lesson-subject" className="text-xs font-semibold text-foreground">
                   O‘quv fani
                 </Label>
                 <Input
@@ -876,19 +913,19 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                   value={formData.subject || ''}
                   onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                   placeholder="Web Full-Stack Development"
-                  className="rounded-xl"
+                  className="rounded-xl h-9 text-xs bg-muted/30 border-0 focus-visible:ring-1"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="lesson-group" className="text-xs font-semibold">
+                <Label htmlFor="lesson-group" className="text-xs font-semibold text-foreground">
                   Biriktirilgan guruh
                 </Label>
                 <select
                   id="lesson-group"
                   value={formData.groupId || ''}
                   onChange={(e) => setFormData({ ...formData, groupId: Number(e.target.value) })}
-                  className="h-9 w-full rounded-xl border border-input bg-background px-3 py-1.5 text-xs font-medium focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring cursor-pointer"
+                  className="h-9 w-full rounded-xl border-0 bg-muted/30 px-3 py-1.5 text-xs font-medium text-foreground focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer shadow-none"
                 >
                   <option value="">Guruhni tanlang</option>
                   {groups.map((g) => (
@@ -901,22 +938,22 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
             </div>
 
             {/* Theory and Practical Split */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-2xl bg-muted/40 border border-border/40">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 rounded-2xl bg-muted/30">
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-xs text-blue-600 dark:text-blue-400 flex items-center gap-1.5">
                     <span>1. Nazariy qism</span>
                   </span>
-                  <Badge variant="outline" className="bg-blue-500/10 text-blue-600 border-blue-500/20 text-[10px]">
+                  <span className="px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-bold">
                     20 daqiqa
-                  </Badge>
+                  </span>
                 </div>
                 <Textarea
                   rows={4}
                   value={formData.theoryContent || ''}
                   onChange={(e) => setFormData({ ...formData, theoryContent: e.target.value })}
                   placeholder="Nazariy mavzu tushunchasi, konsepsiyalar, slaydlardan asosiy nuqtalar..."
-                  className="rounded-xl"
+                  className="rounded-xl bg-background/80 border-0 text-xs focus-visible:ring-1"
                 />
               </div>
 
@@ -925,16 +962,16 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                   <span className="font-bold text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
                     <span>2. Amaliy qism (Live-Coding)</span>
                   </span>
-                  <Badge variant="outline" className="bg-indigo-500/10 text-indigo-600 border-indigo-500/20 text-[10px]">
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 text-[10px] font-bold">
                     25 daqiqa
-                  </Badge>
+                  </span>
                 </div>
                 <Textarea
                   rows={4}
                   value={formData.practicalContent || ''}
                   onChange={(e) => setFormData({ ...formData, practicalContent: e.target.value })}
                   placeholder="Amaliy kod namunalari, mentor bilan birgalikda yoziladigan loyiha qismi..."
-                  className="rounded-xl font-mono text-xs"
+                  className="rounded-xl font-mono text-xs bg-background/80 border-0 focus-visible:ring-1"
                 />
               </div>
             </div>
@@ -942,7 +979,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
             {/* Exercises and Homework */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <Label htmlFor="lesson-exercises" className="text-xs font-semibold">
+                <Label htmlFor="lesson-exercises" className="text-xs font-semibold text-foreground">
                   Sinfdagi mustaqil mashqlar (Loyiha - 25 daq)
                 </Label>
                 <Textarea
@@ -951,12 +988,12 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                   value={formData.exercises || ''}
                   onChange={(e) => setFormData({ ...formData, exercises: e.target.value })}
                   placeholder="1. Masala: massiv elementlarini saralash..."
-                  className="rounded-xl"
+                  className="rounded-xl bg-muted/30 border-0 text-xs focus-visible:ring-1"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="lesson-homework" className="text-xs font-semibold">
+                <Label htmlFor="lesson-homework" className="text-xs font-semibold text-foreground">
                   Uyga vazifa (Homework - 10 daq)
                 </Label>
                 <Textarea
@@ -965,13 +1002,13 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                   value={formData.homework || ''}
                   onChange={(e) => setFormData({ ...formData, homework: e.target.value })}
                   placeholder="Keyingi darsgacha topshirilishi kerak bo‘lgan vazifa..."
-                  className="rounded-xl"
+                  className="rounded-xl bg-muted/30 border-0 text-xs focus-visible:ring-1"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="lesson-outcomes" className="text-xs font-semibold">
+              <Label htmlFor="lesson-outcomes" className="text-xs font-semibold text-foreground">
                 Kutilayotgan natijalar & Maqsad
               </Label>
               <Input
@@ -980,16 +1017,16 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                 value={formData.expectedOutcomes || ''}
                 onChange={(e) => setFormData({ ...formData, expectedOutcomes: e.target.value })}
                 placeholder="Dars yakunida o‘quvchilar nimalarni mustaqil yarata oladilar..."
-                className="rounded-xl"
+                className="rounded-xl h-9 text-xs bg-muted/30 border-0 focus-visible:ring-1"
               />
             </div>
           </div>
 
-          <DialogFooter className="border-t border-border/40 pt-4 gap-2">
-            <Button variant="outline" size="sm" onClick={() => setIsEditorOpen(false)} className="rounded-xl">
+          <DialogFooter className="border-t border-border/15 pt-4 gap-2">
+            <Button variant="ghost" size="sm" onClick={() => setIsEditorOpen(false)} className="rounded-xl border-0">
               Bekor qilish
             </Button>
-            <Button variant="default" size="sm" onClick={handleSaveLesson} className="rounded-xl font-semibold">
+            <Button variant="default" size="sm" onClick={handleSaveLesson} className="rounded-xl font-semibold border-0 shadow-xs">
               Dars rejasini saqlash
             </Button>
           </DialogFooter>
@@ -1002,7 +1039,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
       {isDeliveryMode && selectedLesson && (
         <div className="fixed inset-0 z-50 bg-background flex flex-col animate-in zoom-in-95">
           {/* Top Bar */}
-          <div className="h-16 px-6 border-b border-border/50 bg-card/80 backdrop-blur-md flex items-center justify-between">
+          <div className="h-16 px-6 border-b border-border/15 bg-card/90 backdrop-blur-md flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shadow-md">
                 80m
@@ -1019,21 +1056,21 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
 
             <div className="flex items-center gap-2.5">
               <Button
-                variant="outline"
+                variant="ghost"
                 size="sm"
                 onClick={() => handleStatusTransition(selectedLesson, 'COMPLETED')}
-                className="text-emerald-600 border-emerald-500/30 hover:bg-emerald-500/10 rounded-xl"
+                className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 rounded-xl border-0"
               >
                 <CheckCircle2 className="w-3.5 h-3.5 mr-1" /> Darsni Yakunlash
               </Button>
-              <Button variant="outline" size="sm" onClick={() => setIsDeliveryMode(false)} className="rounded-xl">
+              <Button variant="ghost" size="sm" onClick={() => setIsDeliveryMode(false)} className="rounded-xl border-0 bg-muted/40 hover:bg-muted/70">
                 Chiqish (Esc)
               </Button>
             </div>
           </div>
 
           {/* Delivery Phase Tabs */}
-          <div className="px-6 py-3 bg-muted/40 border-b border-border/40 flex items-center gap-3 overflow-x-auto text-xs font-semibold">
+          <div className="px-6 py-3 bg-muted/30 border-b border-border/15 flex items-center gap-3 overflow-x-auto text-xs font-semibold">
             {[
               { id: 0, title: '1. Tushunish (Nazariya)', duration: '20 daqiqa' },
               { id: 1, title: '2. Amaliyot (Live Coding)', duration: '25 daqiqa' },
@@ -1044,10 +1081,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                 key={phase.id}
                 type="button"
                 onClick={() => setActiveDeliveryPhase(phase.id)}
-                className={`px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl transition cursor-pointer flex items-center gap-2 border-0 ${
                   activeDeliveryPhase === phase.id
                     ? 'bg-primary text-primary-foreground shadow-sm font-bold'
-                    : 'bg-card text-muted-foreground hover:text-foreground border border-border/40'
+                    : 'bg-card text-muted-foreground hover:text-foreground'
                 }`}
               >
                 <span>{phase.title}</span>
@@ -1060,61 +1097,61 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
           <div className="flex-1 p-6 sm:p-10 overflow-y-auto max-w-5xl mx-auto w-full">
             {activeDeliveryPhase === 0 && (
               <div className="space-y-6 animate-in fade-in">
-                <Card className="rounded-2xl bg-blue-500/10 border-blue-500/20 text-blue-800 dark:text-blue-300 p-4">
+                <div className="rounded-2xl bg-blue-500/10 text-blue-800 dark:text-blue-300 p-4 border-0">
                   <h3 className="font-bold text-sm">Nazariy tushuncha va metodologiya (20 daqiqa)</h3>
                   <p className="text-xs mt-1 opacity-90">O‘quvchilar e’tiborini yangi tushunchaga jalb qiling va real misollarni ko‘rsating.</p>
-                </Card>
-                <Card className="rounded-3xl border-border/50 shadow-sm p-6 space-y-4">
+                </div>
+                <div className="rounded-3xl bg-card text-card-foreground shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none p-6 space-y-4 border-0">
                   <h4 className="text-lg font-bold text-foreground">Nazariy Reja:</h4>
                   <div className="text-sm text-secondary-foreground leading-relaxed whitespace-pre-wrap">
                     {selectedLesson.theoryContent || (selectedLesson as any).theoreticalSection || 'Ushbu dars uchun maxsus nazariy ma’lumot kiritilmagan.'}
                   </div>
-                </Card>
+                </div>
               </div>
             )}
 
             {activeDeliveryPhase === 1 && (
               <div className="space-y-6 animate-in fade-in">
-                <Card className="rounded-2xl bg-indigo-500/10 border-indigo-500/20 text-indigo-800 dark:text-indigo-300 p-4">
+                <div className="rounded-2xl bg-indigo-500/10 text-indigo-800 dark:text-indigo-300 p-4 border-0">
                   <h3 className="font-bold text-sm">Amaliyot & Birgalikda kod yozish (25 daqiqa)</h3>
                   <p className="text-xs mt-1 opacity-90">Mentor ekranda kod yozadi, o‘quvchilar bir vaqtning o‘zida o‘z kompyuterlarida takrorlaydilar.</p>
-                </Card>
-                <Card className="rounded-3xl border-border/50 shadow-sm p-6 space-y-4">
+                </div>
+                <div className="rounded-3xl bg-card text-card-foreground shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none p-6 space-y-4 border-0">
                   <h4 className="text-lg font-bold text-foreground">Amaliy Ko‘rsatmalar:</h4>
                   <div className="text-sm leading-relaxed whitespace-pre-wrap font-mono bg-slate-950 p-5 rounded-2xl text-emerald-400 shadow-inner">
                     {selectedLesson.practicalContent || (selectedLesson as any).practicalSection || '// Amaliyot kodi yoki mashqlar'}
                   </div>
-                </Card>
+                </div>
               </div>
             )}
 
             {activeDeliveryPhase === 2 && (
               <div className="space-y-6 animate-in fade-in">
-                <Card className="rounded-2xl bg-purple-500/10 border-purple-500/20 text-purple-800 dark:text-purple-300 p-4">
+                <div className="rounded-2xl bg-purple-500/10 text-purple-800 dark:text-purple-300 p-4 border-0">
                   <h3 className="font-bold text-sm">Loyiha & Mustaqil mini-task (25 daqiqa)</h3>
                   <p className="text-xs mt-1 opacity-90">O‘quvchilar o‘rganilgan bilimlar asosida mustaqil modul yaratadilar. Mentor yordam beradi.</p>
-                </Card>
-                <Card className="rounded-3xl border-border/50 shadow-sm p-6 space-y-4">
+                </div>
+                <div className="rounded-3xl bg-card text-card-foreground shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none p-6 space-y-4 border-0">
                   <h4 className="text-lg font-bold text-foreground">Mustaqil Mashqlar:</h4>
                   <div className="text-sm text-secondary-foreground leading-relaxed whitespace-pre-wrap">
                     {selectedLesson.exercises || 'Mashqlar ko‘rsatilmagan.'}
                   </div>
-                </Card>
+                </div>
               </div>
             )}
 
             {activeDeliveryPhase === 3 && (
               <div className="space-y-6 animate-in fade-in">
-                <Card className="rounded-2xl bg-emerald-500/10 border-emerald-500/20 text-emerald-800 dark:text-emerald-300 p-4">
+                <div className="rounded-2xl bg-emerald-500/10 text-emerald-800 dark:text-emerald-300 p-4 border-0">
                   <h3 className="font-bold text-sm">Natija, Qayta aloqa & Uyga vazifa (10 daqiqa)</h3>
                   <p className="text-xs mt-1 opacity-90">Har bir o‘quvchi natijasi tekshiriladi, xatolar tahlil qilinadi va uy vazifasi beriladi.</p>
-                </Card>
-                <Card className="rounded-3xl border-border/50 shadow-sm p-6 space-y-4">
+                </div>
+                <div className="rounded-3xl bg-card text-card-foreground shadow-[0_2px_14px_-2px_rgba(0,0,0,0.05)] dark:shadow-none p-6 space-y-4 border-0">
                   <h4 className="text-lg font-bold text-foreground">Uyga vazifa:</h4>
-                  <div className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 leading-relaxed whitespace-pre-wrap p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
+                  <div className="text-sm font-semibold text-emerald-600 dark:text-emerald-400 leading-relaxed whitespace-pre-wrap p-4 bg-emerald-500/10 rounded-2xl">
                     {selectedLesson.homework || 'Uy vazifasi kiritilmagan.'}
                   </div>
-                </Card>
+                </div>
               </div>
             )}
           </div>
@@ -1126,10 +1163,10 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
       ======================================================== */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
         {selectedLesson && (
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto rounded-3xl p-6">
-            <DialogHeader className="border-b border-border/40 pb-4">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-xl bg-primary/10 text-primary">
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto bg-card text-card-foreground border-0 rounded-3xl p-6 shadow-2xl">
+            <DialogHeader className="border-b border-border/15 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
                   <BookOpen className="w-5 h-5" />
                 </div>
                 <div>
@@ -1143,7 +1180,7 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
               </div>
             </DialogHeader>
 
-            <div className="space-y-3.5 text-xs sm:text-sm py-2">
+            <div className="space-y-3.5 text-xs sm:text-sm py-3">
               <div>
                 <span className="font-bold text-foreground">Maqsad:</span>{' '}
                 <span className="text-muted-foreground">{selectedLesson.learningObjectives || 'N/A'}</span>
@@ -1152,26 +1189,26 @@ export const LessonManager: React.FC<LessonManagerProps> = ({ groups, mentors })
                 <span className="font-bold text-foreground">Kutilayotgan natija:</span>{' '}
                 <span className="text-muted-foreground">{selectedLesson.expectedOutcomes || 'N/A'}</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-muted/40 border border-border/40">
+              <div className="p-4 rounded-2xl bg-muted/30">
                 <span className="font-bold text-blue-600 dark:text-blue-400">Nazariya:</span>
                 <p className="mt-1 text-muted-foreground leading-relaxed">
                   {selectedLesson.theoryContent || (selectedLesson as any).theoreticalSection || 'N/A'}
                 </p>
               </div>
-              <div className="p-3.5 rounded-2xl bg-muted/40 border border-border/40">
+              <div className="p-4 rounded-2xl bg-muted/30">
                 <span className="font-bold text-indigo-600 dark:text-indigo-400">Amaliyot:</span>
                 <p className="mt-1 font-mono text-xs text-muted-foreground leading-relaxed">
                   {selectedLesson.practicalContent || (selectedLesson as any).practicalSection || 'N/A'}
                 </p>
               </div>
-              <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-700 dark:text-emerald-300">
+              <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">
                 <span className="font-bold">Uyga vazifa:</span>
                 <p className="mt-1 leading-relaxed">{selectedLesson.homework || 'N/A'}</p>
               </div>
             </div>
 
-            <DialogFooter className="border-t border-border/40 pt-4">
-              <Button variant="outline" size="sm" onClick={() => setIsPreviewOpen(false)} className="rounded-xl">
+            <DialogFooter className="border-t border-border/15 pt-4">
+              <Button variant="ghost" size="sm" onClick={() => setIsPreviewOpen(false)} className="rounded-xl border-0">
                 Yopish
               </Button>
             </DialogFooter>

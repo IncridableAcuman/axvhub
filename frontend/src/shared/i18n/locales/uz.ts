@@ -429,6 +429,7 @@
     addStudentSubtitle: '8–11-sinf o‘quvchisini guruhga kiritish',
     fullNameLabel: 'F.I.Sh (To‘liq ism-familiya)',
     fullNamePlaceholder: 'Masalan: Abdurasharipov Izzatbek',
+    phoneLabel: 'Telefon raqami',
     gradeLevelLabel: 'Sinf darajasi',
     studyGroupLabel: 'O‘quv guruhi',
     saveStudentBtn: 'O‘quvchini Saqlash',

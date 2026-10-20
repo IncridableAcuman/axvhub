@@ -1,11 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, AlertTriangle, Check } from 'lucide-react';
-import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { Button } from '@/shared/ui/button/Button';
-import { Badge } from '@/shared/ui/badge/Badge';
+import { ShieldCheck, AlertTriangle, Check, RefreshCw } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { userApi, rbacApi } from '@/api';
 import type { UserDto, RoleDto } from '@/types';
+import { cn } from '@/lib/utils';
 
 interface RoleAssignmentModalProps {
   user: UserDto | null;
@@ -41,6 +49,7 @@ export const RoleAssignmentModal: React.FC<RoleAssignmentModalProps> = ({
       const res = await rbacApi.getRoles();
       setAvailableRoles(res.data.data);
     } catch (err: any) {
+      console.error(err);
       toast.error('Xatolik', 'Rollarni yuklashda xatolik yuz berdi');
     } finally {
       setIsFetching(false);
@@ -86,100 +95,117 @@ export const RoleAssignmentModal: React.FC<RoleAssignmentModalProps> = ({
     user.roles?.includes('SUPER_ADMIN') && !selectedRoles.has('SUPER_ADMIN');
 
   return (
-    <Dialog
-      isOpen={isOpen}
-      onClose={onClose}
-      size="md"
-      title={
-        <div className="flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-[var(--brand-primary)]" />
-          <span>Rollarni biriktirish (Multi-Role)</span>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-lg p-6 sm:p-7 rounded-3xl border-0 shadow-2xl bg-card text-card-foreground">
+        <DialogHeader className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-lg font-bold text-foreground">
+                Rollarni biriktirish (Multi-Role)
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                {user.fullName} (@{user.username}) uchun rollarni belgilang
+              </DialogDescription>
+            </div>
+          </div>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          {isLastSuperAdminWarning && (
+            <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-amber-500/10 text-amber-800 dark:text-amber-300 border-0 text-xs leading-relaxed">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5 text-amber-500" />
+              <span>
+                Diqqat: Siz Super Administrator rolini olib tashlamoqchisiz. Tizimda oxirgi faol
+                Super Admin rolini olib tashlash taqiqlanadi!
+              </span>
+            </div>
+          )}
+
+          {isFetching ? (
+            <div className="py-8 text-center text-xs text-muted-foreground">
+              <RefreshCw className="w-5 h-5 animate-spin mx-auto mb-2 text-primary" />
+              <span>Rollar katalogi yuklanmoqda...</span>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              <label className="text-xs font-bold text-foreground block">
+                Mavjud rollar (bir vaqtning o‘zida bir nechtasini tanlash mumkin):
+              </label>
+
+              <div className="grid grid-cols-1 gap-2 max-h-72 overflow-y-auto pr-1">
+                {availableRoles.map((role) => {
+                  const isSelected = selectedRoles.has(role.name);
+                  return (
+                    <div
+                      key={role.id}
+                      onClick={() => toggleRole(role.name)}
+                      className={cn(
+                        'flex items-start justify-between p-3.5 rounded-2xl cursor-pointer transition-all duration-200 select-none border-0',
+                        isSelected
+                          ? 'bg-primary/10 text-primary shadow-xs'
+                          : 'bg-muted/30 dark:bg-muted/15 hover:bg-muted/60 text-foreground'
+                      )}
+                    >
+                      <div className="space-y-0.5 pr-2">
+                        <div className="flex items-center gap-2">
+                          <span className="font-bold text-xs">{role.name}</span>
+                          {role.isSystem && (
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] px-1.5 py-0 rounded bg-muted/80 text-muted-foreground border-0"
+                            >
+                              Tizimiy
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground line-clamp-2">
+                          {role.description || 'Standart tizim huquqlar to‘plami'}
+                        </p>
+                      </div>
+
+                      <div
+                        className={cn(
+                          'w-5 h-5 rounded-lg flex items-center justify-center shrink-0 mt-0.5 transition-colors',
+                          isSelected
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'bg-muted/80 text-transparent'
+                        )}
+                      >
+                        <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
-      }
-      description={`${user.fullName} (@${user.username}) uchun rollarni belgilang`}
-      footer={
-        <div className="flex items-center justify-end gap-2 w-full">
-          <Button variant="outline" size="sm" onClick={onClose} disabled={isLoading}>
+
+        <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 pt-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            disabled={isLoading}
+            className="rounded-xl border-0"
+          >
             Bekor qilish
           </Button>
           <Button
-            variant="primary"
+            variant="default"
             size="sm"
             onClick={handleSave}
-            isLoading={isLoading}
-            disabled={selectedRoles.size === 0}
+            disabled={isLoading || selectedRoles.size === 0}
+            className="rounded-xl border-0 shadow-sm font-semibold"
           >
-            Saqlash
+            {isLoading && <RefreshCw className="w-3.5 h-3.5 animate-spin mr-1.5" />}
+            <span>Saqlash</span>
           </Button>
-        </div>
-      }
-    >
-      <div className="space-y-4">
-        {isLastSuperAdminWarning && (
-          <div className="flex items-start gap-2.5 p-3 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-700 dark:text-amber-400 text-xs">
-            <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
-            <span>
-              Diqqat: Siz Super Administrator rolini olib tashlamoqchisiz. Tizimda oxirgi faol
-              Super Admin rolini olib tashlash taqiqlanadi!
-            </span>
-          </div>
-        )}
-
-        {isFetching ? (
-          <div className="py-8 text-center text-xs text-[var(--text-muted)]">
-            Rollar katalogi yuklanmoqda...
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <label className="text-xs font-semibold text-[var(--text-primary)]">
-              Mavjud rollar (bir vaqtning o‘zida bir nechtasini tanlash mumkin):
-            </label>
-
-            <div className="grid grid-cols-1 gap-2 max-h-72 overflow-y-auto pr-1">
-              {availableRoles.map((role) => {
-                const isSelected = selectedRoles.has(role.name);
-                return (
-                  <div
-                    key={role.id}
-                    onClick={() => toggleRole(role.name)}
-                    className={`flex items-start justify-between p-3 rounded-lg border cursor-pointer transition select-none ${
-                      isSelected
-                        ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)]/5'
-                        : 'border-[var(--border-default)] bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)]'
-                    }`}
-                  >
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-[var(--text-primary)]">
-                          {role.name}
-                        </span>
-                        {role.isSystem && (
-                          <Badge variant="neutral" size="sm">
-                            Tizimiy
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-[var(--text-muted)] leading-relaxed">
-                        {role.description || 'Ta’rif kiritilmagan'}
-                      </p>
-                    </div>
-
-                    <div
-                      className={`w-5 h-5 rounded-md flex items-center justify-center border transition mt-0.5 ${
-                        isSelected
-                          ? 'bg-[var(--brand-primary)] border-[var(--brand-primary)] text-white'
-                          : 'border-[var(--border-strong)] bg-transparent'
-                      }`}
-                    >
-                      {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
-      </div>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

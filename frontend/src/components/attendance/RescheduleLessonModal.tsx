@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent } from '@/components/ui/card';
 import { attendanceApi } from '@/api';
 import type { LessonSessionDto } from '@/types';
 
@@ -88,14 +87,14 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md p-0 overflow-hidden bg-background border-border shadow-2xl">
-        <DialogHeader className="p-6 pb-4 border-b border-border/40 bg-muted/20">
+      <DialogContent className="max-w-md p-0 overflow-hidden bg-card text-card-foreground border-0 rounded-3xl shadow-2xl">
+        <DialogHeader className="p-6 pb-4 border-b border-border/15 bg-muted/20">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-500">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
               <Calendar className="w-5 h-5" />
             </div>
             <div>
-              <DialogTitle className="text-xl font-bold tracking-tight">
+              <DialogTitle className="text-xl font-bold tracking-tight text-foreground">
                 Dars Vaqtini Ko‘chirish (Reschedule)
               </DialogTitle>
               <DialogDescription className="text-xs text-muted-foreground mt-0.5">
@@ -107,25 +106,23 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
 
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {error && (
-            <div className="p-3 text-xs rounded-xl bg-destructive/10 text-destructive border border-destructive/20 flex items-center gap-2">
+            <div className="p-3 text-xs rounded-xl bg-destructive/10 text-destructive flex items-center gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
-          <Card className="border-border/60 bg-muted/30">
-            <CardContent className="p-3.5 text-xs space-y-1">
-              <div className="font-bold text-foreground">{session.subject}</div>
-              <div className="text-muted-foreground flex items-center gap-2">
-                <span>Guruh: <strong className="text-foreground">{session.groupName || session.groupCode}</strong></span>
-                <span>·</span>
-                <span>Mentor: <strong className="text-foreground">{session.mentorName}</strong></span>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="bg-muted/30 rounded-2xl p-4 text-xs space-y-1.5 border-0">
+            <div className="font-bold text-foreground text-sm">{session.subject}</div>
+            <div className="text-muted-foreground flex items-center gap-2">
+              <span>Guruh: <strong className="text-foreground">{session.groupName || session.groupCode}</strong></span>
+              <span>·</span>
+              <span>Mentor: <strong className="text-foreground">{session.mentorName}</strong></span>
+            </div>
+          </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold flex items-center gap-1.5">
+            <Label className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
               <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
               Yangi sana *
             </Label>
@@ -133,14 +130,14 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
               type="date"
               value={newDate}
               onChange={(e) => setNewDate(e.target.value)}
-              className="h-9 text-xs"
+              className="h-9 text-xs bg-muted/30 border-0 rounded-xl focus-visible:ring-1"
               required
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold flex items-center gap-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                 Boshlanish vaqti *
               </Label>
@@ -148,12 +145,12 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
                 type="time"
                 value={newStartTime}
                 onChange={(e) => setNewStartTime(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-muted/30 border-0 rounded-xl focus-visible:ring-1"
                 required
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-xs font-semibold flex items-center gap-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
                 <Clock className="w-3.5 h-3.5 text-muted-foreground" />
                 Tugash vaqti *
               </Label>
@@ -161,14 +158,14 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
                 type="time"
                 value={newEndTime}
                 onChange={(e) => setNewEndTime(e.target.value)}
-                className="h-9 text-xs"
+                className="h-9 text-xs bg-muted/30 border-0 rounded-xl focus-visible:ring-1"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-xs font-semibold flex items-center gap-1.5">
+            <Label className="text-xs font-semibold flex items-center gap-1.5 text-foreground">
               <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
               Yangi o‘quv xonasi
             </Label>
@@ -176,16 +173,29 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
               value={newRoomNumber}
               onChange={(e) => setNewRoomNumber(e.target.value)}
               placeholder="Masalan: Xona 202"
-              className="h-9 text-xs"
+              className="h-9 text-xs bg-muted/30 border-0 rounded-xl focus-visible:ring-1"
             />
           </div>
 
-          <DialogFooter className="pt-4 border-t border-border/40 flex items-center justify-end gap-2">
-            <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={loading}>
+          <DialogFooter className="pt-4 border-t border-border/15 flex items-center justify-end gap-2">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={onClose}
+              disabled={loading}
+              className="rounded-xl border-0"
+            >
               Bekor qilish
             </Button>
-            <Button type="submit" variant="default" size="sm" disabled={loading} className="gap-1.5">
-              {loading ? 'Ko‘chirilmoqda...' : 'Ko‘chirishni tasdiqlash'}
+            <Button
+              type="submit"
+              variant="default"
+              size="sm"
+              disabled={loading}
+              className="gap-1.5 rounded-xl border-0 font-semibold shadow-xs"
+            >
+              <span>{loading ? 'Ko‘chirilmoqda...' : 'Ko‘chirishni tasdiqlash'}</span>
             </Button>
           </DialogFooter>
         </form>

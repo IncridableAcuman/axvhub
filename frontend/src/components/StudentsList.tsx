@@ -14,8 +14,41 @@ import {
   Check,
 } from 'lucide-react';
 import { studentApi } from '../api';
-import { Input, FormField } from '@/shared/ui';
 import { useTranslation } from '@/shared/i18n';
+import { cn } from '@/lib/utils';
+import {
+  Card,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { CredentialSlipModal, type CredentialSlipData } from './common/CredentialSlipModal';
 
 interface StudentsListProps {
@@ -192,194 +225,271 @@ export const StudentsList: React.FC<StudentsListProps> = ({
     }
   };
 
+  const isFiltered = searchTerm !== '' || selectedGrade !== 'all' || selectedGroup !== 'all';
+
   return (
     <div className="space-y-6 animate-fade-in-up">
-      {/* Top Mini Stats Bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="interactive-card p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
-            <Users className="w-4 h-4" />
+      {/* 1. Top Mini Stats Bar - Clean Shadcn Card, borderless modern feel */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <Card className="border-0 shadow-sm bg-card hover:bg-card/90 transition-all rounded-2xl p-4 flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-500/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shrink-0">
+            <Users className="w-5 h-5" />
           </div>
-          <div>
-            <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider block">
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block truncate">
               {t('students.totalStudents')}
             </span>
-            <span className="text-xl font-extrabold text-[var(--text-primary)] font-mono block">
+            <span className="text-2xl font-black text-foreground font-mono block tracking-tight">
               {students.length}
             </span>
           </div>
-        </div>
+        </Card>
 
-        <div className="interactive-card p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+        <Card className="border-0 shadow-sm bg-card hover:bg-card/90 transition-all rounded-2xl p-4 flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
             <span className="font-extrabold text-xs">8-S</span>
           </div>
-          <div>
-            <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider block">
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block truncate">
               {t('students.grade8')}
             </span>
-            <span className="text-xl font-extrabold text-[var(--text-primary)] font-mono block">
+            <span className="text-2xl font-black text-foreground font-mono block tracking-tight">
               {students.filter((s) => s.gradeLevel === '8-sinf').length}
             </span>
           </div>
-        </div>
+        </Card>
 
-        <div className="interactive-card p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+        <Card className="border-0 shadow-sm bg-card hover:bg-card/90 transition-all rounded-2xl p-4 flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
             <span className="font-extrabold text-xs">11-S</span>
           </div>
-          <div>
-            <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider block">
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block truncate">
               {t('students.grade11')}
             </span>
-            <span className="text-xl font-extrabold text-[var(--text-primary)] font-mono block">
+            <span className="text-2xl font-black text-foreground font-mono block tracking-tight">
               {students.filter((s) => s.gradeLevel === '11-sinf').length}
             </span>
           </div>
-        </div>
+        </Card>
 
-        <div className="interactive-card p-3.5 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 beacon-pulse" />
+        <Card className="border-0 shadow-sm bg-card hover:bg-card/90 transition-all rounded-2xl p-4 flex items-center gap-3.5">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
           </div>
-          <div>
-            <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider block">
+          <div className="min-w-0">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block truncate">
               {t('students.activeStatus')}
             </span>
-            <span className="text-xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono block">
+            <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400 font-mono block tracking-tight">
               {students.filter((s) => s.status === 'Faol').length}
             </span>
           </div>
-        </div>
+        </Card>
       </div>
 
-      {/* Header and Actions */}
-      <div className="glass-panel text-[var(--text-primary)] rounded-3xl p-5 sm:p-6 border border-[var(--border-default)] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-blue-500 beacon-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400">
-              {t('dashboard.admin.programName')}
-            </span>
+      {/* 2. Unified Students Main Section - Header, Toolbar, Table & Pagination */}
+      <Card className="border-0 shadow-sm bg-card rounded-2xl overflow-hidden">
+        {/* Section Header */}
+        <div className="p-5 sm:p-6 pb-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Badge
+                variant="secondary"
+                className="border-0 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5"
+              >
+                <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mr-1.5 animate-pulse" />
+                {t('dashboard.admin.programName')}
+              </Badge>
+            </div>
+            <CardTitle className="text-xl sm:text-2xl font-black tracking-tight text-foreground flex items-center gap-2.5">
+              <Users className="w-6 h-6 text-primary" />
+              {t('students.centerTitle')}
+            </CardTitle>
+            <CardDescription className="text-xs sm:text-sm text-muted-foreground mt-1">
+              {t('students.centerDesc', { count: students.length })}
+            </CardDescription>
           </div>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)] flex items-center">
-            <Users className="w-6 h-6 mr-2.5 text-[var(--brand-primary)]" />
-            {t('students.centerTitle')}
-          </h1>
-          <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-            {t('students.centerDesc', { count: students.length })}
-          </p>
+
+          <div className="flex items-center gap-2.5 self-start md:self-auto">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleExportCSV}
+              className="rounded-xl text-xs font-semibold border-0 bg-muted/40 hover:bg-muted text-foreground gap-1.5 cursor-pointer shadow-2xs"
+            >
+              <Download className="w-4 h-4" />
+              <span>{t('students.csvExport')}</span>
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => setIsAddModalOpen(true)}
+              className="rounded-xl text-xs font-bold gap-1.5 cursor-pointer shadow-sm"
+            >
+              <Plus className="w-4 h-4" />
+              <span>{t('students.addStudent')}</span>
+            </Button>
+          </div>
         </div>
 
-        <div className="flex items-center space-x-2.5 self-start md:self-auto">
-          <button
-            onClick={handleExportCSV}
-            className="px-3.5 py-2 text-xs font-semibold rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-primary)] border border-[var(--border-default)] transition flex items-center space-x-1.5 cursor-pointer shadow-2xs"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>{t('students.csvExport')}</span>
-          </button>
-          <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="btn-shimmer px-4 py-2 text-xs font-bold rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-md shadow-indigo-600/20 transition flex items-center space-x-1.5 cursor-pointer"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{t('students.addStudent')}</span>
-          </button>
+        {/* Integrated Search & Filter Toolbar */}
+        <div className="px-5 sm:px-6 py-3.5 bg-muted/20 border-t border-b border-border/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative w-full sm:w-80">
+            <Input
+              leftIcon={<Search className="w-4 h-4" />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder={t('students.searchPlaceholder')}
+              className="h-9.5 text-xs bg-card border-0 shadow-2xs focus-visible:ring-1"
+              rightIcon={
+                searchTerm ? (
+                  <button
+                    type="button"
+                    onClick={() => setSearchTerm('')}
+                    className="text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    aria-label="Qidiruvni tozalash"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                ) : undefined
+              }
+            />
+          </div>
+
+          <div className="flex items-center gap-2 overflow-x-auto">
+            <Select value={selectedGrade} onValueChange={setSelectedGrade}>
+              <SelectTrigger className="w-full sm:w-[140px] h-9.5 text-xs rounded-xl bg-card border-0 shadow-2xs focus:ring-1">
+                <SelectValue placeholder={t('students.allGrades')} />
+              </SelectTrigger>
+              <SelectContent className="border-0 shadow-xl rounded-xl bg-card">
+                <SelectItem value="all">{t('students.allGrades')}</SelectItem>
+                <SelectItem value="8-sinf">{t('students.grade8')}</SelectItem>
+                <SelectItem value="9-sinf">{t('students.grade9')}</SelectItem>
+                <SelectItem value="10-sinf">{t('students.grade10')}</SelectItem>
+                <SelectItem value="11-sinf">{t('students.grade11')}</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select value={selectedGroup} onValueChange={setSelectedGroup}>
+              <SelectTrigger className="w-full sm:w-[160px] h-9.5 text-xs rounded-xl bg-card border-0 shadow-2xs focus:ring-1">
+                <SelectValue placeholder={t('students.allGroups')} />
+              </SelectTrigger>
+              <SelectContent className="border-0 shadow-xl rounded-xl bg-card">
+                <SelectItem value="all">{t('students.allGroups')}</SelectItem>
+                {groups.map((g) => (
+                  <SelectItem key={g.id} value={g.groupCode}>
+                    {g.groupCode} ({g.gradeLevel})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {isFiltered && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSelectedGrade('all');
+                  setSelectedGroup('all');
+                }}
+                className="h-9.5 text-xs text-muted-foreground hover:text-foreground px-2.5 rounded-xl cursor-pointer shrink-0"
+              >
+                <X className="w-3.5 h-3.5 mr-1" />
+                Tozalash
+              </Button>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Filter and Search Bar */}
-      <div className="glass-panel text-[var(--text-primary)] rounded-2xl p-4 border border-[var(--border-default)] shadow-xs flex flex-col sm:flex-row items-center justify-between gap-3">
-        <div className="w-full sm:w-80">
-          <Input
-            inputSize="sm"
-            leftIcon={<Search className="w-4 h-4" />}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onClear={() => setSearchTerm('')}
-            placeholder={t('students.searchPlaceholder')}
-          />
-        </div>
-
-        <div className="flex items-center space-x-2 w-full sm:w-auto overflow-x-auto">
-          <select
-            value={selectedGrade}
-            onChange={(e) => setSelectedGrade(e.target.value)}
-            className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl px-3 py-2 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition cursor-pointer"
-          >
-            <option value="all">{t('students.allGrades')}</option>
-            <option value="8-sinf">{t('students.grade8')}</option>
-            <option value="9-sinf">{t('students.grade9')}</option>
-            <option value="10-sinf">{t('students.grade10')}</option>
-            <option value="11-sinf">{t('students.grade11')}</option>
-          </select>
-
-          <select
-            value={selectedGroup}
-            onChange={(e) => setSelectedGroup(e.target.value)}
-            className="bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-xl px-3 py-2 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--ring)] transition cursor-pointer"
-          >
-            <option value="all">{t('students.allGroups')}</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.groupCode}>
-                {g.groupCode} ({g.gradeLevel})
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
-
-      {/* Students Table */}
-      <div className="glass-panel rounded-3xl border border-[var(--border-default)] shadow-xs overflow-hidden">
+        {/* Table View */}
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-[var(--bg-subtle)] text-[var(--text-secondary)] font-bold uppercase tracking-wider text-[10px] border-b border-[var(--border-subtle)]">
-              <tr>
-                <th className="py-3.5 px-4 w-12 text-center">#</th>
-                <th className="py-3.5 px-4">{t('students.studentName')}</th>
-                <th className="py-3.5 px-4">{t('students.pinflHeader')}</th>
-                <th className="py-3.5 px-4">{t('students.studentIdHeader')}</th>
-                <th className="py-3.5 px-4">{t('groups.grade')}</th>
-                <th className="py-3.5 px-4">{t('students.group')}</th>
-                <th className="py-3.5 px-4">{t('students.mentorHeader')}</th>
-                <th className="py-3.5 px-4">{t('students.branchHeader')}</th>
-                <th className="py-3.5 px-4 text-center">{t('common.status')}</th>
-                <th className="py-3.5 px-4 text-right">{t('students.actions')}</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[var(--border-subtle)]">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-b border-border/10 hover:bg-transparent bg-muted/20">
+                <TableHead className="w-12 text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground">#</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('students.studentName')}</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('students.pinflHeader')}</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('students.studentIdHeader')}</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('groups.grade')}</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('students.group')}</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('students.mentorHeader')}</TableHead>
+                <TableHead className="font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('students.branchHeader')}</TableHead>
+                <TableHead className="text-center font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('common.status')}</TableHead>
+                <TableHead className="text-right font-bold text-[10px] uppercase tracking-wider text-muted-foreground">{t('students.actions')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {filteredStudents.length === 0 ? (
-                <tr>
-                  <td colSpan={10} className="py-12 text-center text-[var(--text-muted)]">
-                    <Users className="w-10 h-10 mx-auto mb-2 opacity-40" />
-                    <span>{t('students.noStudentsFound')}</span>
-                  </td>
-                </tr>
+                <TableRow className="hover:bg-transparent border-0">
+                  <TableCell colSpan={10} className="py-16 text-center text-muted-foreground">
+                    <div className="w-14 h-14 rounded-2xl bg-muted/40 text-muted-foreground flex items-center justify-center mx-auto mb-3">
+                      <Users className="w-7 h-7 opacity-60" />
+                    </div>
+                    <p className="font-semibold text-sm text-foreground mb-1">
+                      {t('students.noStudentsFound')}
+                    </p>
+                    <p className="text-xs text-muted-foreground max-w-sm mx-auto">
+                      Qidiruv parametrlarini o‘zgartiring yoki filtrlarni tozalang
+                    </p>
+                    {isFiltered && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setSearchTerm('');
+                          setSelectedGrade('all');
+                          setSelectedGroup('all');
+                        }}
+                        className="mt-4 rounded-xl text-xs border-0 bg-muted/60 hover:bg-muted cursor-pointer"
+                      >
+                        Filtrlarni tozalash
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
               ) : (
                 paginatedStudents.map((st, idx) => {
                   const itemIndex = startIndex + idx + 1;
                   return (
-                    <tr key={st.id} className="hover:bg-[var(--bg-subtle)]/60 transition group">
-                      <td className="py-3.5 px-4 text-[var(--text-muted)] font-mono text-center">{itemIndex}</td>
-                      <td className="py-3.5 px-4">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-tr from-blue-500 to-indigo-600 text-white font-bold text-[10px] flex items-center justify-center shrink-0">
-                            {st.fullName ? st.fullName[0] : 'U'}
+                    <TableRow
+                      key={st.id}
+                      className="border-b border-border/10 hover:bg-muted/40 transition-colors group"
+                    >
+                      <TableCell className="text-muted-foreground font-mono text-center text-xs">
+                        {itemIndex}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-3">
+                          <Avatar className="w-8 h-8 ring-0 border-0 bg-primary/10 text-primary font-bold text-xs">
+                            <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+                              {st.fullName ? st.fullName.charAt(0).toUpperCase() : 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div className="flex flex-col min-w-0">
+                            <span className="font-semibold text-sm text-foreground truncate group-hover:text-primary transition-colors">
+                              {st.fullName}
+                            </span>
+                            {st.phone && (
+                              <span className="text-[11px] text-muted-foreground font-mono">
+                                {st.phone}
+                              </span>
+                            )}
                           </div>
-                          <span className="font-bold text-[var(--text-primary)] group-hover:text-[var(--brand-primary)] transition-colors">
-                            {st.fullName}
-                          </span>
                         </div>
-                      </td>
-                      <td className="py-3.5 px-4 font-mono text-[var(--text-secondary)]">{st.pinfl || '—'}</td>
-                      <td className="py-3.5 px-4 font-mono text-[var(--text-secondary)] font-semibold">
-                        <div className="flex items-center gap-1.5">
+                      </TableCell>
+                      <TableCell className="font-mono text-xs text-muted-foreground">
+                        {st.pinfl || '—'}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-1.5 font-mono text-xs text-foreground font-semibold">
                           <span>{st.studentIdNumber || '—'}</span>
                           {st.studentIdNumber && (
-                            <button
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               onClick={(e) => handleCopyStudentId(st.studentIdNumber!, e)}
-                              className="p-1 rounded text-[var(--text-muted)] hover:text-[var(--brand-primary)] hover:bg-[var(--bg-subtle)] transition cursor-pointer"
+                              className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors cursor-pointer"
                               title="ID dan nusxa olish"
                             >
                               {copiedId === st.studentIdNumber ? (
@@ -387,90 +497,112 @@ export const StudentsList: React.FC<StudentsListProps> = ({
                               ) : (
                                 <Copy className="w-3.5 h-3.5" />
                               )}
-                            </button>
+                            </Button>
                           )}
                         </div>
-                      </td>
-                      <td className="py-3.5 px-4">
-                        <span className="px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 font-bold text-[10px] border border-blue-200/50 dark:border-blue-900/50">
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant="secondary"
+                          className="font-mono text-[11px] font-semibold px-2 py-0.5 rounded-md border-0 bg-muted/60 text-foreground"
+                        >
                           {st.gradeLevel || '8-sinf'}
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 font-mono font-bold text-[var(--text-primary)]">
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="font-mono font-bold text-xs text-foreground">
                         {st.studyGroup?.groupCode || '—'}
-                      </td>
-                      <td className="py-3.5 px-4 text-[var(--text-secondary)] truncate max-w-[120px]">
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground truncate max-w-[120px]">
                         {st.mentor?.fullName.split(' ')[0] || '—'}
-                      </td>
-                      <td className="py-3.5 px-4 text-[var(--text-muted)] truncate max-w-[130px]">
+                      </TableCell>
+                      <TableCell className="text-xs text-muted-foreground truncate max-w-[130px]">
                         {st.branchLocation || 'IT Park Yangiariq'}
-                      </td>
-                      <td className="py-3.5 px-4 text-center">
-                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/40">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <Badge
+                          variant={st.status === 'Faol' ? 'success' : 'secondary'}
+                          className="font-medium gap-1.5 px-2.5 py-0.5 rounded-full border-0 text-[11px]"
+                        >
+                          <span
+                            className={cn(
+                              'w-1.5 h-1.5 rounded-full',
+                              st.status === 'Faol' ? 'bg-emerald-500 animate-pulse' : 'bg-muted-foreground'
+                            )}
+                          />
                           <span>{st.status}</span>
-                        </span>
-                      </td>
-                      <td className="py-3.5 px-4 text-right">
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
-                          <button
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleResetPassword(st)}
-                            className="text-[var(--text-muted)] hover:text-amber-500 p-1.5 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer"
+                            className="h-8 w-8 text-muted-foreground hover:text-amber-500 hover:bg-amber-500/10 transition-colors cursor-pointer"
                             title="Yangi parol yaratish (HEMIS)"
                             aria-label="Yangi parol yaratish"
                           >
                             <KeyRound className="w-4 h-4" />
-                          </button>
-                          <button
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
                             onClick={() => handleDelete(st.id)}
-                            className="text-[var(--text-muted)] hover:text-red-600 p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/40 transition cursor-pointer"
+                            className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors cursor-pointer"
                             title={t('common.delete')}
                             aria-label={t('common.delete')}
                           >
                             <Trash2 className="w-4 h-4" />
-                          </button>
+                          </Button>
                         </div>
-                      </td>
-                    </tr>
+                      </TableCell>
+                    </TableRow>
                   );
                 })
               )}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
 
-        {/* Pagination Controls Bar */}
+        {/* 3. Pagination Controls Bar */}
         {filteredStudents.length > 0 && (
-          <div className="p-4 border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-3 text-[var(--text-muted)]">
+          <div className="p-4 sm:px-6 border-t border-border/10 bg-card/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-3 text-muted-foreground">
               <span>
-                {t('common.total')} <strong className="text-[var(--text-primary)] font-mono">{filteredStudents.length}</strong> —{' '}
-                {t('common.showingRecords', { total: filteredStudents.length, start: startIndex + 1, end: endIndex })}
+                {t('common.total')} <strong className="text-foreground font-mono">{filteredStudents.length} ta</strong> —{' '}
+                {t('common.showingRecords', {
+                  total: filteredStudents.length,
+                  start: startIndex + 1,
+                  end: endIndex,
+                })}
               </span>
-              <div className="flex items-center gap-1.5 pl-3 border-l border-[var(--border-subtle)]">
+              <div className="flex items-center gap-1.5 pl-3 border-l border-border/20">
                 <span>{t('common.perPage')}</span>
-                <select
-                  value={pageSize}
-                  onChange={(e) => setPageSize(Number(e.target.value))}
-                  className="bg-[var(--bg-canvas)] border border-[var(--border-default)] rounded-lg px-2 py-1 text-xs text-[var(--text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--brand-primary)]"
-                >
-                  <option value={5}>5</option>
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={50}>50</option>
-                </select>
+                <Select value={String(pageSize)} onValueChange={(val) => setPageSize(Number(val))}>
+                  <SelectTrigger className="w-[68px] h-7.5 text-xs rounded-lg bg-muted/40 border-0 focus:ring-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="border-0 shadow-xl rounded-xl bg-card min-w-[5rem]">
+                    <SelectItem value="5">5</SelectItem>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 
             <div className="flex items-center gap-1 self-center sm:self-auto">
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                 disabled={currentPage === 1}
-                className="p-1.5 rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed text-[var(--text-primary)] transition cursor-pointer"
+                className="h-8 w-8 rounded-lg hover:bg-muted text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                 aria-label={t('common.prevPage')}
               >
                 <ChevronLeft className="w-4 h-4" />
-              </button>
+              </Button>
 
               {Array.from({ length: totalPages }).map((_, i) => {
                 const pageNumber = i + 1;
@@ -482,7 +614,7 @@ export const StudentsList: React.FC<StudentsListProps> = ({
                 ) {
                   if (pageNumber === 2 || pageNumber === totalPages - 1) {
                     return (
-                      <span key={pageNumber} className="px-1 text-[var(--text-muted)]">
+                      <span key={pageNumber} className="px-1 text-muted-foreground font-mono">
                         ...
                       </span>
                     );
@@ -491,154 +623,178 @@ export const StudentsList: React.FC<StudentsListProps> = ({
                 }
 
                 return (
-                  <button
+                  <Button
                     key={pageNumber}
+                    variant={currentPage === pageNumber ? 'default' : 'ghost'}
+                    size="sm"
                     onClick={() => setCurrentPage(pageNumber)}
-                    className={`min-w-8 h-8 px-2 rounded-lg font-mono text-xs font-semibold transition cursor-pointer ${
+                    className={cn(
+                      'min-w-8 h-8 px-2 rounded-lg font-mono text-xs font-semibold cursor-pointer',
                       currentPage === pageNumber
-                        ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-                        : 'border border-[var(--border-default)] hover:bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
-                    }`}
+                        ? 'shadow-xs'
+                        : 'hover:bg-muted text-muted-foreground hover:text-foreground'
+                    )}
                   >
                     {pageNumber}
-                  </button>
+                  </Button>
                 );
               })}
 
-              <button
+              <Button
+                variant="ghost"
+                size="icon"
                 onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
-                className="p-1.5 rounded-lg border border-[var(--border-default)] hover:bg-[var(--bg-subtle)] disabled:opacity-40 disabled:cursor-not-allowed text-[var(--text-primary)] transition cursor-pointer"
+                disabled={currentPage === totalPages || totalPages === 0}
+                className="h-8 w-8 rounded-lg hover:bg-muted text-foreground disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
                 aria-label={t('common.nextPage')}
               >
                 <ChevronRight className="w-4 h-4" />
-              </button>
+              </Button>
             </div>
           </div>
         )}
-      </div>
+      </Card>
 
-      {/* Add Student Modal */}
-      {isAddModalOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsAddModalOpen(false);
-          }}
-        >
-          <div
-            className="glass-panel bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl border border-[var(--border-default)] animate-scale-in"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-subtle)] mb-4">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-blue-500/15 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-                  <Users className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-[var(--text-primary)]">{t('students.addStudentTitle')}</h3>
-                  <p className="text-xs text-[var(--text-muted)]">{t('students.addStudentSubtitle')}</p>
-                </div>
+      {/* 4. Add Student Modal - Clean Shadcn Dialog */}
+      <Dialog open={isAddModalOpen} onOpenChange={setIsAddModalOpen}>
+        <DialogContent className="sm:max-w-lg p-0 overflow-hidden bg-card text-card-foreground border-0 shadow-2xl rounded-3xl">
+          <DialogHeader className="p-6 pb-4 bg-muted/20 border-b border-border/10">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <Users className="w-5 h-5" />
               </div>
-              <button
-                onClick={() => setIsAddModalOpen(false)}
-                className="w-8 h-8 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center justify-center transition cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
+              <div>
+                <DialogTitle className="text-base font-bold text-foreground">
+                  {t('students.addStudentTitle')}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  {t('students.addStudentSubtitle')}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <form onSubmit={handleCreateStudent} className="p-6 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="student-full-name" className="text-xs font-semibold text-foreground">
+                {t('students.fullNameLabel')} <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="student-full-name"
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                placeholder={t('students.fullNamePlaceholder')}
+                required
+                className="h-10 bg-muted/30 border-0 focus-visible:ring-1"
+              />
             </div>
 
-            <form onSubmit={handleCreateStudent} className="space-y-4">
-              <FormField label={t('students.fullNameLabel')} required>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="student-pinfl" className="text-xs font-semibold text-foreground">
+                  {t('students.pinflHeader')}
+                </Label>
                 <Input
+                  id="student-pinfl"
                   type="text"
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder={t('students.fullNamePlaceholder')}
-                  required
+                  value={pinfl}
+                  onChange={(e) => setPinfl(e.target.value)}
+                  placeholder="30101991234567"
+                  maxLength={14}
+                  className="h-10 bg-muted/30 border-0 focus-visible:ring-1 font-mono"
                 />
-              </FormField>
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="student-phone" className="text-xs font-semibold text-foreground">
+                  {t('students.phoneLabel') || 'Telefon raqam'}
+                </Label>
+                <Input
+                  id="student-phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+998 90 123 45 67"
+                  className="h-10 bg-muted/30 border-0 focus-visible:ring-1 font-mono"
+                />
+              </div>
+            </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <FormField label={t('students.pinflHeader')}>
-                  <Input
-                    type="text"
-                    value={pinfl}
-                    onChange={(e) => setPinfl(e.target.value)}
-                    placeholder="30101991234567"
-                    maxLength={14}
-                  />
-                </FormField>
-                <FormField label={t('students.phoneLabel') || 'Telefon raqam'}>
-                  <Input
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="+998 90 123 45 67"
-                  />
-                </FormField>
+            <div className="p-3.5 rounded-2xl bg-primary/10 text-xs flex items-start gap-3">
+              <KeyRound className="w-4 h-4 shrink-0 mt-0.5 text-primary" />
+              <div className="space-y-0.5">
+                <span className="font-semibold block text-xs text-foreground">
+                  HEMIS ID va Parol avtomatik shakllantiriladi
+                </span>
+                <span className="text-[11px] text-muted-foreground block leading-relaxed">
+                  O‘quvchiga HEMIS formatidagi unikal raqamli ID (42600001+) va 8 belgili tasodifiy parol tizim tomonidan generatsiya qilinadi.
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">
+                  {t('students.gradeLevelLabel')} <span className="text-destructive">*</span>
+                </Label>
+                <Select value={gradeLevel} onValueChange={setGradeLevel}>
+                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted/30 border-0 focus:ring-1">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="border-0 shadow-xl rounded-xl bg-card">
+                    <SelectItem value="8-sinf">{t('students.grade8')}</SelectItem>
+                    <SelectItem value="9-sinf">{t('students.grade9')}</SelectItem>
+                    <SelectItem value="10-sinf">{t('students.grade10')}</SelectItem>
+                    <SelectItem value="11-sinf">{t('students.grade11')}</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div className="p-3 rounded-xl bg-blue-500/10 border border-blue-500/20 text-xs text-blue-700 dark:text-blue-300 flex items-start gap-2.5">
-                <KeyRound className="w-4 h-4 shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold block">HEMIS ID va Parol avtomatik shakllantiriladi</span>
-                  <span className="text-[11px] opacity-80">
-                    O‘quvchiga HEMIS formatidagi unikal raqamli ID (42600001+) va 8 belgili tasodifiy parol generatsiya qilinadi.
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <FormField label={t('students.gradeLevelLabel')} required>
-                  <select
-                    value={gradeLevel}
-                    onChange={(e) => setGradeLevel(e.target.value)}
-                    className="w-full h-10.5 sm:h-11 px-3.5 text-sm font-medium rounded-xl border bg-[var(--bg-surface)] text-[var(--text-primary)] cursor-pointer focus:outline-none focus:ring-4 transition"
-                  >
-                    <option value="8-sinf">{t('students.grade8')}</option>
-                    <option value="9-sinf">{t('students.grade9')}</option>
-                    <option value="10-sinf">{t('students.grade10')}</option>
-                    <option value="11-sinf">{t('students.grade11')}</option>
-                  </select>
-                </FormField>
-                <FormField label={t('students.studyGroupLabel')}>
-                  <select
-                    value={selectedGroupId}
-                    onChange={(e) => setSelectedGroupId(Number(e.target.value))}
-                    className="w-full h-10.5 sm:h-11 px-3.5 text-sm font-medium rounded-xl border bg-[var(--bg-surface)] text-[var(--text-primary)] cursor-pointer focus:outline-none focus:ring-4 transition"
-                  >
+              <div className="space-y-1.5">
+                <Label className="text-xs font-semibold text-foreground">
+                  {t('students.studyGroupLabel')}
+                </Label>
+                <Select
+                  value={selectedGroupId ? String(selectedGroupId) : 'none'}
+                  onValueChange={(val) => setSelectedGroupId(val === 'none' ? undefined : Number(val))}
+                >
+                  <SelectTrigger className="h-10 text-xs rounded-xl bg-muted/30 border-0 focus:ring-1">
+                    <SelectValue placeholder="Guruhni tanlang" />
+                  </SelectTrigger>
+                  <SelectContent className="border-0 shadow-xl rounded-xl bg-card">
                     {groups.map((g) => (
-                      <option key={g.id} value={g.id}>
+                      <SelectItem key={g.id} value={String(g.id)}>
                         {g.groupCode} ({g.gradeLevel})
-                      </option>
+                      </SelectItem>
                     ))}
-                  </select>
-                </FormField>
+                  </SelectContent>
+                </Select>
               </div>
+            </div>
 
-              <div className="pt-3 border-t border-[var(--border-subtle)] flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-secondary)] transition cursor-pointer"
-                >
-                  {t('common.cancel')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="btn-shimmer px-5 py-2 text-xs font-bold rounded-xl bg-[var(--brand-primary)] hover:opacity-90 text-white shadow-md shadow-[var(--brand-primary)]/20 transition cursor-pointer disabled:opacity-50"
-                >
-                  {saving ? t('common.saving') : t('students.saveStudentBtn')}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+            <DialogFooter className="pt-3 border-t border-border/10 flex flex-col-reverse sm:flex-row sm:justify-end gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={() => setIsAddModalOpen(false)}
+                className="rounded-xl text-xs cursor-pointer"
+              >
+                {t('common.cancel')}
+              </Button>
+              <Button
+                type="submit"
+                disabled={saving}
+                isLoading={saving}
+                className="rounded-xl text-xs font-semibold cursor-pointer shadow-sm"
+              >
+                {saving ? t('common.saving') : t('students.saveStudentBtn')}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
 
-      {/* HEMIS Credential Slip Modal */}
+      {/* 5. HEMIS Credential Slip Modal */}
       <CredentialSlipModal
         isOpen={isCredentialModalOpen}
         onClose={() => setIsCredentialModalOpen(false)}

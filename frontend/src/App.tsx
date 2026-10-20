@@ -6,7 +6,7 @@ import { ManualScheduleModal } from './components/ManualScheduleModal';
 import { AiImportModal } from './components/AiImportModal';
 import { AppShell } from '@/widgets/app-shell/AppShell';
 import { DesignSystemShowcase } from '@/pages/design-system/DesignSystemShowcase';
-import { UserProfileModal } from '@/features/auth';
+import { UserProfileModal, AuthModal } from '@/features/auth';
 import type { Schedule, Student, Mentor, StudyGroup } from './types';
 
 import { UsersDirectory } from './components/users/UsersDirectory';
@@ -290,8 +290,9 @@ export const App: React.FC<{ initialTab?: string }> = ({ initialTab = 'dashboard
         />
       )}
 
-      {/* User Profile Details Modal */}
+      {/* User Profile Details Modal & Auth Modal */}
       <UserProfileModal />
+      <AuthModal />
     </AppShell>
   );
 };

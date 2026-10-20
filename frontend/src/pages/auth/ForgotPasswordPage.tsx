@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Mail, ArrowLeft, KeyRound, CheckCircle2, Send, ExternalLink } from 'lucide-react';
-import { FormField } from '@/shared/ui/form/FormField';
-import { Input } from '@/shared/ui/input/Input';
-import { Button } from '@/shared/ui/button/Button';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
 import { ThemeToggle } from '@/shared/ui/theme-toggle/ThemeToggle';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useAuth } from '@/features/auth/AuthContext';
@@ -54,7 +54,7 @@ export const ForgotPasswordPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between bg-[var(--bg-canvas)] text-[var(--text-primary)] p-6 sm:p-12 relative overflow-hidden">
+    <div className="min-h-screen flex flex-col justify-between bg-background text-foreground p-6 sm:p-12 relative overflow-hidden">
       {/* Ambient subtle light blobs */}
       <div className="absolute top-10 right-10 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 left-10 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
@@ -63,7 +63,7 @@ export const ForgotPasswordPage: React.FC = () => {
       <div className="relative z-10 flex items-center justify-between max-w-md w-full mx-auto pb-6">
         <Link
           to="/login"
-          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-[var(--text-secondary)] hover:text-[var(--brand-primary)] transition"
+          className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-muted-foreground hover:text-primary transition"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>Kirish sahifasiga qaytish</span>
@@ -72,69 +72,84 @@ export const ForgotPasswordPage: React.FC = () => {
       </div>
 
       {/* Center Card */}
-      <div className="relative z-10 w-full max-w-md mx-auto my-auto p-6 sm:p-8 glass-panel border border-[var(--border-default)] rounded-3xl shadow-xl space-y-6 animate-scale-in">
+      <div className="relative z-10 w-full max-w-md mx-auto my-auto p-6 sm:p-8 bg-card/90 dark:bg-card/75 backdrop-blur-xl border-0 rounded-3xl shadow-2xl space-y-6 animate-scale-in">
         <div className="text-left space-y-2">
-          <div className="inline-flex p-3 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] mb-1">
+          <div className="inline-flex p-3 rounded-2xl bg-primary/10 text-primary mb-1">
             <KeyRound className="w-6 h-6" />
           </div>
-          <h1 className="text-2xl font-extrabold text-[var(--text-primary)]">
+          <h1 className="text-2xl font-extrabold text-foreground tracking-tight">
             Parolni unutdingizmi?
           </h1>
-          <p className="text-xs sm:text-sm text-[var(--text-secondary)]">
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
             Hisobingizga biriktirilgan email manzilini kiriting. Biz sizga yangi parol o‘rnatish uchun maxsus havola yuboramiz.
           </p>
         </div>
 
         {error && (
-          <div className="p-3 text-xs rounded-xl bg-red-500/10 border border-red-500/30 text-red-600 dark:text-red-400">
+          <div className="p-3.5 text-xs rounded-xl bg-destructive/10 text-destructive border-0">
             {error}
           </div>
         )}
 
         {isSubmitted ? (
           <div className="space-y-4 animate-in fade-in">
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm space-y-2">
+            <div className="p-4 rounded-2xl bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 text-xs sm:text-sm space-y-2 border-0">
               <div className="flex items-center gap-2 font-bold">
                 <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0" />
                 <span>Havola yuborildi!</span>
               </div>
-              <p>
-                <strong>{email}</strong> manziliga yangi parol o‘rnatish xabari jo‘natildi. Iltimos, pochtangizni tekshiring.
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                <strong>{email}</strong> manziliga tasdiqlash havolasi yuborildi. Pochtadagi xatni tekshiring va havolaga bosing.
               </p>
             </div>
 
-            {/* Quick development link helper */}
+            {/* Test Helper Link */}
             {generatedToken && (
-              <div className="p-3 bg-[var(--bg-subtle)] rounded-xl border border-[var(--border-default)] text-xs space-y-1.5">
-                <span className="font-semibold text-[var(--text-primary)] block">
-                  Sinov uchun to‘g‘ridan-to‘g‘ri o‘tish:
-                </span>
+              <div className="p-3.5 bg-muted/40 rounded-2xl text-xs space-y-1.5 border-0">
+                <div className="flex items-center gap-1 font-bold text-foreground">
+                  <ExternalLink className="w-3.5 h-3.5 text-primary" />
+                  <span>Tezkor test havolasi:</span>
+                </div>
                 <Link
                   to={`/reset-password?token=${generatedToken}`}
-                  className="inline-flex items-center gap-1.5 text-[var(--brand-primary)] font-bold hover:underline break-all"
+                  className="font-mono text-[11px] text-primary hover:underline break-all block"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>Parolni yangilash sahifasiga o‘tish (Token bilan)</span>
+                  /reset-password?token={generatedToken}
                 </Link>
               </div>
             )}
 
-            <div className="pt-2">
+            <div className="pt-2 space-y-2">
+              <Button
+                variant="outline"
+                size="default"
+                className="w-full rounded-xl border-0 bg-muted/60 hover:bg-muted text-foreground"
+                onClick={() => {
+                  setIsSubmitted(false);
+                  setEmail('');
+                  setGeneratedToken(null);
+                }}
+              >
+                <span>Boshqa email bilan sinab ko‘rish</span>
+              </Button>
+
               <Link to="/login" className="block w-full">
-                <Button variant="outline" size="md" className="w-full">
-                  <span>Kirish sahifasiga o‘tish</span>
+                <Button
+                  variant="default"
+                  size="default"
+                  className="w-full rounded-xl border-0 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-md shadow-indigo-600/20"
+                >
+                  <span>Kirish oynasiga qaytish</span>
                 </Button>
               </Link>
             </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <FormField
-              label="Email manzili"
-              htmlFor="forgot-email"
-              required
-              error={error}
-            >
+            <div className="space-y-1.5">
+              <Label htmlFor="forgot-email" className="text-xs font-semibold text-foreground">
+                Email manzili <span className="text-destructive">*</span>
+              </Label>
               <Input
                 id="forgot-email"
                 type="email"
@@ -144,38 +159,40 @@ export const ForgotPasswordPage: React.FC = () => {
                   setEmail(e.target.value);
                   if (error) setError('');
                 }}
-                leftIcon={<Mail className="w-4 h-4" />}
+                leftIcon={<Mail className="w-4 h-4 text-muted-foreground" />}
                 autoComplete="email"
-                error={Boolean(error)}
+                className="bg-muted/30 border-0 !border-0 rounded-xl focus-visible:ring-1 text-xs"
               />
-            </FormField>
+            </div>
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="lg"
-              isLoading={isLoading}
-              className="w-full font-semibold"
-              leftIcon={<Send className="w-4 h-4" />}
-            >
-              <span>Tiklash havolasini yuborish</span>
-            </Button>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                variant="default"
+                size="default"
+                isLoading={isLoading}
+                className="w-full rounded-xl border-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-semibold shadow-lg shadow-indigo-600/25"
+                leftIcon={<Send className="w-4 h-4" />}
+              >
+                <span>Tiklash havolasini yuborish</span>
+              </Button>
+            </div>
 
             <div className="text-center pt-2">
               <Link
                 to="/login"
-                className="text-xs font-semibold text-[var(--brand-primary)] hover:underline"
+                className="text-xs font-semibold text-muted-foreground hover:text-primary transition"
               >
-                Parolni esladingizmi? Tizimga kirish
+                Parolni esladingizmi? <strong className="text-primary hover:underline">Kirish</strong>
               </Link>
             </div>
           </form>
         )}
       </div>
 
-      {/* Bottom Footer */}
-      <div className="text-center text-xs text-[var(--text-muted)] pt-8">
-        <span>Muhammad Al-Xorazmiy Vorislari • Xavfsiz tizim</span>
+      {/* Footer */}
+      <div className="text-center text-xs text-muted-foreground py-4">
+        <span>© 2026 AXM Nexus. O‘zbekiston Respublikasi Raqamli Texnologiyalar Vazirligi</span>
       </div>
     </div>
   );

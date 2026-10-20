@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { KeyRound, Copy, Check, Printer, X, ShieldCheck } from 'lucide-react';
-import { Button } from '@/shared/ui/button/Button';
+import { KeyRound, Copy, Check, Printer, ShieldCheck } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export interface CredentialSlipData {
   fullName: string;
@@ -27,7 +36,7 @@ export const CredentialSlipModal: React.FC<CredentialSlipModalProps> = ({
   const [copiedPwd, setCopiedPwd] = useState(false);
   const [copiedAll, setCopiedAll] = useState(false);
 
-  if (!isOpen || !data) return null;
+  if (!data) return null;
 
   const handleCopyId = () => {
     navigator.clipboard.writeText(data.hemisId);
@@ -53,128 +62,131 @@ export const CredentialSlipModal: React.FC<CredentialSlipModalProps> = ({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fade-in"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
-    >
-      <div
-        className="glass-panel bg-[var(--bg-surface)] text-[var(--text-primary)] rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl border border-[var(--border-default)] animate-scale-in"
-        onClick={(e) => e.stopPropagation()}
-      >
-        {/* Modal Header */}
-        <div className="flex items-center justify-between pb-3.5 border-b border-[var(--border-subtle)] mb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="sm:max-w-md p-0 overflow-hidden bg-card text-card-foreground border-0 shadow-2xl rounded-3xl">
+        <DialogHeader className="p-6 pb-4 bg-muted/20 border-b border-border/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shrink-0">
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base font-extrabold text-[var(--text-primary)]">
-                {data.isReset ? "Parol yangilandi" : "HEMIS Hisobi Yaratildi"}
-              </h3>
-              <p className="text-xs text-[var(--text-muted)]">
+              <DialogTitle className="text-base font-bold text-foreground">
+                {data.isReset ? 'Parol yangilandi' : 'HEMIS Hisobi Yaratildi'}
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
                 Al-Xorazmiy Vorislari autentifikatsiya ma'lumotnomasi
-              </p>
+              </DialogDescription>
             </div>
           </div>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-xl bg-[var(--bg-subtle)] hover:bg-[var(--bg-muted)] text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center justify-center transition cursor-pointer"
-          >
-            <X className="w-4 h-4" />
-          </button>
-        </div>
+        </DialogHeader>
 
-        {/* Content Box */}
-        <div className="space-y-4">
+        <div className="p-6 space-y-4">
           {/* User info */}
-          <div className="p-3.5 rounded-2xl bg-[var(--bg-subtle)] border border-[var(--border-default)] space-y-1">
-            <span className="text-[10px] uppercase font-bold text-[var(--text-muted)] tracking-wider">
+          <div className="p-3.5 rounded-2xl bg-muted/30 space-y-1.5">
+            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
               Foydalanuvchi:
             </span>
-            <div className="font-bold text-sm text-[var(--text-primary)]">
+            <div className="font-bold text-sm text-foreground">
               {data.fullName}
             </div>
-            <div className="flex items-center gap-2 text-xs text-[var(--text-secondary)]">
-              <span className="px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-bold border border-indigo-200/50">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Badge variant="secondary" className="border-0 font-medium">
                 {data.role === 'MENTOR' ? 'Mentor' : "O'quvchi"}
-              </span>
-              {data.groupCode && <span>Guruh: <strong>{data.groupCode}</strong></span>}
+              </Badge>
+              {data.groupCode && (
+                <span>
+                  Guruh: <strong className="text-foreground">{data.groupCode}</strong>
+                </span>
+              )}
             </div>
           </div>
 
-          {/* Credentials Card */}
+          {/* Credentials Cards */}
           <div className="space-y-3">
             {/* HEMIS ID */}
-            <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between">
+            <div className="p-3.5 rounded-2xl bg-muted/40 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-[var(--text-muted)] block uppercase">
+                <span className="text-[10px] font-bold text-muted-foreground block uppercase tracking-wider">
                   HEMIS ID (Login):
                 </span>
-                <span className="font-mono text-lg font-black text-[var(--brand-primary)]">
+                <span className="font-mono text-lg font-black text-primary">
                   {data.hemisId}
                 </span>
               </div>
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleCopyId}
-                className="p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer flex items-center gap-1 text-xs"
+                className="h-8 gap-1.5 text-xs rounded-xl border-0 bg-background hover:bg-muted shadow-2xs cursor-pointer"
                 title="ID raqamidan nusxa olish"
               >
-                {copiedId ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedId ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
                 <span>{copiedId ? 'Nusxalandi' : 'Nusxa'}</span>
-              </button>
+              </Button>
             </div>
 
-            {/* Generated Password */}
-            <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 flex items-center justify-between">
+            {/* Password */}
+            <div className="p-3.5 rounded-2xl bg-muted/40 flex items-center justify-between">
               <div>
-                <span className="text-[10px] font-bold text-[var(--text-muted)] block uppercase">
+                <span className="text-[10px] font-bold text-muted-foreground block uppercase tracking-wider">
                   Vaqtinchalik Parol:
                 </span>
                 <span className="font-mono text-lg font-black text-emerald-600 dark:text-emerald-400">
                   {data.password}
                 </span>
               </div>
-              <button
-                type="button"
+              <Button
+                variant="outline"
+                size="sm"
                 onClick={handleCopyPassword}
-                className="p-2 rounded-lg bg-[var(--bg-surface)] border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition cursor-pointer flex items-center gap-1 text-xs"
+                className="h-8 gap-1.5 text-xs rounded-xl border-0 bg-background hover:bg-muted shadow-2xs cursor-pointer"
                 title="Paroldan nusxa olish"
               >
-                {copiedPwd ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedPwd ? (
+                  <Check className="w-3.5 h-3.5 text-emerald-500" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
                 <span>{copiedPwd ? 'Nusxalandi' : 'Nusxa'}</span>
-              </button>
+              </Button>
             </div>
           </div>
 
-          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-xs flex items-start gap-2">
-            <KeyRound className="w-4 h-4 shrink-0 mt-0.5" />
+          {/* Security notice */}
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 text-amber-800 dark:text-amber-300 text-xs flex items-start gap-2.5">
+            <KeyRound className="w-4 h-4 shrink-0 mt-0.5 text-amber-600 dark:text-amber-400" />
             <p className="leading-relaxed">
-              Ushbu maxsus raqamli ID va parol foydalanuvchiga beriladi. Tizimga kirishda botlardan himoya sifatida 5 xonali grafik xavfsizlik kodi ham kiritiladi.
+              Ushbu maxsus raqamli ID va parol foydalanuvchiga taqdim etiladi. Tizimga kirishda xavfsizlik uchun grafik captcha kodi ham kiritiladi.
             </p>
           </div>
 
-          {/* Action Buttons */}
-          <div className="pt-2 flex flex-col sm:flex-row gap-2">
+          {/* Actions */}
+          <DialogFooter className="pt-2 flex flex-col sm:flex-row gap-2">
             <Button
-              variant="primary"
+              variant="default"
               size="sm"
               onClick={handleCopyAll}
-              className="flex-1 font-semibold"
-              leftIcon={copiedAll ? <Check className="w-4 h-4 text-emerald-300" /> : <Copy className="w-4 h-4" />}
+              className="flex-1 font-semibold rounded-xl text-xs gap-1.5 cursor-pointer shadow-sm"
             >
-              <span>{copiedAll ? "Barchasi nusxalandi!" : "Ma'lumotnomani nusxalash"}</span>
+              {copiedAll ? (
+                <Check className="w-4 h-4 text-emerald-300" />
+              ) : (
+                <Copy className="w-4 h-4" />
+              )}
+              <span>{copiedAll ? 'Barchasi nusxalandi!' : "Ma'lumotnomani nusxalash"}</span>
             </Button>
 
             <Button
               variant="outline"
               size="sm"
               onClick={handlePrint}
-              className="font-medium"
-              leftIcon={<Printer className="w-4 h-4" />}
+              className="font-medium rounded-xl text-xs gap-1.5 border-0 bg-muted/50 hover:bg-muted cursor-pointer"
             >
+              <Printer className="w-4 h-4" />
               <span>Chop etish</span>
             </Button>
 
@@ -182,13 +194,13 @@ export const CredentialSlipModal: React.FC<CredentialSlipModalProps> = ({
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="font-medium"
+              className="font-medium rounded-xl text-xs cursor-pointer"
             >
               <span>Yopish</span>
             </Button>
-          </div>
+          </DialogFooter>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 };

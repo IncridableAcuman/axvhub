@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { createPortal } from 'react-dom';
 import {
   Search,
   X,
@@ -25,6 +24,15 @@ import {
 } from 'lucide-react';
 import { useTheme } from '@/shared/theme/ThemeContext';
 import { useOptionalAuth } from '@/features/auth/AuthContext';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 
 export interface SearchItem {
   id: string;
@@ -72,24 +80,6 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       }, 50);
     }
   }, [isOpen]);
-
-  // Global hotkey Ctrl+K / Cmd+K and Escape
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault();
-        if (isOpen) {
-          onClose();
-        }
-      } else if (e.key === 'Escape' && isOpen) {
-        e.preventDefault();
-        onClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, onClose]);
 
   const searchItems: SearchItem[] = useMemo(() => {
     return [
@@ -352,6 +342,28 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     });
   }, [searchItems, query, selectedCategory, userNormRoles]);
 
+  // Dynamic category counts matching current query and role access
+  const categoryCounts = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const counts = { all: 0, pages: 0, actions: 0, courses: 0 };
+    searchItems.forEach((item) => {
+      if (!isItemAllowed(item)) return;
+      const matchesQuery =
+        !q ||
+        item.title.toLowerCase().includes(q) ||
+        item.subtitle.toLowerCase().includes(q) ||
+        (item.badge && item.badge.toLowerCase().includes(q));
+
+      if (matchesQuery) {
+        counts.all += 1;
+        if (item.category === 'pages') counts.pages += 1;
+        if (item.category === 'actions') counts.actions += 1;
+        if (item.category === 'courses') counts.courses += 1;
+      }
+    });
+    return counts;
+  }, [searchItems, query, userNormRoles]);
+
   // Keyboard navigation inside list
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (filteredItems.length === 0) return;
@@ -381,23 +393,22 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
     }
   }, [selectedIndex]);
 
-  if (!isOpen) return null;
-
-  const modalContent = (
-    <div
-      role="dialog"
-      aria-modal="true"
-      aria-label="Tezkor qidiruv modali"
-      className="fixed inset-0 z-50 flex items-start justify-center pt-14 sm:pt-20 px-3 sm:px-4 bg-slate-950/60 backdrop-blur-md animate-in fade-in duration-200"
-      onClick={onClose}
-    >
-      <div
-        className="w-full max-w-2xl bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[85vh]"
-        onClick={(e) => e.stopPropagation()}
+  return (
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent
+        aria-label="Tezkor qidiruv modali"
+        className="p-0 gap-0 overflow-hidden w-[calc(100%-1.5rem)] sm:max-w-2xl border-border/70 bg-card/95 backdrop-blur-xl shadow-2xl rounded-2xl sm:rounded-3xl [&>button]:hidden top-[25%] sm:top-[30%] translate-y-[-25%] sm:translate-y-[-30%]"
       >
-        {/* Top Input Bar */}
-        <div className="relative flex items-center px-4 sm:px-5 py-3.5 border-b border-[var(--border-subtle)] bg-[var(--bg-surface)]">
-          <Search className="w-5 h-5 text-[var(--brand-primary)] shrink-0 mr-3" />
+        <DialogHeader className="sr-only">
+          <DialogTitle>Tezkor qidiruv</DialogTitle>
+          <DialogDescription>
+            AXM Nexus bo‘yicha sahifalar, amallar va dars yo‘nalishlarini tezkor qidirish
+          </DialogDescription>
+        </DialogHeader>
+
+        {/* Top Spotlight Search Bar */}
+        <div className="relative flex items-center px-4 sm:px-5 py-3.5 border-b border-border/50 bg-background/50">
+          <Search className="w-5 h-5 text-primary shrink-0 mr-3" />
           <input
             ref={inputRef}
             type="text"
@@ -408,63 +419,82 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             }}
             onKeyDown={handleKeyDown}
             placeholder="AXM Nexus bo‘yicha qidirish (o‘quvchi, guruh, mentor, sahifa)..."
-            className="w-full text-sm sm:text-base bg-transparent text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none font-medium p-1.5"
+            className="w-full text-sm sm:text-base bg-transparent text-foreground placeholder:text-muted-foreground focus:outline-none font-medium py-1"
           />
 
           {query && (
-            <button
+            <Button
               type="button"
+              variant="ghost"
+              size="icon"
               onClick={() => {
                 setQuery('');
                 inputRef.current?.focus();
               }}
-              className="p-1 rounded-lg text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] transition mr-1.5"
+              className="h-7 w-7 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted mr-1.5 cursor-pointer"
               aria-label="Matnni tozalash"
             >
               <X className="w-4 h-4" />
-            </button>
+            </Button>
           )}
 
-          <kbd className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] bg-[var(--bg-subtle)] text-[var(--text-secondary)] px-2 py-1 rounded-lg border border-[var(--border-default)] font-semibold select-none">
+          <kbd className="hidden sm:inline-flex items-center gap-1 font-mono text-[10px] bg-muted text-muted-foreground px-2 py-1 rounded-md border border-border font-medium select-none">
             ESC
           </kbd>
         </div>
 
         {/* Category Filter Chips */}
-        <div className="px-4 py-2 border-b border-[var(--border-subtle)] bg-[var(--bg-subtle)]/40 flex items-center gap-1.5 overflow-x-auto text-xs">
+        <div className="px-4 py-2 border-b border-border/40 bg-muted/20 flex items-center gap-1.5 overflow-x-auto text-xs no-scrollbar">
           {[
-            { id: 'all', label: 'Barchasi' },
-            { id: 'pages', label: 'Sahifalar' },
-            { id: 'actions', label: 'Tezkor amallar' },
-            { id: 'courses', label: 'O‘quv yo‘nalishlari' },
-          ].map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() => {
-                setSelectedCategory(cat.id as any);
-                setSelectedIndex(0);
-              }}
-              className={`px-3 py-1 rounded-xl font-semibold transition whitespace-nowrap cursor-pointer ${
-                selectedCategory === cat.id
-                  ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-                  : 'bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] border border-[var(--border-default)]'
-              }`}
-            >
-              {cat.label}
-            </button>
-          ))}
+            { id: 'all', label: 'Barchasi', count: categoryCounts.all },
+            { id: 'pages', label: 'Sahifalar', count: categoryCounts.pages },
+            { id: 'actions', label: 'Tezkor amallar', count: categoryCounts.actions },
+            { id: 'courses', label: 'O‘quv yo‘nalishlari', count: categoryCounts.courses },
+          ].map((cat) => {
+            const isSelected = selectedCategory === cat.id;
+            return (
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => {
+                  setSelectedCategory(cat.id as any);
+                  setSelectedIndex(0);
+                }}
+                className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs transition-all whitespace-nowrap cursor-pointer ${
+                  isSelected
+                    ? 'bg-primary text-primary-foreground font-semibold shadow-xs'
+                    : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-muted/70 border border-border/50 font-medium'
+                }`}
+              >
+                <span>{cat.label}</span>
+                <span
+                  className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                    isSelected
+                      ? 'bg-primary-foreground/20 text-primary-foreground'
+                      : 'bg-muted text-muted-foreground'
+                  }`}
+                >
+                  {cat.count}
+                </span>
+              </button>
+            );
+          })}
         </div>
 
         {/* Results List */}
-        <div ref={listRef} className="overflow-y-auto p-2 sm:p-3 space-y-1 divide-y divide-transparent">
+        <div
+          ref={listRef}
+          className="max-h-[60vh] sm:max-h-[380px] overflow-y-auto p-2 sm:p-3 space-y-1"
+        >
           {filteredItems.length === 0 ? (
-            <div className="py-12 text-center text-[var(--text-muted)]">
-              <Search className="w-8 h-8 mx-auto mb-2 text-slate-400 opacity-60" />
-              <p className="text-sm font-semibold text-[var(--text-primary)]">
+            <div className="py-12 px-4 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-muted/60 flex items-center justify-center mx-auto mb-3 text-muted-foreground">
+                <Search className="w-6 h-6 opacity-60" />
+              </div>
+              <p className="text-sm font-semibold text-foreground">
                 Hech narsa topilmadi
               </p>
-              <p className="text-xs text-[var(--text-muted)] mt-1">
+              <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
                 &ldquo;{query}&rdquo; so‘rovi bo‘yicha mos keladigan ma’lumot mavjud emas.
               </p>
             </div>
@@ -479,18 +509,18 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     onClose();
                   }}
                   onMouseEnter={() => setSelectedIndex(index)}
-                  className={`flex items-center justify-between p-3 rounded-2xl cursor-pointer transition-all duration-150 select-none ${
+                  className={`flex items-center justify-between p-3 rounded-xl sm:rounded-2xl cursor-pointer transition-all duration-150 select-none ${
                     isSelected
-                      ? 'bg-[var(--brand-subtle)] border border-[var(--brand-primary)]/20 shadow-xs'
-                      : 'hover:bg-[var(--bg-subtle)]/80 border border-transparent'
+                      ? 'bg-primary/10 border border-primary/25 shadow-xs'
+                      : 'hover:bg-muted/60 border border-transparent'
                   }`}
                 >
                   <div className="flex items-center gap-3 min-w-0">
                     <div
-                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition ${
+                      className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 transition-all ${
                         isSelected
-                          ? 'bg-[var(--brand-primary)] text-white shadow-md shadow-[var(--brand-primary)]/20'
-                          : 'bg-[var(--bg-subtle)] text-[var(--text-secondary)]'
+                          ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-105'
+                          : 'bg-muted/80 text-muted-foreground'
                       }`}
                     >
                       {item.icon}
@@ -499,31 +529,41 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     <div className="flex flex-col min-w-0">
                       <div className="flex items-center gap-2">
                         <span
-                          className={`text-xs sm:text-sm font-bold truncate ${
-                            isSelected ? 'text-[var(--brand-primary)]' : 'text-[var(--text-primary)]'
+                          className={`text-xs sm:text-sm font-semibold truncate ${
+                            isSelected ? 'text-primary' : 'text-foreground'
                           }`}
                         >
                           {item.title}
                         </span>
                         {item.badge && (
-                          <span className="text-[10px] font-semibold px-2 py-0.5 rounded-md bg-[var(--bg-subtle)] text-[var(--text-muted)] border border-[var(--border-subtle)]">
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] px-1.5 py-0 h-4 font-medium border border-border/50"
+                          >
                             {item.badge}
-                          </span>
+                          </Badge>
                         )}
                       </div>
-                      <span className="text-[11px] text-[var(--text-muted)] truncate mt-0.5">
+                      <span className="text-[11px] text-muted-foreground truncate mt-0.5">
                         {item.subtitle}
                       </span>
                     </div>
                   </div>
 
-                  <ArrowRight
-                    className={`w-4 h-4 shrink-0 transition-transform ${
-                      isSelected
-                        ? 'translate-x-0.5 text-[var(--brand-primary)] opacity-100'
-                        : 'opacity-0 text-[var(--text-muted)]'
-                    }`}
-                  />
+                  <div className="flex items-center gap-2 shrink-0">
+                    {isSelected && (
+                      <kbd className="hidden sm:inline-flex items-center font-mono text-[10px] text-primary/80 bg-background px-1.5 py-0.5 rounded border border-primary/25">
+                        ↵ Enter
+                      </kbd>
+                    )}
+                    <ArrowRight
+                      className={`w-4 h-4 transition-transform ${
+                        isSelected
+                          ? 'translate-x-0.5 text-primary opacity-100'
+                          : 'opacity-0 text-muted-foreground'
+                      }`}
+                    />
+                  </div>
                 </div>
               );
             })
@@ -531,35 +571,38 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         </div>
 
         {/* Footer Shortcut Bar */}
-        <div className="px-4 py-2.5 bg-[var(--bg-subtle)]/70 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] text-[var(--text-muted)]">
-          <div className="flex items-center gap-4">
+        <div className="px-4 py-2.5 bg-muted/30 border-t border-border/50 flex items-center justify-between text-[11px] text-muted-foreground">
+          <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border-default)] font-mono text-[10px] font-bold">
+              <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono text-[10px] font-semibold text-foreground/80 shadow-2xs">
                 ↑↓
               </kbd>
               <span>Harakatlanish</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border-default)] font-mono text-[10px] font-bold">
+              <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono text-[10px] font-semibold text-foreground/80 shadow-2xs">
                 ↵
               </kbd>
               <span>Tanlash</span>
             </span>
             <span className="flex items-center gap-1">
-              <kbd className="px-1.5 py-0.5 rounded bg-[var(--bg-surface)] border border-[var(--border-default)] font-mono text-[10px] font-bold">
+              <kbd className="px-1.5 py-0.5 rounded bg-background border border-border font-mono text-[10px] font-semibold text-foreground/80 shadow-2xs">
                 ESC
               </kbd>
               <span>Yopish</span>
             </span>
           </div>
 
-          <span className="font-semibold text-[var(--brand-primary)] hidden sm:inline">
-            AXM Nexus Spotlight
-          </span>
+          <div className="hidden sm:flex items-center gap-1.5">
+            <Badge
+              variant="outline"
+              className="text-[10px] font-medium text-primary border-primary/20 bg-primary/5 py-0.5"
+            >
+              AXM Nexus Spotlight
+            </Badge>
+          </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
-
-  return typeof document !== 'undefined' ? createPortal(modalContent, document.body) : null;
 };
