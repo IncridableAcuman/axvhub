@@ -13,14 +13,6 @@ import {
   Send,
   Play,
   Award,
-  Layers,
-  GraduationCap,
-  Calendar,
-  Code2,
-  HelpCircle,
-  FileText,
-  X,
-  Share2,
 } from 'lucide-react';
 import {
   Card,
@@ -42,7 +34,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { lessonPlanApi } from '@/api';
 import type { LessonPlanDto, StudyGroup, Mentor } from '@/types';

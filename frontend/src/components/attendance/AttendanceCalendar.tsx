@@ -12,24 +12,14 @@ import {
   CalendarDays,
   Search,
   CheckCircle2,
-  XCircle,
   AlertCircle,
-  MoreVertical,
   GraduationCap,
-  Sparkles,
 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { attendanceApi } from '@/api';
 import { useTranslation } from '@/shared/i18n';
 import { useOptionalAuth } from '@/features/auth/AuthContext';
@@ -47,7 +37,7 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
   groups,
   mentors,
 }) => {
-  const { t, locale, formatDate } = useTranslation();
+  const { t, locale } = useTranslation();
   const auth = useOptionalAuth();
   const isAdmin = auth ? auth.isAdmin : true;
   const isMentor = auth ? auth.isMentor : true;
