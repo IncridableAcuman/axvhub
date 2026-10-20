@@ -1,8 +1,16 @@
 import React, { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
-import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { Button } from '@/shared/ui/button/Button';
-import { Input } from '@/shared/ui/input/Input';
+import { AlertTriangle, Calendar, Clock, MapPin, BookOpen, User, Users } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { attendanceApi } from '@/api';
 import type { StudyGroup, Mentor } from '@/types';
 
@@ -23,12 +31,12 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
 }) => {
   const [groupId, setGroupId] = useState<number>(groups[0]?.id || 1);
   const [mentorId, setMentorId] = useState<number>(mentors[0]?.id || 1);
-  const [subject, setSubject] = useState('Dasturlash asoslari');
+  const [subject, setSubject] = useState('Web Full-Stack Development');
   const [topic, setTopic] = useState('');
   const [roomNumber, setRoomNumber] = useState('Xona 101');
   const [lessonDate, setLessonDate] = useState(() => new Date().toISOString().split('T')[0]);
   const [startTimeStr, setStartTimeStr] = useState('14:00');
-  const [endTimeStr, setEndTimeStr] = useState('16:00');
+  const [endTimeStr, setEndTimeStr] = useState('15:20');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -73,138 +81,171 @@ export const CreateLessonModal: React.FC<CreateLessonModalProps> = ({
   };
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title="Yangi Dars Mashg'ulotini Rejalashtirish" size="lg">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="p-3 text-xs rounded-xl bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-900 flex items-start space-x-2">
-            <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-xl p-0 overflow-hidden bg-background border-border shadow-2xl">
+        <DialogHeader className="p-6 pb-4 border-b border-border/40 bg-muted/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
+              <Calendar className="w-5 h-5" />
+            </div>
             <div>
-              <span className="font-bold">Rejalashtirish xatosi: </span>
-              {error}
+              <DialogTitle className="text-xl font-bold tracking-tight">
+                Yangi Dars Mashg‘ulotini Rejalashtirish
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                Dars jadvaliga yangi mashg‘ulot sessiyasini kiriting
+              </DialogDescription>
             </div>
           </div>
-        )}
+        </DialogHeader>
 
-        {/* Group and Mentor selection */}
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-              O'quv Guruhi *
-            </label>
-            <select
-              value={groupId}
-              onChange={(e) => setGroupId(Number(e.target.value))}
-              aria-label="O'quv Guruhi"
-              className="w-full text-xs rounded-xl border border-slate-300 dark:border-[var(--border-default)] bg-white dark:bg-[var(--bg-surface)] px-3 py-2 text-slate-900 dark:text-[var(--text-primary)] focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-            >
-              {groups.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.name || g.groupCode} ({g.gradeLevel})
-                </option>
-              ))}
-            </select>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 text-xs rounded-xl bg-destructive/10 text-destructive border border-destructive/20 flex items-start gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
+              <div>
+                <span className="font-bold">Rejalashtirish xatosi: </span>
+                {error}
+              </div>
+            </div>
+          )}
+
+          {/* Group and Mentor selection */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <Users className="w-3.5 h-3.5 text-muted-foreground" />
+                O‘quv Guruhi *
+              </Label>
+              <select
+                value={groupId}
+                onChange={(e) => setGroupId(Number(e.target.value))}
+                aria-label="O'quv Guruhi"
+                className="w-full text-xs h-9 rounded-md border border-input bg-background px-3 py-1 text-foreground shadow-xs focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+              >
+                {groups.map((g) => (
+                  <option key={g.id} value={g.id}>
+                    {g.name || g.groupCode} ({g.gradeLevel})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <User className="w-3.5 h-3.5 text-muted-foreground" />
+                Mas‘ul Mentor *
+              </Label>
+              <select
+                value={mentorId}
+                onChange={(e) => setMentorId(Number(e.target.value))}
+                aria-label="Mas'ul Mentor"
+                className="w-full text-xs h-9 rounded-md border border-input bg-background px-3 py-1 text-foreground shadow-xs focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+              >
+                {mentors.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.fullName} ({m.role || 'Mentor'})
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-              Mas'ul Mentor *
-            </label>
-            <select
-              value={mentorId}
-              onChange={(e) => setMentorId(Number(e.target.value))}
-              aria-label="Mas'ul Mentor"
-              className="w-full text-xs rounded-xl border border-slate-300 dark:border-[var(--border-default)] bg-white dark:bg-[var(--bg-surface)] px-3 py-2 text-slate-900 dark:text-[var(--text-primary)] focus:outline-hidden focus:ring-2 focus:ring-blue-500"
-            >
-              {mentors.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.fullName} ({m.role})
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {/* Subject and Topic */}
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-            Fan / Yo'nalish nomi *
-          </label>
-          <Input
-            value={subject}
-            onChange={(e) => setSubject(e.target.value)}
-            placeholder="Masalan: Web-dasturlash asoslari"
-            required
-          />
-        </div>
-
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-            Dars mavzusi (Ixtiyoriy)
-          </label>
-          <Input
-            value={topic}
-            onChange={(e) => setTopic(e.target.value)}
-            placeholder="Masalan: React komponentlari va state boshqaruvi"
-          />
-        </div>
-
-        {/* Date, Time and Room */}
-        <div className="grid grid-cols-3 gap-2">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-              Sana *
-            </label>
+          {/* Subject and Topic */}
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold flex items-center gap-1.5">
+              <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
+              Fan / Yo‘nalish nomi *
+            </Label>
             <Input
-              type="date"
-              value={lessonDate}
-              onChange={(e) => setLessonDate(e.target.value)}
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Masalan: Web Full-Stack Development"
+              className="h-9 text-xs"
               required
             />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-              Boshlanish *
-            </label>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold">
+              Dars mavzusi (Ixtiyoriy)
+            </Label>
             <Input
-              type="time"
-              value={startTimeStr}
-              onChange={(e) => setStartTimeStr(e.target.value)}
-              required
+              value={topic}
+              onChange={(e) => setTopic(e.target.value)}
+              placeholder="Masalan: React Hooks va State management"
+              className="h-9 text-xs"
             />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-              Tugash *
-            </label>
+
+          {/* Date, Time and Room */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                Sana *
+              </Label>
+              <Input
+                type="date"
+                value={lessonDate}
+                onChange={(e) => setLessonDate(e.target.value)}
+                className="h-9 text-xs"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                Boshlanish *
+              </Label>
+              <Input
+                type="time"
+                value={startTimeStr}
+                onChange={(e) => setStartTimeStr(e.target.value)}
+                className="h-9 text-xs"
+                required
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                Tugash *
+              </Label>
+              <Input
+                type="time"
+                value={endTimeStr}
+                onChange={(e) => setEndTimeStr(e.target.value)}
+                className="h-9 text-xs"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+              O‘quv xonasi
+            </Label>
             <Input
-              type="time"
-              value={endTimeStr}
-              onChange={(e) => setEndTimeStr(e.target.value)}
-              required
+              value={roomNumber}
+              onChange={(e) => setRoomNumber(e.target.value)}
+              placeholder="Masalan: Lab-101 yoki Auditorium A"
+              className="h-9 text-xs"
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-            O'quv xonasi
-          </label>
-          <Input
-            value={roomNumber}
-            onChange={(e) => setRoomNumber(e.target.value)}
-            placeholder="Masalan: Xona 102"
-          />
-        </div>
-
-        <div className="flex justify-end space-x-2 pt-3 border-t border-slate-200 dark:border-slate-800">
-          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-            Bekor qilish
-          </Button>
-          <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? 'Rejalashtirilmoqda...' : 'Darsni saqlash'}
-          </Button>
-        </div>
-      </form>
+          <DialogFooter className="pt-4 border-t border-border/40 flex items-center justify-end gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={loading}>
+              Bekor qilish
+            </Button>
+            <Button type="submit" variant="default" size="sm" disabled={loading} className="gap-1.5">
+              {loading ? 'Rejalashtirilmoqda...' : 'Darsni saqlash'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

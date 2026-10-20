@@ -1,7 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog } from '@/shared/ui/dialog/Dialog';
-import { Button } from '@/shared/ui/button/Button';
-import { Input } from '@/shared/ui/input/Input';
+import { Calendar, Clock, MapPin, AlertTriangle } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent } from '@/components/ui/card';
 import { attendanceApi } from '@/api';
 import type { LessonSessionDto } from '@/types';
 
@@ -20,20 +30,27 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
 }) => {
   const [newDate, setNewDate] = useState('');
   const [newStartTime, setNewStartTime] = useState('14:00');
-  const [newEndTime, setNewEndTime] = useState('16:00');
+  const [newEndTime, setNewEndTime] = useState('15:20');
   const [newRoomNumber, setNewRoomNumber] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session) {
-      const datePart = session.startTime.split('T')[0];
-      const startHour = session.startTime.split('T')[1]?.substring(0, 5) || '14:00';
-      const endHour = session.endTime.split('T')[1]?.substring(0, 5) || '16:00';
+      const datePart = session.startTime?.includes('T')
+        ? session.startTime.split('T')[0]
+        : session.lessonDate || '';
+      const startHour = session.startTime?.includes('T')
+        ? session.startTime.split('T')[1]?.substring(0, 5)
+        : session.startTime || '14:00';
+      const endHour = session.endTime?.includes('T')
+        ? session.endTime.split('T')[1]?.substring(0, 5)
+        : session.endTime || '15:20';
+
       setNewDate(datePart);
       setNewStartTime(startHour);
       setNewEndTime(endHour);
-      setNewRoomNumber(session.roomNumber || '');
+      setNewRoomNumber(session.roomNumber || session.room || '');
     }
   }, [session, isOpen]);
 
@@ -70,79 +87,109 @@ export const RescheduleLessonModal: React.FC<RescheduleLessonModalProps> = ({
   };
 
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title="Dars Vaqtini Ko'chirish (Reschedule)" size="md">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {error && (
-          <div className="p-3 text-xs rounded-xl bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-900">
-            {error}
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md p-0 overflow-hidden bg-background border-border shadow-2xl">
+        <DialogHeader className="p-6 pb-4 border-b border-border/40 bg-muted/20">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 rounded-2xl bg-amber-500/10 text-amber-500">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <div>
+              <DialogTitle className="text-xl font-bold tracking-tight">
+                Dars Vaqtini Ko‘chirish (Reschedule)
+              </DialogTitle>
+              <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                Mashg‘ulotning sana, vaqt va auditoriya ma’lumotlarini o‘zgartiring
+              </DialogDescription>
+            </div>
           </div>
-        )}
+        </DialogHeader>
 
-        <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs">
-          <div className="font-bold text-slate-900 dark:text-slate-100">{session.subject}</div>
-          <div className="text-slate-500 mt-0.5">
-            Guruh: <span className="font-semibold text-blue-600">{session.groupName}</span> | Mentor:{' '}
-            <span className="font-semibold">{session.mentorName}</span>
-          </div>
-        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          {error && (
+            <div className="p-3 text-xs rounded-xl bg-destructive/10 text-destructive border border-destructive/20 flex items-center gap-2">
+              <AlertTriangle className="w-4 h-4 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-            Yangi sana *
-          </label>
-          <Input
-            type="date"
-            value={newDate}
-            onChange={(e) => setNewDate(e.target.value)}
-            required
-          />
-        </div>
+          <Card className="border-border/60 bg-muted/30">
+            <CardContent className="p-3.5 text-xs space-y-1">
+              <div className="font-bold text-foreground">{session.subject}</div>
+              <div className="text-muted-foreground flex items-center gap-2">
+                <span>Guruh: <strong className="text-foreground">{session.groupName || session.groupCode}</strong></span>
+                <span>·</span>
+                <span>Mentor: <strong className="text-foreground">{session.mentorName}</strong></span>
+              </div>
+            </CardContent>
+          </Card>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-              Boshlanish vaqti *
-            </label>
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold flex items-center gap-1.5">
+              <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+              Yangi sana *
+            </Label>
             <Input
-              type="time"
-              value={newStartTime}
-              onChange={(e) => setNewStartTime(e.target.value)}
+              type="date"
+              value={newDate}
+              onChange={(e) => setNewDate(e.target.value)}
+              className="h-9 text-xs"
               required
             />
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-              Tugash vaqti *
-            </label>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                Boshlanish vaqti *
+              </Label>
+              <Input
+                type="time"
+                value={newStartTime}
+                onChange={(e) => setNewStartTime(e.target.value)}
+                className="h-9 text-xs"
+                required
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-muted-foreground" />
+                Tugash vaqti *
+              </Label>
+              <Input
+                type="time"
+                value={newEndTime}
+                onChange={(e) => setNewEndTime(e.target.value)}
+                className="h-9 text-xs"
+                required
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-semibold flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+              Yangi o‘quv xonasi
+            </Label>
             <Input
-              type="time"
-              value={newEndTime}
-              onChange={(e) => setNewEndTime(e.target.value)}
-              required
+              value={newRoomNumber}
+              onChange={(e) => setNewRoomNumber(e.target.value)}
+              placeholder="Masalan: Xona 202"
+              className="h-9 text-xs"
             />
           </div>
-        </div>
 
-        <div>
-          <label className="block text-xs font-semibold text-slate-700 dark:text-[var(--text-secondary)] mb-1">
-            Yangi o'quv xonasi
-          </label>
-          <Input
-            value={newRoomNumber}
-            onChange={(e) => setNewRoomNumber(e.target.value)}
-            placeholder="Masalan: Xona 202"
-          />
-        </div>
-
-        <div className="flex justify-end space-x-2 pt-3 border-t border-slate-200 dark:border-slate-800">
-          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
-            Bekor qilish
-          </Button>
-          <Button type="submit" variant="primary" disabled={loading}>
-            {loading ? 'Ko‘chirilmoqda...' : 'Ko‘chirishni tasdiqlash'}
-          </Button>
-        </div>
-      </form>
+          <DialogFooter className="pt-4 border-t border-border/40 flex items-center justify-end gap-2">
+            <Button type="button" variant="outline" size="sm" onClick={onClose} disabled={loading}>
+              Bekor qilish
+            </Button>
+            <Button type="submit" variant="default" size="sm" disabled={loading} className="gap-1.5">
+              {loading ? 'Ko‘chirilmoqda...' : 'Ko‘chirishni tasdiqlash'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };
