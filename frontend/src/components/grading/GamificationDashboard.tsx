@@ -8,6 +8,7 @@ import {
   Plus,
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button/Button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useOptionalAuth } from '@/features/auth/AuthContext';
 import { gradingApi } from '@/api';
@@ -236,8 +237,15 @@ export const GamificationDashboard: React.FC<GamificationDashboardProps> = ({ st
           </div>
 
           {loading ? (
-            <div className="py-12 flex items-center justify-center text-xs text-[var(--text-muted)] animate-pulse">
-              Reyting ma’lumotlari yuklanmoqda...
+            <div className="space-y-3 py-4">
+              {[1, 2, 3, 4, 5, 6].map((row) => (
+                <div key={row} className="flex items-center gap-4 py-3 border-b border-[var(--border-subtle)]">
+                  <Skeleton className="h-6 w-8 rounded-full" />
+                  <Skeleton className="h-5 w-48 rounded-md" />
+                  <Skeleton className="h-5 w-24 rounded-md" />
+                  <Skeleton className="h-5 w-16 rounded-md ml-auto" />
+                </div>
+              ))}
             </div>
           ) : !isGroupView ? (
             <div className="overflow-x-auto">

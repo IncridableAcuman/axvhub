@@ -26,7 +26,25 @@ import {
 import { adminApi } from '@/api';
 import { useTranslation } from '@/shared/i18n';
 import { useToast } from '@/shared/ui/toast/ToastContext';
-import { Button } from '@/shared/ui/button/Button';
+import {
+  Card,
+  CardTitle,
+  CardDescription,
+  CardContent,
+} from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import type {
   AdminOverview,
   AdminUserItem,
@@ -117,7 +135,6 @@ export const AdminControlCenter: React.FC = () => {
         setUsers(res.data.data.content);
       }
     } catch {
-      // Fallback
       setUsers([]);
     } finally {
       setLoading(false);
@@ -265,21 +282,22 @@ export const AdminControlCenter: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-200">
-      {/* Header Banner */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white border border-indigo-500/20 shadow-xl relative overflow-hidden">
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div className="space-y-6 animate-in fade-in duration-300">
+      {/* Header Banner (Shadcn Card with Gradient) */}
+      <Card className="relative overflow-hidden border-indigo-500/20 bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none -mr-16 -mt-16" />
+        <CardContent className="p-6 relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="p-2 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+            <div className="flex items-center gap-2.5">
+              <span className="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
                 <ShieldCheck className="w-6 h-6" />
               </span>
               <div>
                 <h1 className="text-xl sm:text-2xl font-black tracking-tight flex items-center gap-2">
                   <span>{t('admin.title')}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  <Badge variant="outline" className="bg-emerald-500/20 text-emerald-300 border-emerald-500/30 text-[10px]">
                     Modul 16
-                  </span>
+                  </Badge>
                 </h1>
                 <p className="text-xs text-slate-300 mt-0.5">{t('admin.subtitle')}</p>
               </div>
@@ -297,24 +315,24 @@ export const AdminControlCenter: React.FC = () => {
                 else if (activeTab === 'config') loadConfigs();
                 else if (activeTab === 'health') loadHealth();
               }}
-              leftIcon={<RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />}
-              className="bg-white/10 hover:bg-white/20 text-white border-white/20"
+              className="bg-white/10 hover:bg-white/20 text-white border-white/20 gap-1.5"
             >
-              {t('common.refresh')}
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+              <span>{t('common.refresh')}</span>
             </Button>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      {/* Tabs Navigation */}
-      <div className="flex items-center gap-2 p-1 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] overflow-x-auto shadow-xs text-xs font-semibold">
+      {/* Tabs Navigation (Shadcn-styled button pills) */}
+      <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-muted/40 overflow-x-auto text-xs font-semibold">
         <button
           type="button"
           onClick={() => setActiveTab('overview')}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
             activeTab === 'overview'
-              ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
         >
           <Activity className="w-4 h-4" />
@@ -326,8 +344,8 @@ export const AdminControlCenter: React.FC = () => {
           onClick={() => setActiveTab('users')}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
             activeTab === 'users'
-              ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
         >
           <Users className="w-4 h-4" />
@@ -339,8 +357,8 @@ export const AdminControlCenter: React.FC = () => {
           onClick={() => setActiveTab('audit')}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
             activeTab === 'audit'
-              ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
         >
           <FileText className="w-4 h-4" />
@@ -352,8 +370,8 @@ export const AdminControlCenter: React.FC = () => {
           onClick={() => setActiveTab('moderation')}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
             activeTab === 'moderation'
-              ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
         >
           <GraduationCap className="w-4 h-4" />
@@ -365,8 +383,8 @@ export const AdminControlCenter: React.FC = () => {
           onClick={() => setActiveTab('config')}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
             activeTab === 'config'
-              ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
         >
           <Sliders className="w-4 h-4" />
@@ -378,8 +396,8 @@ export const AdminControlCenter: React.FC = () => {
           onClick={() => setActiveTab('health')}
           className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition cursor-pointer whitespace-nowrap ${
             activeTab === 'health'
-              ? 'bg-[var(--brand-primary)] text-white shadow-xs'
-              : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-subtle)]'
+              ? 'bg-primary text-primary-foreground shadow-xs'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
           }`}
         >
           <HeartPulse className="w-4 h-4" />
@@ -391,120 +409,116 @@ export const AdminControlCenter: React.FC = () => {
       {activeTab === 'overview' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs flex items-center justify-between">
+            <Card className="flex items-center justify-between p-5">
               <div>
-                <span className="text-xs font-semibold text-[var(--text-muted)]">
+                <CardDescription className="text-xs font-semibold">
                   {t('admin.stats.totalUsers')}
-                </span>
-                <h3 className="text-2xl font-black text-[var(--text-primary)] mt-1">
+                </CardDescription>
+                <div className="text-2xl font-black text-foreground mt-1">
                   {overview?.totalUsers ?? '—'}
-                </h3>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-blue-500/10 text-blue-600">
+              <div className="p-3 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
                 <Users className="w-6 h-6" />
               </div>
-            </div>
+            </Card>
 
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs flex items-center justify-between">
+            <Card className="flex items-center justify-between p-5">
               <div>
-                <span className="text-xs font-semibold text-[var(--text-muted)]">
+                <CardDescription className="text-xs font-semibold">
                   {t('admin.stats.totalStudents')}
-                </span>
-                <h3 className="text-2xl font-black text-[var(--text-primary)] mt-1">
+                </CardDescription>
+                <div className="text-2xl font-black text-foreground mt-1">
                   {overview?.totalStudents ?? '—'}
-                </h3>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600">
+              <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                 <GraduationCap className="w-6 h-6" />
               </div>
-            </div>
+            </Card>
 
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs flex items-center justify-between">
+            <Card className="flex items-center justify-between p-5">
               <div>
-                <span className="text-xs font-semibold text-[var(--text-muted)]">
+                <CardDescription className="text-xs font-semibold">
                   {t('admin.stats.totalMentors')}
-                </span>
-                <h3 className="text-2xl font-black text-[var(--text-primary)] mt-1">
+                </CardDescription>
+                <div className="text-2xl font-black text-foreground mt-1">
                   {overview?.totalMentors ?? '—'}
-                </h3>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-purple-500/10 text-purple-600">
+              <div className="p-3 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
                 <Trophy className="w-6 h-6" />
               </div>
-            </div>
+            </Card>
 
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs flex items-center justify-between">
+            <Card className="flex items-center justify-between p-5">
               <div>
-                <span className="text-xs font-semibold text-[var(--text-muted)]">
+                <CardDescription className="text-xs font-semibold">
                   {t('admin.stats.totalLessons')}
-                </span>
-                <h3 className="text-2xl font-black text-[var(--text-primary)] mt-1">
+                </CardDescription>
+                <div className="text-2xl font-black text-foreground mt-1">
                   {overview?.totalLessons ?? '—'}
-                </h3>
+                </div>
               </div>
-              <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600">
+              <div className="p-3 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
                 <BookOpen className="w-6 h-6" />
               </div>
-            </div>
+            </Card>
           </div>
 
           {/* Quick Metrics & System Health Bar */}
-          <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs space-y-4">
-            <h3 className="text-sm font-bold text-[var(--text-primary)] flex items-center gap-2">
-              <Server className="w-4 h-4 text-[var(--brand-primary)]" />
+          <Card className="p-5 space-y-4">
+            <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <Server className="w-4 h-4 text-primary" />
               <span>Infratuzilma tezkor holati</span>
-            </h3>
+            </CardTitle>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] space-y-1">
-                <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+              <div className="p-4 rounded-xl bg-muted/40 space-y-2">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>JVM Xotirasi</span>
-                  <span className="font-bold text-[var(--text-primary)]">
+                  <span className="font-bold text-foreground">
                     {overview?.operationalMetrics?.jvmUsedMemoryMb} MB / {overview?.operationalMetrics?.jvmTotalMemoryMb} MB
                   </span>
                 </div>
-                <div className="w-full h-2 rounded-full bg-[var(--border-default)] overflow-hidden mt-2">
-                  <div
-                    className="h-full bg-blue-600 rounded-full"
-                    style={{
-                      width: `${Math.min(
-                        100,
-                        (((Number(overview?.operationalMetrics?.jvmUsedMemoryMb) || 100) /
-                          (Number(overview?.operationalMetrics?.jvmTotalMemoryMb) || 512)) *
-                          100)
-                      )}%`,
-                    }}
-                  />
-                </div>
+                <Progress
+                  value={Math.min(
+                    100,
+                    (((Number(overview?.operationalMetrics?.jvmUsedMemoryMb) || 100) /
+                      (Number(overview?.operationalMetrics?.jvmTotalMemoryMb) || 512)) *
+                      100)
+                  )}
+                  className="h-2"
+                />
               </div>
 
-              <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] space-y-1">
-                <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+              <div className="p-4 rounded-xl bg-muted/40 space-y-1">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Protsessor yadrolari</span>
-                  <span className="font-bold text-[var(--text-primary)]">
+                  <span className="font-bold text-foreground">
                     {overview?.operationalMetrics?.availableProcessors ?? '4'} yadroli
                   </span>
                 </div>
-                <p className="text-[11px] text-emerald-600 font-semibold mt-2 flex items-center gap-1">
+                <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold mt-2 flex items-center gap-1">
                   <CheckCircle2 className="w-3.5 h-3.5" />
                   <span>Optimal yuklama me’yorda</span>
                 </p>
               </div>
 
-              <div className="p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] space-y-1">
-                <div className="flex items-center justify-between text-xs text-[var(--text-muted)]">
+              <div className="p-4 rounded-xl bg-muted/40 space-y-1">
+                <div className="flex items-center justify-between text-xs text-muted-foreground">
                   <span>Uptime (Ishlash davomiyligi)</span>
-                  <span className="font-bold text-[var(--text-primary)]">
+                  <span className="font-bold text-foreground">
                     {Math.floor((Number(overview?.operationalMetrics?.uptimeSeconds) || 86400) / 3600)} soat
                   </span>
                 </div>
-                <p className="text-[11px] text-blue-600 font-semibold mt-2 flex items-center gap-1">
+                <p className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold mt-2 flex items-center gap-1">
                   <Clock className="w-3.5 h-3.5" />
                   <span>Uzluksiz xizmat ko‘rsatish</span>
                 </p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -512,22 +526,22 @@ export const AdminControlCenter: React.FC = () => {
       {activeTab === 'users' && (
         <div className="space-y-4">
           {/* Search & Filter Bar */}
-          <div className="flex flex-col sm:flex-row items-center gap-3 p-4 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs">
+          <Card className="p-4 flex flex-col sm:flex-row items-center gap-3">
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-[var(--text-muted)]" />
-              <input
+              <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+              <Input
                 type="text"
                 placeholder="Foydalanuvchini ismi, pochtasi yoki username bo‘yicha izlash..."
                 value={userQuery}
                 onChange={(e) => setUserQuery(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                className="pl-9 h-9 text-xs"
               />
             </div>
 
             <select
               value={userRoleFilter}
               onChange={(e) => setUserRoleFilter(e.target.value)}
-              className="px-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] font-medium text-[var(--text-primary)] cursor-pointer"
+              className="h-9 px-3 text-xs rounded-lg border border-input bg-background font-medium text-foreground cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
             >
               <option value="ALL">Barcha rollar</option>
               <option value="ROLE_SUPER_ADMIN">Super Admin</option>
@@ -535,103 +549,115 @@ export const AdminControlCenter: React.FC = () => {
               <option value="ROLE_MENTOR">IT Mentor</option>
               <option value="ROLE_STUDENT">O‘quvchi</option>
             </select>
-          </div>
+          </Card>
 
-          {/* Users Table */}
-          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[var(--bg-subtle)] border-b border-[var(--border-default)] text-[var(--text-muted)] uppercase tracking-wider font-bold">
-                  <tr>
-                    <th className="py-3 px-4">Foydalanuvchi</th>
-                    <th className="py-3 px-4">Username & Aloqa</th>
-                    <th className="py-3 px-4">Rollar</th>
-                    <th className="py-3 px-4">Holat</th>
-                    <th className="py-3 px-4 text-right">Amallar</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border-subtle)]">
-                  {users.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="py-12 text-center text-[var(--text-muted)]">
-                        {loading ? t('common.loading') : t('common.noData')}
-                      </td>
-                    </tr>
-                  ) : (
-                    users.map((u) => (
-                      <tr key={u.id} className="hover:bg-[var(--bg-subtle)]/50 transition">
-                        <td className="py-3 px-4">
-                          <div className="font-bold text-[var(--text-primary)]">{u.fullName}</div>
-                          <div className="text-[11px] text-[var(--text-muted)]">ID #{u.id}</div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="font-mono text-xs text-[var(--text-secondary)]">@{u.username}</div>
-                          <div className="text-[11px] text-[var(--text-muted)]">{u.email || u.phone || '—'}</div>
-                        </td>
-                        <td className="py-3 px-4">
-                          <div className="flex flex-wrap gap-1">
-                            {u.roles?.map((r: string) => (
-                              <span
-                                key={r}
-                                className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-indigo-500/10 text-indigo-600 border border-indigo-500/20"
-                              >
-                                {r.replace('ROLE_', '')}
-                              </span>
-                            ))}
+          {/* Users Table (Shadcn Table) */}
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Foydalanuvchi</TableHead>
+                  <TableHead>Username & Aloqa</TableHead>
+                  <TableHead>Rollar</TableHead>
+                  <TableHead>Holat</TableHead>
+                  <TableHead className="text-right">Amallar</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {users.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
+                      {loading ? t('common.loading') : t('common.noData')}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  users.map((u) => (
+                    <TableRow key={u.id} className="hover:bg-muted/50">
+                      <TableCell>
+                        <div className="flex items-center gap-2.5">
+                          <Avatar className="h-8 w-8">
+                            <AvatarFallback className="text-xs font-bold">
+                              {u.fullName?.substring(0, 2).toUpperCase() || 'U'}
+                            </AvatarFallback>
+                          </Avatar>
+                          <div>
+                            <div className="font-bold text-foreground">{u.fullName}</div>
+                            <div className="text-[11px] text-muted-foreground">ID #{u.id}</div>
                           </div>
-                        </td>
-                        <td className="py-3 px-4">
-                          {u.enabled ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-600 border border-emerald-500/20">
-                              <CheckCircle2 className="w-3 h-3" />
-                              <span>{t('common.active')}</span>
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/10 text-rose-600 border border-rose-500/20">
-                              <XCircle className="w-3 h-3" />
-                              <span>{t('common.suspended')}</span>
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedUser(u);
-                                setSelectedRoles(u.roles || ['ROLE_STUDENT']);
-                                setIsRoleModalOpen(true);
-                              }}
-                              className="p-1.5 rounded-lg border border-[var(--border-default)] text-[var(--text-secondary)] hover:text-[var(--brand-primary)] hover:bg-[var(--bg-subtle)] transition cursor-pointer"
-                              title="Rollarni tahrirlash"
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-mono text-xs text-foreground font-medium">@{u.username}</div>
+                        <div className="text-[11px] text-muted-foreground">{u.email || u.phone || '—'}</div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {u.roles?.map((r: string) => (
+                            <Badge
+                              key={r}
+                              variant="secondary"
+                              className="text-[10px] font-mono font-semibold"
                             >
-                              <Edit2 className="w-3.5 h-3.5" />
-                            </button>
+                              {r.replace('ROLE_', '')}
+                            </Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        {u.enabled ? (
+                          <Badge variant="success" className="gap-1 text-[10px] font-semibold">
+                            <CheckCircle2 className="w-3 h-3" />
+                            <span>{t('common.active')}</span>
+                          </Badge>
+                        ) : (
+                          <Badge variant="destructive" className="gap-1 text-[10px] font-semibold">
+                            <XCircle className="w-3 h-3" />
+                            <span>{t('common.suspended')}</span>
+                          </Badge>
+                        )}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-1.5">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => {
+                              setSelectedUser(u);
+                              setSelectedRoles(u.roles || ['ROLE_STUDENT']);
+                              setIsRoleModalOpen(true);
+                            }}
+                            title="Rollarni tahrirlash"
+                          >
+                            <Edit2 className="w-3.5 h-3.5" />
+                          </Button>
 
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setSelectedUser(u);
-                                setIsStatusModalOpen(true);
-                              }}
-                              className={`p-1.5 rounded-lg border transition cursor-pointer ${
-                                u.enabled
-                                  ? 'border-rose-500/20 text-rose-600 hover:bg-rose-500/10'
-                                  : 'border-emerald-500/20 text-emerald-600 hover:bg-emerald-500/10'
-                              }`}
-                              title={u.enabled ? 'Hisobni to‘xtatish' : 'Hisobni faollashtirish'}
-                            >
-                              {u.enabled ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className={`h-8 w-8 ${
+                              u.enabled
+                                ? 'text-destructive hover:bg-destructive/10'
+                                : 'text-emerald-600 hover:bg-emerald-500/10'
+                            }`}
+                            onClick={() => {
+                              setSelectedUser(u);
+                              setIsStatusModalOpen(true);
+                            }}
+                            title={u.enabled ? 'Hisobni to‘xtatish' : 'Hisobni faollashtirish'}
+                          >
+                            {u.enabled ? <Lock className="w-3.5 h-3.5" /> : <Unlock className="w-3.5 h-3.5" />}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
 
@@ -639,23 +665,23 @@ export const AdminControlCenter: React.FC = () => {
       {activeTab === 'audit' && (
         <div className="space-y-4">
           {/* Audit Controls & Export Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 p-4 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs">
+          <Card className="p-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div className="flex items-center gap-2 flex-1 w-full">
               <div className="relative flex-1">
-                <Search className="absolute left-3 top-2.5 w-4 h-4 text-[var(--text-muted)]" />
-                <input
+                <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
+                <Input
                   type="text"
                   placeholder="Audit yozuvlaridan qidirish (ijrochi, obyekt, tafsilotlar)..."
                   value={auditQuery}
                   onChange={(e) => setAuditQuery(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                  className="pl-9 h-9 text-xs"
                 />
               </div>
 
               <select
                 value={auditActionFilter}
                 onChange={(e) => setAuditActionFilter(e.target.value)}
-                className="px-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] font-medium text-[var(--text-primary)] cursor-pointer"
+                className="h-9 px-3 text-xs rounded-lg border border-input bg-background font-medium text-foreground cursor-pointer focus:outline-none focus:ring-2 focus:ring-ring"
               >
                 <option value="">Barcha harakatlar</option>
                 <option value="ROLE_ASSIGN">ROLE_ASSIGN</option>
@@ -672,84 +698,81 @@ export const AdminControlCenter: React.FC = () => {
                 variant="outline"
                 size="sm"
                 onClick={() => handleExportAudit('csv')}
-                leftIcon={<Download className="w-3.5 h-3.5" />}
+                className="text-xs"
               >
-                {t('admin.actions.exportCsv')}
+                <Download className="w-3.5 h-3.5 mr-1.5" />
+                <span>{t('admin.actions.exportCsv')}</span>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => handleExportAudit('json')}
-                leftIcon={<Download className="w-3.5 h-3.5" />}
+                className="text-xs"
               >
-                {t('admin.actions.exportJson')}
+                <Download className="w-3.5 h-3.5 mr-1.5" />
+                <span>{t('admin.actions.exportJson')}</span>
               </Button>
             </div>
-          </div>
+          </Card>
 
-          {/* Audit Table */}
-          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead className="bg-[var(--bg-subtle)] border-b border-[var(--border-default)] text-[var(--text-muted)] uppercase tracking-wider font-bold">
-                  <tr>
-                    <th className="py-3 px-4">Vaqt</th>
-                    <th className="py-3 px-4">Harakat</th>
-                    <th className="py-3 px-4">Obyekt</th>
-                    <th className="py-3 px-4">Ijrochi</th>
-                    <th className="py-3 px-4">Natija</th>
-                    <th className="py-3 px-4">Tafsilotlar</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--border-subtle)]">
-                  {auditLogs.length === 0 ? (
-                    <tr>
-                      <td colSpan={6} className="py-12 text-center text-[var(--text-muted)]">
-                        {loading ? t('common.loading') : t('common.noData')}
-                      </td>
-                    </tr>
-                  ) : (
-                    auditLogs.map((log) => (
-                      <tr
-                        key={log.id}
-                        onClick={() => setSelectedLog(log)}
-                        className="hover:bg-[var(--bg-subtle)]/50 transition cursor-pointer"
-                      >
-                        <td className="py-3 px-4 whitespace-nowrap text-[11px] text-[var(--text-muted)]">
-                          {formatRelative(log.createdAt)}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span className="font-mono font-bold text-xs text-[var(--brand-primary)]">
-                            {log.action}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 text-[var(--text-secondary)]">
-                          {log.entityName} #{log.entityId}
-                        </td>
-                        <td className="py-3 px-4 font-semibold text-[var(--text-primary)]">
-                          {log.performedBy}
-                        </td>
-                        <td className="py-3 px-4">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
-                              log.outcome === 'SUCCESS'
-                                ? 'bg-emerald-500/10 text-emerald-600 border border-emerald-500/20'
-                                : 'bg-rose-500/10 text-rose-600 border border-rose-500/20'
-                            }`}
-                          >
-                            {log.outcome}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 max-w-xs truncate text-[var(--text-secondary)]">
-                          {log.details || '—'}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+          {/* Audit Table (Shadcn Table) */}
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Vaqt</TableHead>
+                  <TableHead>Harakat</TableHead>
+                  <TableHead>Obyekt</TableHead>
+                  <TableHead>Ijrochi</TableHead>
+                  <TableHead>Natija</TableHead>
+                  <TableHead>Tafsilotlar</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {auditLogs.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
+                      {loading ? t('common.loading') : t('common.noData')}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  auditLogs.map((log) => (
+                    <TableRow
+                      key={log.id}
+                      onClick={() => setSelectedLog(log)}
+                      className="hover:bg-muted/50 cursor-pointer"
+                    >
+                      <TableCell className="whitespace-nowrap text-[11px] text-muted-foreground font-mono">
+                        {formatRelative(log.createdAt)}
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="font-mono text-xs font-bold text-primary">
+                          {log.action}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-muted-foreground">
+                        {log.entityName} #{log.entityId}
+                      </TableCell>
+                      <TableCell className="font-semibold text-foreground">
+                        {log.performedBy}
+                      </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={log.outcome === 'SUCCESS' ? 'success' : 'destructive'}
+                          className="text-[10px] font-bold"
+                        >
+                          {log.outcome}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="max-w-xs truncate text-muted-foreground">
+                        {log.details || '—'}
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
 
@@ -757,48 +780,48 @@ export const AdminControlCenter: React.FC = () => {
       {activeTab === 'moderation' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Grade Override Console */}
-          <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs space-y-4">
+          <Card className="p-5 space-y-4">
             <div className="flex items-center gap-2">
               <Trophy className="w-5 h-5 text-amber-500" />
               <div>
-                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                <CardTitle className="text-sm font-bold">
                   Baholarni asosli tuzatish (Grade Override)
-                </h3>
-                <p className="text-xs text-[var(--text-muted)]">
+                </CardTitle>
+                <CardDescription className="text-xs">
                   Barcha baho o‘zgarishlari va sabablari o‘chmas auditga kiritiladi
-                </p>
+                </CardDescription>
               </div>
             </div>
 
             <form onSubmit={handleOverrideGrade} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+                <label className="block text-xs font-semibold text-foreground mb-1">
                   Baho yozuvi ID raqami
                 </label>
-                <input
+                <Input
                   type="number"
                   placeholder="Masalan: 12"
                   value={overrideGradeId}
                   onChange={(e) => setOverrideGradeId(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                  className="h-9 text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+                <label className="block text-xs font-semibold text-foreground mb-1">
                   Yangi belgilangan ball (0–100)
                 </label>
-                <input
+                <Input
                   type="number"
                   placeholder="Masalan: 95"
                   value={overrideScore}
                   onChange={(e) => setOverrideScore(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                  className="h-9 text-xs"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+                <label className="block text-xs font-semibold text-foreground mb-1">
                   Tuzatish asosi / Izoh (Majburiy audit maydoni)
                 </label>
                 <textarea
@@ -806,100 +829,100 @@ export const AdminControlCenter: React.FC = () => {
                   placeholder="Apellyatsiya komissiyasi qarori yoki texnik xatolik tuzatildi..."
                   value={overrideReason}
                   onChange={(e) => setOverrideReason(e.target.value)}
-                  className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                  className="w-full px-3 py-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
                 />
               </div>
 
-              <Button type="submit" variant="primary" size="sm" className="w-full">
+              <Button type="submit" size="sm" className="w-full">
                 {t('admin.actions.overrideGrade')}
               </Button>
             </form>
-          </div>
+          </Card>
 
           {/* Educational Content Moderation Guidelines */}
-          <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs space-y-4">
+          <Card className="p-5 space-y-4">
             <div className="flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-indigo-500" />
               <div>
-                <h3 className="text-sm font-bold text-[var(--text-primary)]">
+                <CardTitle className="text-sm font-bold">
                   Ta’lim materiallari moderatsiya mezonlari
-                </h3>
-                <p className="text-xs text-[var(--text-muted)]">
+                </CardTitle>
+                <CardDescription className="text-xs">
                   Muhammad Al-Xorazmiy Vorislari akademik standartlar nazorati
-                </p>
+                </CardDescription>
               </div>
             </div>
 
-            <div className="space-y-3 text-xs text-[var(--text-secondary)]">
-              <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)]/60">
-                <h4 className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+            <div className="space-y-3 text-xs">
+              <div className="p-3.5 rounded-xl bg-muted/40">
+                <h4 className="font-bold text-foreground flex items-center gap-1.5">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
                   <span>Dars rejasi strukturasi (80 daqiqa)</span>
                 </h4>
-                <p className="mt-1 text-[11px] text-[var(--text-muted)] leading-relaxed">
+                <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
                   Har bir darsda 20 daqiqa nazariya, 25 daqiqa amaliyot, topshiriqlar va uyga vazifa
                   aniq ko‘rsatilgan bo‘lishi lozim.
                 </p>
               </div>
 
-              <div className="p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)]/60">
-                <h4 className="font-bold text-[var(--text-primary)] flex items-center gap-1.5">
+              <div className="p-3.5 rounded-xl bg-muted/40">
+                <h4 className="font-bold text-foreground flex items-center gap-1.5">
                   <AlertTriangle className="w-3.5 h-3.5 text-amber-500" />
                   <span>Xavfsizlik va Maxfiylik</span>
                 </h4>
-                <p className="mt-1 text-[11px] text-[var(--text-muted)] leading-relaxed">
+                <p className="mt-1 text-[11px] text-muted-foreground leading-relaxed">
                   O‘quv materiallari va topshiriqlarda shaxsiy ma’lumotlar, parollar yoki maxfiy
                   kalitlar joylashtirilmasligi qat’iy nazorat qilinadi.
                 </p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
       {/* TAB 5: System Configuration */}
       {activeTab === 'config' && (
         <div className="space-y-4">
-          <div className="p-4 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs flex items-center justify-between">
+          <Card className="p-4 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-[var(--text-primary)]">
+              <CardTitle className="text-sm font-bold">
                 Tizim konfiguratsiyasi parametrlari
-              </h3>
-              <p className="text-xs text-[var(--text-muted)]">
+              </CardTitle>
+              <CardDescription className="text-xs">
                 Xavfsiz standartlar va operatsion sozlamalar ro‘yxati (Maxfiy qiymatlar yashirilgan)
-              </p>
+              </CardDescription>
             </div>
-          </div>
+          </Card>
 
-          <div className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs overflow-hidden">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[var(--bg-subtle)] border-b border-[var(--border-default)] text-[var(--text-muted)] uppercase tracking-wider font-bold">
-                <tr>
-                  <th className="py-3 px-4">Konfiguratsiya kaliti</th>
-                  <th className="py-3 px-4">Kategoriya</th>
-                  <th className="py-3 px-4">Qiymat</th>
-                  <th className="py-3 px-4">Tavsif</th>
-                  <th className="py-3 px-4 text-right">Amal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[var(--border-subtle)]">
+          <Card className="overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Konfiguratsiya kaliti</TableHead>
+                  <TableHead>Kategoriya</TableHead>
+                  <TableHead>Qiymat</TableHead>
+                  <TableHead>Tavsif</TableHead>
+                  <TableHead className="text-right">Amal</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {configs.map((cfg) => (
-                  <tr key={cfg.configKey} className="hover:bg-[var(--bg-subtle)]/50 transition">
-                    <td className="py-3 px-4 font-mono font-bold text-[var(--brand-primary)]">
+                  <TableRow key={cfg.configKey} className="hover:bg-muted/50">
+                    <TableCell className="font-mono font-bold text-primary">
                       {cfg.configKey}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[var(--bg-subtle)] text-[var(--text-secondary)] border border-[var(--border-default)]">
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className="text-[10px] font-mono">
                         {cfg.category}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 font-mono font-semibold text-[var(--text-primary)]">
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="font-mono font-semibold text-foreground">
                       {cfg.configValue}
-                    </td>
-                    <td className="py-3 px-4 text-[var(--text-secondary)] max-w-xs truncate">
+                    </TableCell>
+                    <TableCell className="text-muted-foreground max-w-xs truncate">
                       {cfg.description || '—'}
-                    </td>
-                    <td className="py-3 px-4 text-right">
+                    </TableCell>
+                    <TableCell className="text-right">
                       <Button
                         variant="outline"
                         size="sm"
@@ -910,12 +933,12 @@ export const AdminControlCenter: React.FC = () => {
                       >
                         {t('common.edit')}
                       </Button>
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
-          </div>
+              </TableBody>
+            </Table>
+          </Card>
         </div>
       )}
 
@@ -923,49 +946,49 @@ export const AdminControlCenter: React.FC = () => {
       {activeTab === 'health' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs space-y-2">
+            <Card className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--text-muted)]">Ma’lumotlar bazasi</span>
+                <CardDescription className="text-xs font-semibold">Ma’lumotlar bazasi</CardDescription>
                 <Database className="w-5 h-5 text-emerald-500" />
               </div>
-              <h4 className="text-lg font-bold text-[var(--text-primary)]">
+              <div className="text-lg font-bold text-foreground">
                 {health?.databaseStatus ?? 'CONNECTED'}
-              </h4>
-              <p className="text-[11px] text-emerald-600 font-medium">Ulanish barqaror</p>
-            </div>
+              </div>
+              <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Ulanish barqaror</p>
+            </Card>
 
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs space-y-2">
+            <Card className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--text-muted)]">JVM Xotira</span>
+                <CardDescription className="text-xs font-semibold">JVM Xotira</CardDescription>
                 <Cpu className="w-5 h-5 text-blue-500" />
               </div>
-              <h4 className="text-lg font-bold text-[var(--text-primary)]">
+              <div className="text-lg font-bold text-foreground">
                 {health?.usedJvmMemoryMb ?? '198'} MB ishlatilmoqda
-              </h4>
-              <p className="text-[11px] text-[var(--text-muted)]">
+              </div>
+              <p className="text-[11px] text-muted-foreground">
                 Jami ajratilgan: {health?.totalJvmMemoryMb ?? '512'} MB
               </p>
-            </div>
+            </Card>
 
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs space-y-2">
+            <Card className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--text-muted)]">Xavfsizlik filtrlari</span>
+                <CardDescription className="text-xs font-semibold">Xavfsizlik filtrlari</CardDescription>
                 <ShieldCheck className="w-5 h-5 text-indigo-500" />
               </div>
-              <h4 className="text-lg font-bold text-[var(--text-primary)]">FAOL</h4>
-              <p className="text-[11px] text-indigo-600 font-medium">JWT Stateless & RBAC</p>
-            </div>
+              <div className="text-lg font-bold text-foreground">FAOL</div>
+              <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-medium">JWT Stateless & RBAC</p>
+            </Card>
 
-            <div className="p-5 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-surface)] shadow-xs space-y-2">
+            <Card className="p-5 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-[var(--text-muted)]">Uptime</span>
+                <CardDescription className="text-xs font-semibold">Uptime</CardDescription>
                 <Clock className="w-5 h-5 text-teal-500" />
               </div>
-              <h4 className="text-lg font-bold text-[var(--text-primary)]">
+              <div className="text-lg font-bold text-foreground">
                 {Math.floor((health?.uptimeSeconds ?? 86400) / 3600)} soat
-              </h4>
-              <p className="text-[11px] text-teal-600 font-medium">Uzilishlarsiz ishlamoqda</p>
-            </div>
+              </div>
+              <p className="text-[11px] text-teal-600 dark:text-teal-400 font-medium">Uzilishlarsiz ishlamoqda</p>
+            </Card>
           </div>
         </div>
       )}
@@ -978,24 +1001,24 @@ export const AdminControlCenter: React.FC = () => {
             if (e.target === e.currentTarget) setIsStatusModalOpen(false);
           }}
         >
-          <div
-            className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-2xl shadow-2xl p-5 space-y-4"
+          <Card
+            className="w-full max-w-md shadow-2xl p-5 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-[var(--text-primary)]">
+            <CardTitle className="text-base font-bold">
               Foydalanuvchi holatini o‘zgartirish
-            </h3>
-            <p className="text-xs text-[var(--text-secondary)]">
-              Siz <span className="font-bold text-[var(--text-primary)]">{selectedUser.fullName}</span> (
+            </CardTitle>
+            <CardDescription className="text-xs text-muted-foreground">
+              Siz <span className="font-bold text-foreground">{selectedUser.fullName}</span> (
               @{selectedUser.username}) hisobini{' '}
               <span className="font-bold text-amber-600">
                 {selectedUser.enabled ? 'to‘xtatmoqchimisiz' : 'faollashtirmoqchimisiz'}
               </span>
               ?
-            </p>
+            </CardDescription>
 
             <div>
-              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 O‘zgartirish sababi (Auditga yoziladi)
               </label>
               <textarea
@@ -1003,19 +1026,19 @@ export const AdminControlCenter: React.FC = () => {
                 value={statusReason}
                 onChange={(e) => setStatusReason(e.target.value)}
                 placeholder="Sababni batafsil yozing..."
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                className="w-full px-3 py-2 text-xs rounded-lg border border-input bg-background focus:outline-none focus:ring-2 focus:ring-ring text-foreground"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border-subtle)]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
               <Button variant="outline" size="sm" onClick={() => setIsStatusModalOpen(false)}>
                 {t('common.cancel')}
               </Button>
-              <Button variant="primary" size="sm" onClick={handleToggleUserStatus}>
+              <Button size="sm" onClick={handleToggleUserStatus}>
                 {t('common.confirm')}
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -1027,19 +1050,19 @@ export const AdminControlCenter: React.FC = () => {
             if (e.target === e.currentTarget) setIsRoleModalOpen(false);
           }}
         >
-          <div
-            className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-2xl shadow-2xl p-5 space-y-4"
+          <Card
+            className="w-full max-w-md shadow-2xl p-5 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-[var(--text-primary)]">
+            <CardTitle className="text-base font-bold">
               Foydalanuvchi rollarini boshqarish
-            </h3>
-            <p className="text-xs text-[var(--text-secondary)]">
-              Foydalanuvchi: <span className="font-bold text-[var(--text-primary)]">{selectedUser.fullName}</span> (@{selectedUser.username})
-            </p>
+            </CardTitle>
+            <CardDescription className="text-xs">
+              Foydalanuvchi: <span className="font-bold text-foreground">{selectedUser.fullName}</span> (@{selectedUser.username})
+            </CardDescription>
 
             <div className="space-y-2">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
+              <label className="block text-xs font-semibold text-foreground">
                 Tayinlangan rollar
               </label>
               <div className="space-y-1.5">
@@ -1048,7 +1071,7 @@ export const AdminControlCenter: React.FC = () => {
                   return (
                     <label
                       key={role}
-                      className="flex items-center gap-2 p-2 rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)] cursor-pointer text-xs transition"
+                      className="flex items-center gap-2 p-2 rounded-lg border border-border bg-muted/40 hover:bg-muted cursor-pointer text-xs transition"
                     >
                       <input
                         type="checkbox"
@@ -1060,24 +1083,24 @@ export const AdminControlCenter: React.FC = () => {
                             setSelectedRoles(selectedRoles.filter((r) => r !== role));
                           }
                         }}
-                        className="rounded border-[var(--border-default)] text-[var(--brand-primary)] focus:ring-0"
+                        className="rounded border-input text-primary focus:ring-0"
                       />
-                      <span className="font-mono font-medium text-[var(--text-primary)]">{role}</span>
+                      <span className="font-mono font-medium text-foreground">{role}</span>
                     </label>
                   );
                 })}
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border-subtle)]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
               <Button variant="outline" size="sm" onClick={() => setIsRoleModalOpen(false)}>
                 {t('common.cancel')}
               </Button>
-              <Button variant="primary" size="sm" onClick={handleUpdateRoles}>
+              <Button size="sm" onClick={handleUpdateRoles}>
                 {t('common.save')}
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -1089,65 +1112,67 @@ export const AdminControlCenter: React.FC = () => {
             if (e.target === e.currentTarget) setSelectedLog(null);
           }}
         >
-          <div
-            className="w-full max-w-lg bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-2xl shadow-2xl p-5 space-y-4"
+          <Card
+            className="w-full max-w-lg shadow-2xl p-5 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-[var(--text-primary)]">
+            <CardTitle className="text-base font-bold">
               Audit yozuvi tafsilotlari #{selectedLog.id}
-            </h3>
+            </CardTitle>
 
             <div className="space-y-2 text-xs">
-              <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
-                <span className="text-[var(--text-secondary)]">Harakat:</span>
-                <span className="font-mono font-bold text-[var(--brand-primary)]">{selectedLog.action}</span>
+              <div className="flex justify-between py-1 border-b border-border">
+                <span className="text-muted-foreground">Harakat:</span>
+                <span className="font-mono font-bold text-primary">{selectedLog.action}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
-                <span className="text-[var(--text-secondary)]">Ijrochi:</span>
-                <span className="font-semibold text-[var(--text-primary)]">{selectedLog.performedBy}</span>
+              <div className="flex justify-between py-1 border-b border-border">
+                <span className="text-muted-foreground">Ijrochi:</span>
+                <span className="font-semibold text-foreground">{selectedLog.performedBy}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
-                <span className="text-[var(--text-secondary)]">Obyekt:</span>
-                <span className="text-[var(--text-primary)]">{selectedLog.entityName} #{selectedLog.entityId}</span>
+              <div className="flex justify-between py-1 border-b border-border">
+                <span className="text-muted-foreground">Obyekt:</span>
+                <span className="text-foreground">{selectedLog.entityName} #{selectedLog.entityId}</span>
               </div>
-              <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
-                <span className="text-[var(--text-secondary)]">Natija:</span>
-                <span className="font-bold">{selectedLog.outcome}</span>
+              <div className="flex justify-between py-1 border-b border-border">
+                <span className="text-muted-foreground">Natija:</span>
+                <Badge variant={selectedLog.outcome === 'SUCCESS' ? 'success' : 'destructive'} className="text-[10px]">
+                  {selectedLog.outcome}
+                </Badge>
               </div>
-              <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
-                <span className="text-[var(--text-secondary)]">Vaqt:</span>
-                <span className="text-[var(--text-primary)]">{selectedLog.createdAt}</span>
+              <div className="flex justify-between py-1 border-b border-border">
+                <span className="text-muted-foreground">Vaqt:</span>
+                <span className="text-foreground">{selectedLog.createdAt}</span>
               </div>
               {selectedLog.ipAddress && (
-                <div className="flex justify-between py-1 border-b border-[var(--border-subtle)]">
-                  <span className="text-[var(--text-secondary)]">IP Manzil:</span>
-                  <span className="font-mono text-[var(--text-primary)]">{selectedLog.ipAddress}</span>
+                <div className="flex justify-between py-1 border-b border-border">
+                  <span className="text-muted-foreground">IP Manzil:</span>
+                  <span className="font-mono text-foreground">{selectedLog.ipAddress}</span>
                 </div>
               )}
               {selectedLog.details && (
                 <div className="pt-2">
-                  <span className="block text-[var(--text-secondary)] mb-1">Tafsilotlar:</span>
-                  <div className="p-2.5 rounded-xl bg-[var(--bg-subtle)] text-[var(--text-primary)] text-[11px] break-words">
+                  <span className="block text-muted-foreground mb-1">Tafsilotlar:</span>
+                  <div className="p-2.5 rounded-lg bg-muted text-foreground text-[11px] break-words">
                     {selectedLog.details}
                   </div>
                 </div>
               )}
               {selectedLog.metadata && (
                 <div className="pt-1">
-                  <span className="block text-[var(--text-secondary)] mb-1">Metadata:</span>
-                  <pre className="p-2.5 rounded-xl bg-[var(--bg-subtle)] text-[10px] font-mono text-[var(--text-muted)] overflow-x-auto max-h-32">
+                  <span className="block text-muted-foreground mb-1">Metadata:</span>
+                  <pre className="p-2.5 rounded-lg bg-muted text-[10px] font-mono text-muted-foreground overflow-x-auto max-h-32">
                     {selectedLog.metadata}
                   </pre>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center justify-end pt-2 border-t border-[var(--border-subtle)]">
+            <div className="flex items-center justify-end pt-2 border-t border-border">
               <Button variant="outline" size="sm" onClick={() => setSelectedLog(null)}>
                 {t('common.close')}
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
 
@@ -1159,35 +1184,35 @@ export const AdminControlCenter: React.FC = () => {
             if (e.target === e.currentTarget) setEditingConfig(null);
           }}
         >
-          <div
-            className="w-full max-w-md bg-[var(--bg-surface)] border border-[var(--border-default)] rounded-2xl shadow-2xl p-5 space-y-4"
+          <Card
+            className="w-full max-w-md shadow-2xl p-5 space-y-4"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-base font-bold text-[var(--text-primary)]">
+            <CardTitle className="text-base font-bold">
               Parametrni yangilash: {editingConfig.configKey}
-            </h3>
+            </CardTitle>
 
             <div>
-              <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-1">
+              <label className="block text-xs font-semibold text-foreground mb-1">
                 Yangi qiymat
               </label>
-              <input
+              <Input
                 type="text"
                 value={configValueInput}
                 onChange={(e) => setConfigValueInput(e.target.value)}
-                className="w-full px-3 py-2 text-xs rounded-xl border border-[var(--border-default)] bg-[var(--bg-subtle)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-primary)]"
+                className="h-9 text-xs"
               />
             </div>
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-[var(--border-subtle)]">
+            <div className="flex items-center justify-end gap-2 pt-2 border-t border-border">
               <Button variant="outline" size="sm" onClick={() => setEditingConfig(null)}>
                 {t('common.cancel')}
               </Button>
-              <Button variant="primary" size="sm" onClick={handleSaveConfig}>
+              <Button size="sm" onClick={handleSaveConfig}>
                 {t('common.save')}
               </Button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>
