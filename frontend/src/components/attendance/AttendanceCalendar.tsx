@@ -10,8 +10,26 @@ import {
   ChevronRight,
   CheckCheck,
   CalendarDays,
+  Search,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+  MoreVertical,
+  GraduationCap,
+  Sparkles,
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button/Button';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { attendanceApi } from '@/api';
 import { useTranslation } from '@/shared/i18n';
 import { useOptionalAuth } from '@/features/auth/AuthContext';
@@ -34,11 +52,13 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
   const isAdmin = auth ? auth.isAdmin : true;
   const isMentor = auth ? auth.isMentor : true;
   const canManageAttendance = isAdmin || isMentor;
+
   const [sessions, setSessions] = useState<LessonSessionDto[]>([]);
   const [todaySessions, setTodaySessions] = useState<LessonSessionDto[]>([]);
   const [loading, setLoading] = useState(false);
   const [viewMode, setViewMode] = useState<'day' | 'week' | 'month'>('week');
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Filters
   const [selectedMentor, setSelectedMentor] = useState<string>('all');
@@ -75,8 +95,8 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
     loadData();
   }, [selectedMentor, selectedGroup]);
 
-  const handleCancelSession = async (session: LessonSessionDto, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleCancelSession = async (session: LessonSessionDto, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     const reason = window.prompt(
       t('schedule.cancelReasonPrompt', { subject: session.subject })
     );
@@ -96,13 +116,12 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
     setIsAttendanceOpen(true);
   };
 
-  const handleOpenReschedule = (session: LessonSessionDto, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleOpenReschedule = (session: LessonSessionDto, e?: React.MouseEvent) => {
+    e?.stopPropagation();
     setRescheduleSession(session);
     setIsRescheduleOpen(true);
   };
 
-  // Date navigation handlers
   const handlePrev = () => {
     const d = new Date(currentDate);
     if (viewMode === 'day') d.setDate(d.getDate() - 1);
@@ -136,18 +155,18 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
     return new Date();
   };
 
-  // Filter sessions according to viewMode & currentDate
+  // Filter sessions according to viewMode, currentDate & searchQuery
   const filteredSessions = useMemo(() => {
     return sessions.filter((s) => {
       const sessDate = getSessionDate(s);
+      let dateMatch = false;
+
       if (viewMode === 'day') {
-        return (
+        dateMatch =
           sessDate.getFullYear() === currentDate.getFullYear() &&
           sessDate.getMonth() === currentDate.getMonth() &&
-          sessDate.getDate() === currentDate.getDate()
-        );
+          sessDate.getDate() === currentDate.getDate();
       } else if (viewMode === 'week') {
-        // get start of week (Monday)
         const d = new Date(currentDate);
         const day = d.getDay();
         const diff = d.getDate() - day + (day === 0 ? -6 : 1);
@@ -158,15 +177,28 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
         endOfWeek.setDate(endOfWeek.getDate() + 6);
         endOfWeek.setHours(23, 59, 59, 999);
 
-        return sessDate >= startOfWeek && sessDate <= endOfWeek;
+        dateMatch = sessDate >= startOfWeek && sessDate <= endOfWeek;
       } else {
-        return (
+        dateMatch =
           sessDate.getFullYear() === currentDate.getFullYear() &&
-          sessDate.getMonth() === currentDate.getMonth()
-        );
+          sessDate.getMonth() === currentDate.getMonth();
       }
+
+      if (!dateMatch) return false;
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        const sub = (s.subject || '').toLowerCase();
+        const top = (s.topic || '').toLowerCase();
+        const grp = (s.groupCode || s.groupName || '').toLowerCase();
+        const mnt = (s.mentorName || '').toLowerCase();
+        const rm = (s.room || s.roomNumber || '').toLowerCase();
+        return sub.includes(q) || top.includes(q) || grp.includes(q) || mnt.includes(q) || rm.includes(q);
+      }
+
+      return true;
     });
-  }, [sessions, viewMode, currentDate]);
+  }, [sessions, viewMode, currentDate, searchQuery]);
 
   // Today summary stats
   const todayTotal = todaySessions.length;
@@ -174,195 +206,257 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
   const todayScheduled = todaySessions.filter((s) => s.status === 'SCHEDULED').length;
   const todayCancelled = todaySessions.filter((s) => s.status === 'CANCELLED').length;
 
+  const totalPresentToday = todaySessions.reduce((acc, sess) => {
+    return acc + (sess.attendanceRecords?.filter((r) => r.status === 'PRESENT').length || 0);
+  }, 0);
+  const totalRosterToday = todaySessions.reduce((acc, sess) => {
+    return acc + (sess.attendanceRecords?.length || 0);
+  }, 0);
+  const todayAttendanceRate = totalRosterToday > 0 ? Math.round((totalPresentToday / totalRosterToday) * 100) : 0;
+
   return (
-    <div className="space-y-6 animate-fade-in-up">
-      {/* Header Banner */}
-      <div className="glass-panel text-[var(--text-primary)] rounded-3xl p-6 border border-[var(--border-default)] shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center space-x-3 mb-1">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-blue-600 to-cyan-500 text-white flex items-center justify-center font-bold shadow-md shadow-blue-500/20">
-              <CalendarIcon className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-[var(--text-primary)]">
-                  {t('schedule.title')}
-                </h1>
-                <span className="w-2 h-2 rounded-full bg-emerald-500 beacon-pulse" />
+    <div className="space-y-6">
+      {/* Header Banner with Gradient Accent */}
+      <Card className="border-border/60 bg-gradient-to-br from-card via-card to-primary/5 shadow-xs overflow-hidden">
+        <CardContent className="p-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-primary text-primary-foreground flex items-center justify-center font-bold shadow-md shadow-primary/25 shrink-0">
+                <CalendarIcon className="w-6 h-6" />
               </div>
-              <p className="text-xs text-[var(--text-muted)] mt-0.5">
-                {t('schedule.subtitle')}
-              </p>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h1 className="text-xl sm:text-2xl font-extrabold text-foreground tracking-tight">
+                    {t('schedule.title')}
+                  </h1>
+                  <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {t('schedule.subtitle')}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
 
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" size="sm" onClick={loadData} disabled={loading} title={t('common.refresh')}>
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-          </Button>
-          {canManageAttendance && (
-            <Button
-              variant="primary"
-              size="sm"
-              onClick={() => setIsCreateOpen(true)}
-              className="btn-shimmer flex items-center space-x-1.5 shadow-md shadow-[var(--brand-primary)]/20"
-            >
-              <Plus className="w-4 h-4" />
-              <span>{t('schedule.planNewLesson')}</span>
-            </Button>
-          )}
-        </div>
-      </div>
-
-      {/* Today's Schedule Quick Banner */}
-      <div className="p-5 rounded-3xl bg-gradient-to-r from-blue-600 via-indigo-600 to-cyan-600 text-white shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="flex items-center space-x-3 text-center sm:text-left relative z-10">
-          <div className="p-3 rounded-2xl bg-white/15 backdrop-blur-md shadow-inner">
-            <CalendarDays className="w-6 h-6 text-white" />
-          </div>
-          <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm font-extrabold tracking-tight">{t('schedule.todaySummary')}</h3>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 beacon-pulse" />
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={loadData}
+                disabled={loading}
+                title={t('common.refresh')}
+                className="gap-1.5"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">{t('common.refresh')}</span>
+              </Button>
+              {canManageAttendance && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => setIsCreateOpen(true)}
+                  className="shadow-sm shadow-primary/25 gap-1.5"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{t('schedule.planNewLesson')}</span>
+                </Button>
+              )}
             </div>
-            <p className="text-xs text-blue-100 mt-0.5">
-              {t('schedule.todayCountDesc', { count: todayTotal, date: formatDate(new Date()) })}
-            </p>
           </div>
-        </div>
+        </CardContent>
+      </Card>
 
-        <div className="flex items-center space-x-3 text-xs font-semibold relative z-10">
-          <div className="px-3.5 py-1.5 rounded-xl bg-white/15 backdrop-blur-md border border-white/20">
-            <span className="text-blue-200">{t('status.scheduled')}: </span>
-            <span className="font-extrabold text-white">{todayScheduled}</span>
-          </div>
-          <div className="px-3.5 py-1.5 rounded-xl bg-emerald-500/25 border border-emerald-400/30 backdrop-blur-md">
-            <span className="text-emerald-200">{t('status.completed')}: </span>
-            <span className="font-extrabold text-white">{todayCompleted}</span>
-          </div>
-          {todayCancelled > 0 && (
-            <div className="px-3.5 py-1.5 rounded-xl bg-rose-500/25 border border-rose-400/30 backdrop-blur-md">
-              <span className="text-rose-200">{t('status.cancelled')}: </span>
-              <span className="font-extrabold text-white">{todayCancelled}</span>
+      {/* Modern KPI Stats Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* KPI 1: Today total */}
+        <Card className="border-border/50 bg-card hover:border-primary/40 transition-colors shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('schedule.todaySummary')}
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black text-foreground">{todayTotal}</span>
+                <span className="text-xs text-muted-foreground">mashg‘ulot</span>
+              </div>
             </div>
-          )}
-        </div>
+            <div className="p-3 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+              <CalendarDays className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* KPI 2: Scheduled */}
+        <Card className="border-border/50 bg-card hover:border-primary/40 transition-colors shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('status.scheduled')}
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black text-foreground">{todayScheduled}</span>
+                <span className="text-xs text-blue-500 font-medium">Kutilmoqda</span>
+              </div>
+            </div>
+            <div className="p-3 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+              <Clock className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* KPI 3: Completed */}
+        <Card className="border-border/50 bg-card hover:border-emerald-500/40 transition-colors shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                {t('status.completed')}
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black text-emerald-600 dark:text-emerald-400">{todayCompleted}</span>
+                <span className="text-xs text-emerald-500 font-medium">O‘tildi</span>
+              </div>
+            </div>
+            <div className="p-3 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* KPI 4: Attendance Rate */}
+        <Card className="border-border/50 bg-card hover:border-primary/40 transition-colors shadow-xs">
+          <CardContent className="p-4 flex items-center justify-between">
+            <div className="space-y-1">
+              <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
+                Bugungi Davomat
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-2xl font-black text-foreground">
+                  {totalRosterToday > 0 ? `${todayAttendanceRate}%` : '—'}
+                </span>
+                {todayCancelled > 0 ? (
+                  <span className="text-xs text-rose-500 font-medium">({todayCancelled} bekor)</span>
+                ) : (
+                  <span className="text-xs text-muted-foreground">faollik</span>
+                )}
+              </div>
+            </div>
+            <div className="p-3 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+              <CheckCheck className="w-5 h-5" />
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* Controls & Filters Bar */}
-      <div className="glass-panel rounded-2xl p-4 border border-[var(--border-default)] shadow-xs flex flex-col lg:flex-row items-center justify-between gap-3">
-        {/* Date Navigation */}
-        <div className="flex items-center space-x-2 w-full lg:w-auto">
-          <Button variant="outline" size="sm" onClick={handlePrev}>
-            <ChevronLeft className="w-4 h-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleToday} className="text-xs font-semibold">
-            {t('schedule.today')}
-          </Button>
-          <Button variant="outline" size="sm" onClick={handleNext}>
-            <ChevronRight className="w-4 h-4" />
-          </Button>
+      {/* Control Bar: Date Navigation, Search, View Mode, Filters */}
+      <Card className="border-border/60 bg-card shadow-xs">
+        <CardContent className="p-4 space-y-3">
+          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+            {/* Date Navigation */}
+            <div className="flex items-center gap-2">
+              <Button variant="outline" size="icon" onClick={handlePrev} className="h-8 w-8">
+                <ChevronLeft className="w-4 h-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleToday} className="h-8 text-xs font-semibold px-3">
+                {t('schedule.today')}
+              </Button>
+              <Button variant="outline" size="icon" onClick={handleNext} className="h-8 w-8">
+                <ChevronRight className="w-4 h-4" />
+              </Button>
 
-          <span className="text-xs font-bold text-slate-800 dark:text-slate-200 ml-2">
-            {currentDate.toLocaleDateString(locale === 'uz' ? 'uz-UZ' : locale === 'ru' ? 'ru-RU' : 'en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: viewMode === 'day' ? 'numeric' : undefined,
-            })}
-          </span>
-        </div>
+              <div className="flex items-center gap-2 ml-2">
+                <CalendarIcon className="w-4 h-4 text-primary" />
+                <span className="text-sm font-bold text-foreground capitalize">
+                  {currentDate.toLocaleDateString(locale === 'uz' ? 'uz-UZ' : locale === 'ru' ? 'ru-RU' : 'en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: viewMode === 'day' ? 'numeric' : undefined,
+                  })}
+                </span>
+              </div>
+            </div>
 
-        {/* View Mode & Filters */}
-        <div className="flex flex-wrap items-center gap-2.5 w-full lg:w-auto justify-end">
-          {/* View Mode Toggle */}
-          <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs font-semibold">
-            <button
-              onClick={() => setViewMode('day')}
-              className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                viewMode === 'day'
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              {t('schedule.viewDay')}
-            </button>
-            <button
-              onClick={() => setViewMode('week')}
-              className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                viewMode === 'week'
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              {t('schedule.viewWeek')}
-            </button>
-            <button
-              onClick={() => setViewMode('month')}
-              className={`px-3 py-1 rounded-lg transition cursor-pointer ${
-                viewMode === 'month'
-                  ? 'bg-white dark:bg-slate-900 text-blue-600 dark:text-blue-400 shadow-xs font-bold'
-                  : 'text-slate-600 dark:text-slate-400'
-              }`}
-            >
-              {t('schedule.viewMonth')}
-            </button>
+            {/* View Mode Toggle (Day / Week / Month) via Shadcn Tabs */}
+            <div className="flex items-center gap-2">
+              <Tabs value={viewMode} onValueChange={(val) => setViewMode(val as 'day' | 'week' | 'month')}>
+                <TabsList className="h-8 bg-muted/60 p-0.5">
+                  <TabsTrigger value="day" className="h-7 text-xs px-3 font-semibold data-[state=active]:bg-background">
+                    {t('schedule.viewDay')}
+                  </TabsTrigger>
+                  <TabsTrigger value="week" className="h-7 text-xs px-3 font-semibold data-[state=active]:bg-background">
+                    {t('schedule.viewWeek')}
+                  </TabsTrigger>
+                  <TabsTrigger value="month" className="h-7 text-xs px-3 font-semibold data-[state=active]:bg-background">
+                    {t('schedule.viewMonth')}
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
+            </div>
           </div>
 
-          {/* Mentor Filter */}
-          <select
-            value={selectedMentor}
-            onChange={(e) => setSelectedMentor(e.target.value)}
-            aria-label={t('schedule.mentorFilter')}
-            className="text-xs rounded-xl border border-slate-300 dark:border-[var(--border-default)] bg-white dark:bg-[var(--bg-surface)] px-2.5 py-1.5 text-slate-700 dark:text-slate-200 cursor-pointer"
-          >
-            <option value="all">{t('schedule.allMentors')}</option>
-            {mentors.map((m) => (
-              <option key={m.id} value={m.id.toString()}>
-                {m.fullName}
-              </option>
-            ))}
-          </select>
+          {/* Search & Select Filters */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border/40">
+            <div className="relative">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                placeholder="Fan, mavzu, xona yoki mentor bo‘yicha qidiruv..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8.5 h-8 text-xs bg-background"
+              />
+            </div>
 
-          {/* Group Filter */}
-          <select
-            value={selectedGroup}
-            onChange={(e) => setSelectedGroup(e.target.value)}
-            aria-label={t('schedule.groupFilter')}
-            className="text-xs rounded-xl border border-slate-300 dark:border-[var(--border-default)] bg-white dark:bg-[var(--bg-surface)] px-2.5 py-1.5 text-slate-700 dark:text-slate-200 cursor-pointer"
-          >
-            <option value="all">{t('schedule.allGroups')}</option>
-            {groups.map((g) => (
-              <option key={g.id} value={g.id.toString()}>
-                {g.name}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+            <select
+              value={selectedMentor}
+              onChange={(e) => setSelectedMentor(e.target.value)}
+              aria-label={t('schedule.mentorFilter')}
+              className="w-full text-xs h-8 rounded-md border border-input bg-background px-3 py-1 text-foreground shadow-xs focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+            >
+              <option value="all">{t('schedule.allMentors')}</option>
+              {mentors.map((m) => (
+                <option key={m.id} value={m.id.toString()}>
+                  {m.fullName}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedGroup}
+              onChange={(e) => setSelectedGroup(e.target.value)}
+              aria-label={t('schedule.groupFilter')}
+              className="w-full text-xs h-8 rounded-md border border-input bg-background px-3 py-1 text-foreground shadow-xs focus:outline-none focus:ring-1 focus:ring-ring cursor-pointer"
+            >
+              <option value="all">{t('schedule.allGroups')}</option>
+              {groups.map((g) => (
+                <option key={g.id} value={g.id.toString()}>
+                  {g.name || g.groupCode}
+                </option>
+              ))}
+            </select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Sessions Grid */}
       {loading ? (
-        <div className="py-20 text-center">
-          <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-xs text-slate-500 font-medium">{t('common.loading')}</p>
+        <div className="py-20 text-center space-y-3">
+          <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs text-muted-foreground font-medium">{t('common.loading')}</p>
         </div>
       ) : filteredSessions.length === 0 ? (
-        <div className="bg-white dark:bg-[var(--bg-surface)] rounded-2xl p-12 text-center border border-slate-200 dark:border-[var(--border-default)]">
-          <CalendarIcon className="w-12 h-12 text-slate-300 mx-auto mb-3" />
-          <h3 className="text-sm font-bold text-slate-700 dark:text-slate-300">
+        <Card className="border-border/60 bg-card p-12 text-center shadow-xs">
+          <CalendarIcon className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
+          <h3 className="text-sm font-bold text-foreground">
             {t('schedule.noSessionsTitle')}
           </h3>
-          <p className="text-xs text-slate-400 mt-1 mb-4">
+          <p className="text-xs text-muted-foreground mt-1 mb-4 max-w-sm mx-auto">
             {t('schedule.noSessionsDesc')}
           </p>
           {canManageAttendance && (
-            <Button variant="primary" size="sm" onClick={() => setIsCreateOpen(true)}>
+            <Button variant="default" size="sm" onClick={() => setIsCreateOpen(true)} className="gap-1.5">
+              <Plus className="w-4 h-4" />
               {t('schedule.addLessonBtn')}
             </Button>
           )}
-        </div>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredSessions.map((session) => {
@@ -376,149 +470,176 @@ export const AttendanceCalendar: React.FC<AttendanceCalendarProps> = ({
               ? `${session.startTime} - ${session.endTime}`
               : startDate.toTimeString().substring(0, 5);
 
-            const presentRecs = session.attendanceRecords?.filter((r) => r.status === 'PRESENT')
-              .length || 0;
-            const absentRecs = session.attendanceRecords?.filter((r) => r.status === 'ABSENT')
-              .length || 0;
+            const presentRecs = session.attendanceRecords?.filter((r) => r.status === 'PRESENT').length || 0;
+            const absentRecs = session.attendanceRecords?.filter((r) => r.status === 'ABSENT').length || 0;
             const hasAttendance = session.attendanceRecords && session.attendanceRecords.length > 0;
+            const totalRoster = session.attendanceRecords?.length || 0;
+
+            const isCancelled = session.status === 'CANCELLED';
+            const isCompleted = session.status === 'COMPLETED';
+            const isRescheduled = session.status === 'RESCHEDULED';
 
             return (
-              <div
+              <Card
                 key={session.id}
                 onClick={() => {
                   if (canManageAttendance) {
                     handleOpenAttendance(session);
                   }
                 }}
-                className={`rounded-2xl p-4.5 border transition ${canManageAttendance ? 'cursor-pointer hover:shadow-md' : ''} flex flex-col justify-between ${
-                  session.status === 'CANCELLED'
-                    ? 'bg-rose-50/40 dark:bg-rose-950/20 border-rose-200 dark:border-rose-900/60 opacity-80'
-                    : session.status === 'COMPLETED'
-                    ? 'bg-white dark:bg-[var(--bg-surface)] border-slate-200 dark:border-[var(--border-default)] hover:border-emerald-400'
-                    : 'bg-white dark:bg-[var(--bg-surface)] border-slate-200 dark:border-[var(--border-default)] hover:border-blue-400'
+                className={`flex flex-col justify-between transition-all duration-200 border-border/60 ${
+                  canManageAttendance ? 'cursor-pointer hover:shadow-md hover:border-primary/50' : ''
+                } ${
+                  isCancelled
+                    ? 'bg-destructive/5 border-destructive/20 opacity-85'
+                    : isCompleted
+                    ? 'bg-card hover:border-emerald-500/40'
+                    : 'bg-card hover:border-primary/50'
                 }`}
               >
-                <div>
-                  {/* Status & Date */}
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center space-x-1.5 text-xs font-bold text-slate-700 dark:text-slate-300">
-                      <Clock className="w-3.5 h-3.5 text-blue-600" />
+                <CardHeader className="p-4.5 pb-2">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-1.5 text-xs font-bold text-foreground">
+                      <Clock className="w-3.5 h-3.5 text-primary" />
                       <span>{dateStr}, {timeStr}</span>
                     </div>
 
-                    <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                        session.status === 'COMPLETED'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-300'
-                          : session.status === 'CANCELLED'
-                          ? 'bg-rose-100 text-rose-800 border border-rose-200 dark:bg-rose-950/60 dark:text-rose-300'
-                          : session.status === 'RESCHEDULED'
-                          ? 'bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/40 dark:text-amber-300'
-                          : 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/40 dark:text-blue-300'
-                      }`}
+                    <Badge
+                      variant={
+                        isCompleted
+                          ? 'success'
+                          : isCancelled
+                          ? 'destructive'
+                          : isRescheduled
+                          ? 'warning'
+                          : 'default'
+                      }
+                      className="text-[10px] uppercase font-bold"
                     >
-                      {session.status === 'COMPLETED'
+                      {isCompleted
                         ? t('status.completed')
-                        : session.status === 'CANCELLED'
+                        : isCancelled
                         ? t('status.cancelled')
-                        : session.status === 'RESCHEDULED'
+                        : isRescheduled
                         ? t('status.rescheduled')
                         : t('status.scheduled')}
-                    </span>
+                    </Badge>
                   </div>
 
-                  {/* Subject and Topic */}
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-0.5">
+                  <CardTitle className="text-base font-bold text-foreground mt-2 line-clamp-1">
                     {session.subject}
-                  </h4>
+                  </CardTitle>
                   {session.topic && (
-                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-2.5 line-clamp-1">
+                    <CardDescription className="text-xs line-clamp-1 mt-0.5">
                       {t('schedule.topic')}: {session.topic}
-                    </p>
+                    </CardDescription>
                   )}
+                </CardHeader>
 
-                  {/* Group & Room */}
-                  <div className="grid grid-cols-2 gap-2 text-xs mb-3 text-slate-600 dark:text-slate-400">
-                    <div className="flex items-center space-x-1.5">
-                      <Users className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="font-semibold truncate">{session.groupCode || session.groupName || `Guruh #${session.groupId}`}</span>
+                <CardContent className="p-4.5 pt-1 space-y-3">
+                  {/* Group & Room Details */}
+                  <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground bg-muted/30 p-2.5 rounded-xl border border-border/40">
+                    <div className="flex items-center gap-1.5 truncate">
+                      <Users className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span className="font-semibold text-foreground truncate">
+                        {session.groupCode || session.groupName || `Guruh #${session.groupId}`}
+                      </span>
                     </div>
-                    <div className="flex items-center space-x-1.5">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                      <span className="truncate">{session.room || session.roomNumber || t('schedule.noRoom')}</span>
+                    <div className="flex items-center gap-1.5 truncate">
+                      <MapPin className="w-3.5 h-3.5 text-primary shrink-0" />
+                      <span className="truncate">
+                        {session.room || session.roomNumber || t('schedule.noRoom')}
+                      </span>
                     </div>
                   </div>
 
-                  {/* Mentor */}
-                  <div className="text-xs text-slate-500 mb-3 flex items-center space-x-1.5">
-                    <span className="text-slate-400">{t('roles.ROLE_MENTOR')}:</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">
-                      {session.mentorName}
-                    </span>
+                  {/* Mentor Info */}
+                  <div className="flex items-center justify-between text-xs">
+                    <div className="flex items-center gap-1.5 text-muted-foreground truncate">
+                      <GraduationCap className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[11px]">{t('roles.ROLE_MENTOR')}:</span>
+                      <span className="font-semibold text-foreground truncate">
+                        {session.mentorName}
+                      </span>
+                    </div>
                   </div>
 
-                  {/* Cancellation reason if cancelled */}
+                  {/* Cancellation Reason alert if cancelled */}
                   {session.cancellationReason && (
-                    <div className="p-2 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/40 dark:border-rose-900 text-[11px] mb-2">
+                    <div className="p-2 rounded-lg bg-destructive/10 text-destructive text-[11px] border border-destructive/20">
                       <span className="font-bold">{t('schedule.cancelReason')}: </span>
                       {session.cancellationReason}
                     </div>
                   )}
 
-                  {/* Attendance badge */}
-                  {hasAttendance && (
-                    <div className="flex items-center space-x-2 text-xs mb-2">
-                      <span className="text-[11px] font-semibold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-md border border-emerald-200 dark:border-emerald-900">
+                  {/* Attendance Summary Badge / Progress */}
+                  {hasAttendance ? (
+                    <div className="flex items-center gap-2 text-xs pt-1">
+                      <Badge variant="outline" className="bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 text-[11px] font-bold">
                         ✓ {t('schedule.presentCount', { count: presentRecs })}
-                      </span>
+                      </Badge>
                       {absentRecs > 0 && (
-                        <span className="text-[11px] font-semibold text-rose-600 bg-rose-50 dark:bg-rose-950/40 px-2 py-0.5 rounded-md border border-rose-200 dark:border-rose-900">
+                        <Badge variant="outline" className="bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/30 text-[11px] font-bold">
                           ✕ {t('schedule.absentCount', { count: absentRecs })}
-                        </span>
+                        </Badge>
                       )}
+                      <span className="text-[10px] text-muted-foreground ml-auto font-mono">
+                        {Math.round((presentRecs / totalRoster) * 100)}%
+                      </span>
                     </div>
-                  )}
-                </div>
+                  ) : !isCancelled ? (
+                    <div className="text-[11px] text-amber-600 dark:text-amber-400 flex items-center gap-1.5 font-medium pt-1">
+                      <AlertCircle className="w-3.5 h-3.5" />
+                      <span>Davomat kutilmoqda</span>
+                    </div>
+                  ) : null}
+                </CardContent>
 
-                {/* Footer buttons (Faqat Mentor va Admin uchun) */}
+                {/* Footer Controls */}
                 {canManageAttendance && (
-                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-1">
-                    <button
+                  <CardFooter className="p-4 pt-2 border-t border-border/40 flex items-center justify-between gap-2">
+                    <Button
+                      variant={hasAttendance ? 'outline' : 'default'}
+                      size="sm"
                       onClick={(e) => handleOpenAttendance(session, e)}
-                      className="px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-blue-50 text-blue-700 hover:bg-blue-100 dark:bg-blue-950/40 dark:text-blue-300 transition flex items-center space-x-1 cursor-pointer"
+                      className="text-xs h-8 gap-1 font-semibold"
                     >
                       <CheckCheck className="w-3.5 h-3.5" />
                       <span>{hasAttendance ? t('schedule.editAttendance') : t('schedule.takeAttendance')}</span>
-                    </button>
+                    </Button>
 
-                    {session.status !== 'CANCELLED' && (
-                      <div className="flex items-center space-x-1">
-                        <button
+                    {!isCancelled && (
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={(e) => handleOpenReschedule(session, e)}
-                          className="px-2 py-1 rounded-lg text-xs font-medium text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800 transition cursor-pointer"
+                          className="h-8 text-xs text-muted-foreground hover:text-foreground"
                           title={t('schedule.reschedule')}
                         >
                           {t('schedule.reschedule')}
-                        </button>
+                        </Button>
 
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={(e) => handleCancelSession(session, e)}
-                          className="px-2 py-1 rounded-lg text-xs font-medium text-rose-600 hover:bg-rose-50 dark:text-rose-400 dark:hover:bg-rose-950/40 transition cursor-pointer"
+                          className="h-8 text-xs text-destructive hover:bg-destructive/10"
                           title={t('common.cancel')}
                         >
                           {t('common.cancel')}
-                        </button>
+                        </Button>
                       </div>
                     )}
-                  </div>
+                  </CardFooter>
                 )}
-              </div>
+              </Card>
             );
           })}
         </div>
       )}
 
-      {/* Modals (Faqat Mentor va Admin uchun) */}
+      {/* Modals */}
       {canManageAttendance && (
         <>
           <AttendanceSheetModal
