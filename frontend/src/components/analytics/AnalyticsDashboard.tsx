@@ -12,12 +12,37 @@ import {
   HelpCircle,
   BarChart3,
   Percent,
+  Clock,
+  Activity,
+  GraduationCap,
 } from 'lucide-react';
-import { Button } from '@/shared/ui/button/Button';
-import { Badge } from '@/shared/ui/badge/Badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from '@/components/ui/dialog';
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Input } from '@/components/ui/input';
 import { useToast } from '@/shared/ui/toast/ToastContext';
 import { useTranslation } from '@/shared/i18n';
 import { analyticsApi } from '@/api';
+import { cn } from '@/lib/utils';
 import type {
   DashboardOverviewDto,
   GroupAnalyticsDto,
@@ -142,44 +167,55 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ groups, 
     }
   };
 
+  const reportTypes = [
+    { id: 'student', label: t('analytics.pdfModal.reports.student.label'), desc: t('analytics.pdfModal.reports.student.desc') },
+    { id: 'group', label: t('analytics.pdfModal.reports.group.label'), desc: t('analytics.pdfModal.reports.group.desc') },
+    { id: 'assessment', label: t('analytics.pdfModal.reports.assessment.label'), desc: t('analytics.pdfModal.reports.assessment.desc') },
+    { id: 'attendance', label: t('analytics.pdfModal.reports.attendance.label'), desc: t('analytics.pdfModal.reports.attendance.desc') },
+    { id: 'lesson-completion', label: t('analytics.pdfModal.reports.lessonCompletion.label'), desc: t('analytics.pdfModal.reports.lessonCompletion.desc') },
+    { id: 'mentor', label: t('analytics.pdfModal.reports.mentor.label'), desc: t('analytics.pdfModal.reports.mentor.desc') },
+    { id: 'subjects', label: t('analytics.pdfModal.reports.subjects.label'), desc: t('analytics.pdfModal.reports.subjects.desc') },
+    { id: 'academic-period', label: t('analytics.pdfModal.reports.academicPeriod.label'), desc: t('analytics.pdfModal.reports.academicPeriod.desc') },
+  ];
+
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-16">
-      {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-[var(--border-subtle)] pb-5">
-        <div>
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center font-bold">
-              <BarChart3 className="w-5 h-5" />
+      {/* 1. Header Section */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-border/40 pb-5">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-bold shadow-xs shrink-0">
+            <BarChart3 className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2.5">
+              <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">
+                {t('analytics.title')}
+              </h1>
+              <Badge variant="outline" className="border-emerald-500/30 text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 font-semibold text-xs">
+                {t('analytics.moduleBadge')}
+              </Badge>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl md:text-2xl font-bold text-[var(--text-primary)]">
-                  {t('analytics.title')}
-                </h1>
-                <Badge variant="outline" className="border-emerald-600 text-emerald-700 font-medium">
-                  {t('analytics.moduleBadge')}
-                </Badge>
-              </div>
-              <p className="text-xs text-[var(--text-secondary)] mt-0.5">
-                {t('analytics.subtitle')}
-              </p>
-            </div>
+            <p className="text-xs text-muted-foreground mt-0.5 max-w-2xl">
+              {t('analytics.subtitle')}
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2.5 shrink-0">
           <Button
             variant="outline"
-            className="gap-2 border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--text-primary)]"
+            size="sm"
+            className="gap-2 text-xs font-semibold"
             onClick={() => setActiveView('rules')}
           >
-            <HelpCircle className="w-4 h-4 text-emerald-600" />
+            <HelpCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
             {t('analytics.metricRules')}
           </Button>
 
           <Button
-            variant="primary"
-            className="gap-2 bg-[var(--brand-primary)] text-white shadow-sm"
+            variant="default"
+            size="sm"
+            className="gap-2 text-xs font-semibold shadow-sm"
             onClick={() => setIsPdfModalOpen(true)}
           >
             <FileDown className="w-4 h-4" />
@@ -188,681 +224,906 @@ export const AnalyticsDashboard: React.FC<AnalyticsDashboardProps> = ({ groups, 
         </div>
       </div>
 
-      {/* Filter and Date-range Selection Bar */}
-      <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs flex flex-wrap items-center justify-between gap-4">
-        {/* View Switcher Tabs */}
-        <div className="flex items-center p-1 bg-[var(--surface-secondary)] rounded-lg text-xs font-semibold">
-          <button
-            onClick={() => setActiveView('overview')}
-            className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeView === 'overview'
-                ? 'bg-[var(--bg-surface)] text-[var(--brand-primary)] shadow-xs border border-[var(--border-default)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            {t('analytics.tabs.overview')}
-          </button>
-          <button
-            onClick={() => setActiveView('group')}
-            className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeView === 'group'
-                ? 'bg-[var(--bg-surface)] text-[var(--brand-primary)] shadow-xs border border-[var(--border-default)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            {t('analytics.tabs.group')}
-          </button>
-          <button
-            onClick={() => setActiveView('student')}
-            className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeView === 'student'
-                ? 'bg-[var(--bg-surface)] text-[var(--brand-primary)] shadow-xs border border-[var(--border-default)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            {t('analytics.tabs.student')}
-          </button>
-          <button
-            onClick={() => setActiveView('rules')}
-            className={`px-3 py-1.5 rounded-md transition-colors ${
-              activeView === 'rules'
-                ? 'bg-[var(--bg-surface)] text-[var(--brand-primary)] shadow-xs border border-[var(--border-default)]'
-                : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]'
-            }`}
-          >
-            {t('analytics.tabs.rules')}
-          </button>
-        </div>
-
-        {/* Date presets & selectors */}
-        <div className="flex flex-wrap items-center gap-2">
-          {activeView === 'group' && (
-            <select
-              aria-label={t('analytics.aria.selectGroup')}
-              value={selectedGroupId}
-              onChange={(e) => setSelectedGroupId(Number(e.target.value))}
-              className="text-xs bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg px-2.5 py-1.5 font-medium text-[var(--text-primary)] focus:outline-hidden"
+      {/* 2. Top Control & Navigation Bar */}
+      <Tabs value={activeView} onValueChange={(val) => setActiveView(val as any)} className="w-full space-y-6">
+        <div className="bg-card p-3 sm:p-4 rounded-2xl border border-border/40 shadow-xs flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          {/* Main Navigation Tabs */}
+          <TabsList className="bg-muted/70 p-1 rounded-xl h-9 sm:h-10">
+            <TabsTrigger
+              value="overview"
+              className="rounded-lg text-xs font-semibold px-3 py-1.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-xs transition-all"
             >
-              {groups.map((g) => (
-                <option key={g.id} value={g.id}>
-                  {g.groupCode} ({g.gradeLevel})
-                </option>
-              ))}
-            </select>
-          )}
-
-          {activeView === 'student' && (
-            <select
-              aria-label={t('analytics.aria.selectStudent')}
-              value={selectedStudentId}
-              onChange={(e) => setSelectedStudentId(Number(e.target.value))}
-              className="text-xs bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg px-2.5 py-1.5 font-medium text-[var(--text-primary)] focus:outline-hidden"
+              {t('analytics.tabs.overview')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="group"
+              className="rounded-lg text-xs font-semibold px-3 py-1.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-xs transition-all"
             >
-              {students.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.fullName} ({s.gradeLevel})
-                </option>
-              ))}
-            </select>
-          )}
-
-          <div className="flex items-center gap-1 bg-[var(--surface-secondary)] p-1 rounded-lg text-xs font-medium">
-            <Calendar className="w-3.5 h-3.5 text-[var(--text-secondary)] ml-1" />
-            <button
-              onClick={() => setDateRangePreset('7d')}
-              className={`px-2 py-1 rounded transition-colors ${dateRangePreset === '7d' ? 'bg-[var(--bg-surface)] font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-[var(--border-default)]' : 'text-[var(--text-secondary)]'}`}
+              {t('analytics.tabs.group')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="student"
+              className="rounded-lg text-xs font-semibold px-3 py-1.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-xs transition-all"
             >
-              {t('analytics.datePresets.sevenDays')}
-            </button>
-            <button
-              onClick={() => setDateRangePreset('30d')}
-              className={`px-2 py-1 rounded transition-colors ${dateRangePreset === '30d' ? 'bg-[var(--bg-surface)] font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-[var(--border-default)]' : 'text-[var(--text-secondary)]'}`}
+              {t('analytics.tabs.student')}
+            </TabsTrigger>
+            <TabsTrigger
+              value="rules"
+              className="rounded-lg text-xs font-semibold px-3 py-1.5 data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-xs transition-all"
             >
-              {t('analytics.datePresets.thirtyDays')}
-            </button>
-            <button
-              onClick={() => setDateRangePreset('semester')}
-              className={`px-2 py-1 rounded transition-colors ${dateRangePreset === 'semester' ? 'bg-[var(--bg-surface)] font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-[var(--border-default)]' : 'text-[var(--text-secondary)]'}`}
-            >
-              {t('analytics.datePresets.semester')}
-            </button>
-            <button
-              onClick={() => setDateRangePreset('custom')}
-              className={`px-2 py-1 rounded transition-colors ${dateRangePreset === 'custom' ? 'bg-[var(--bg-surface)] font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-[var(--border-default)]' : 'text-[var(--text-secondary)]'}`}
-            >
-              {t('analytics.datePresets.custom')}
-            </button>
-          </div>
+              {t('analytics.tabs.rules')}
+            </TabsTrigger>
+          </TabsList>
 
-          {dateRangePreset === 'custom' && (
-            <div className="flex items-center gap-1.5 text-xs">
-              <input
-                type="date"
-                aria-label={t('analytics.aria.startDate')}
-                value={customFrom}
-                onChange={(e) => setCustomFrom(e.target.value)}
-                className="bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg px-2 py-1 text-xs text-[var(--text-primary)]"
-              />
-              <span className="text-[var(--text-secondary)]">-</span>
-              <input
-                type="date"
-                aria-label={t('analytics.aria.endDate')}
-                value={customTo}
-                onChange={(e) => setCustomTo(e.target.value)}
-                className="bg-[var(--surface-secondary)] border border-[var(--border-subtle)] rounded-lg px-2 py-1 text-xs text-[var(--text-primary)]"
-              />
-            </div>
-          )}
-        </div>
-      </div>
-
-      {loading && !overviewData ? (
-        <div className="py-20 text-center">
-          <div className="w-9 h-9 border-3 border-[var(--brand-primary)] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
-          <p className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.loadingReports')}</p>
-        </div>
-      ) : (
-        <>
-          {/* VIEW 1: OVERVIEW DASHBOARD */}
-          {activeView === 'overview' && overviewData && (
-            <div className="space-y-6">
-              {/* Primary KPI Metric Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs relative overflow-hidden">
-                  <div className="flex items-center justify-between text-[var(--text-secondary)] mb-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider">{t('analytics.kpi.avgAttendance')}</span>
-                    <Percent className="w-4 h-4 text-emerald-600" />
-                  </div>
-                  <div className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
-                    {overviewData.systemWideAttendanceRate}%
-                  </div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1 flex items-center gap-1">
-                    <span className="text-emerald-700 font-semibold">{t('analytics.kpi.denominatorLabel')}</span>
-                    <span>{t('analytics.kpi.canceledExcluded')}</span>
-                  </div>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs">
-                  <div className="flex items-center justify-between text-[var(--text-secondary)] mb-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider">{t('analytics.kpi.avgScore')}</span>
-                    <Award className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
-                    {overviewData.systemWideAverageScore}%
-                  </div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                    {t('analytics.kpi.testsAndTasks')}
-                  </div>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs">
-                  <div className="flex items-center justify-between text-[var(--text-secondary)] mb-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider">{t('analytics.kpi.completedLessons')}</span>
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                  </div>
-                  <div className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
-                    {overviewData.totalCompletedLessons} {t('analytics.units.count')}
-                  </div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                    {t('analytics.kpi.eightyMinuteStandard')}
-                  </div>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] shadow-xs">
-                  <div className="flex items-center justify-between text-[var(--text-secondary)] mb-1">
-                    <span className="text-xs font-semibold uppercase tracking-wider">{t('analytics.kpi.groupsStudents')}</span>
-                    <Users className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div className="text-2xl md:text-3xl font-extrabold text-[var(--text-primary)]">
-                    {overviewData.activeGroups} / {overviewData.totalStudents}
-                  </div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                    {t('analytics.kpi.branchLocation')}
-                  </div>
-                </div>
-              </div>
-
-              {/* Group Comparison Table */}
-              <div className="bg-[var(--surface-primary)] rounded-xl border border-[var(--border-subtle)] overflow-hidden shadow-xs">
-                <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-[var(--brand-primary)]" />
-                    <h2 className="text-sm font-bold text-[var(--text-primary)]">
-                      {t('analytics.overview.tableTitle')}
-                    </h2>
-                  </div>
-                  <Badge variant="outline" className="text-xs">
-                    {t('analytics.overview.realDataBadge')}
-                  </Badge>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-[var(--surface-secondary)] text-[var(--text-secondary)] border-b border-[var(--border-subtle)]">
-                        <th className="py-2.5 px-4 font-semibold">{t('analytics.overview.cols.groupCode')}</th>
-                        <th className="py-2.5 px-4 font-semibold">{t('analytics.overview.cols.gradeSubject')}</th>
-                        <th className="py-2.5 px-4 font-semibold">{t('analytics.overview.cols.mentor')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.overview.cols.students')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.overview.cols.attendancePct')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.overview.cols.avgScore')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.overview.cols.completedLessons')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-right">{t('analytics.overview.cols.action')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-primary)]">
-                      {(overviewData.groupComparisons || []).map((gc) => (
-                        <tr key={gc.groupId} className="hover:bg-[var(--surface-secondary)]/50 transition-colors">
-                          <td className="py-3 px-4 font-bold text-[var(--brand-primary)]">{gc.groupCode}</td>
-                          <td className="py-3 px-4">
-                            <span className="font-medium">{gc.gradeLevel}</span>
-                            <div className="text-[11px] text-[var(--text-secondary)]">{gc.subject}</div>
-                          </td>
-                          <td className="py-3 px-4">{gc.mentorName}</td>
-                          <td className="py-3 px-4 text-center font-medium">{gc.studentCount} {t('analytics.units.persons')}</td>
-                          <td className="py-3 px-4 text-center">
-                            <span className={`inline-block px-2 py-0.5 rounded font-bold ${
-                              gc.attendanceRate >= 90 ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                            }`}>
-                              {gc.attendanceRate}%
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-center font-bold">{gc.averageAssessmentScore}%</td>
-                          <td className="py-3 px-4 text-center">{gc.completedLessons} {t('analytics.units.count')}</td>
-                          <td className="py-3 px-4 text-right">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-xs text-[var(--brand-primary)]"
-                              onClick={() => {
-                                setSelectedGroupId(gc.groupId);
-                                setActiveView('group');
-                              }}
-                            >
-                              {t('analytics.overview.analyzeBtn')} <ChevronRight className="w-3.5 h-3.5 ml-1" />
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* VIEW 2: GROUP PERFORMANCE */}
-          {activeView === 'group' && groupData && (
-            <div className="space-y-6">
-              {/* Group Banner */}
-              <div className="bg-[var(--surface-primary)] p-5 rounded-xl border border-[var(--border-subtle)] shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-[var(--text-primary)]">
-                      {t('analytics.groupView.group')}: {groupData.groupCode} ({groupData.gradeLevel})
-                    </h2>
-                    <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">
-                      {groupData.subject}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)] mt-1">
-                    {t('analytics.groupView.responsibleMentor')}: <span className="font-semibold text-[var(--text-primary)]">{groupData.mentorName}</span> | {t('analytics.groupView.branch')}: {groupData.branchLocation} | {t('analytics.groupView.students')}: {groupData.studentCount} {t('analytics.units.persons')}
-                  </p>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="gap-1.5 text-xs"
-                    onClick={() => handleDownloadPdf('attendance')}
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    {t('analytics.groupView.attendancePdf')}
-                  </Button>
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    className="gap-1.5 text-xs bg-[var(--brand-primary)]"
-                    onClick={() => handleDownloadPdf('group')}
-                  >
-                    <Download className="w-3.5 h-3.5" />
-                    {t('analytics.groupView.fullGroupPdf')}
-                  </Button>
-                </div>
-              </div>
-
-              {/* Group KPI Cards */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.kpi.avgAttendance')}</span>
-                  <div className="text-2xl font-bold text-emerald-700 mt-1">{groupData.averageAttendanceRate}%</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">{t('analytics.groupView.excusedExcluded')}</div>
-                </div>
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.kpi.avgScore')}</span>
-                  <div className="text-2xl font-bold text-blue-700 mt-1">{groupData.averageAssessmentScore}%</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">{t('analytics.groupView.basedOnTests')}</div>
-                </div>
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.kpi.completedLessons')}</span>
-                  <div className="text-2xl font-bold text-[var(--text-primary)] mt-1">{groupData.totalLessonsConducted} {t('analytics.units.count')}</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">{t('analytics.groupView.plannedOutOf', { count: groupData.totalLessonsPlanned })}</div>
-                </div>
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.groupView.assignmentCompletion')}</span>
-                  <div className="text-2xl font-bold text-purple-700 mt-1">{groupData.averageAssignmentCompletionRate}%</div>
-                  <div className="text-[10px] text-[var(--text-secondary)] mt-0.5">{t('analytics.groupView.practicalWorksSubmitted')}</div>
-                </div>
-              </div>
-
-              {/* Students in group table */}
-              <div className="bg-[var(--surface-primary)] rounded-xl border border-[var(--border-subtle)] overflow-hidden shadow-xs">
-                <div className="p-4 border-b border-[var(--border-subtle)] flex items-center justify-between">
-                  <h3 className="text-sm font-bold text-[var(--text-primary)]">
-                    {t('analytics.groupView.studentsTableTitle')}
-                  </h3>
-                  <span className="text-xs text-[var(--text-secondary)]">
-                    {t('analytics.groupView.totalStudentsCount', { count: groupData.students.length })}
-                  </span>
-                </div>
-
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse text-xs">
-                    <thead>
-                      <tr className="bg-[var(--surface-secondary)] text-[var(--text-secondary)] border-b border-[var(--border-subtle)]">
-                        <th className="py-2.5 px-4 font-semibold">№</th>
-                        <th className="py-2.5 px-4 font-semibold">{t('analytics.groupView.cols.studentName')}</th>
-                        <th className="py-2.5 px-4 font-semibold">{t('analytics.groupView.cols.studentId')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.groupView.cols.attendance')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.groupView.cols.avgScore')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.groupView.cols.lessons')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-center">{t('analytics.groupView.cols.masteryLevel')}</th>
-                        <th className="py-2.5 px-4 font-semibold text-right">{t('analytics.groupView.cols.individualPdf')}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--border-subtle)] text-[var(--text-primary)]">
-                      {(groupData.students || []).map((s, idx) => (
-                        <tr key={s.studentId} className="hover:bg-[var(--surface-secondary)]/50 transition-colors">
-                          <td className="py-3 px-4 text-[var(--text-secondary)]">{idx + 1}</td>
-                          <td className="py-3 px-4 font-bold">{s.studentName}</td>
-                          <td className="py-3 px-4 text-[var(--text-secondary)] font-mono">{s.studentIdNumber || '-'}</td>
-                          <td className="py-3 px-4 text-center font-bold text-emerald-700">{s.attendanceRate}%</td>
-                          <td className="py-3 px-4 text-center font-bold">{s.averageScore}%</td>
-                          <td className="py-3 px-4 text-center">{s.completedLessons} {t('analytics.units.count')}</td>
-                          <td className="py-3 px-4 text-center">
-                            <span className="px-2 py-0.5 rounded text-[11px] font-semibold bg-emerald-50 text-emerald-800">
-                              {s.masteryLevel}
-                            </span>
-                          </td>
-                          <td className="py-3 px-4 text-right">
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="text-xs text-[var(--brand-primary)]"
-                              onClick={() => {
-                                setSelectedStudentId(s.studentId);
-                                setActiveView('student');
-                              }}
-                            >
-                              {t('analytics.groupView.viewBtn')}
-                            </Button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* VIEW 3: INDIVIDUAL STUDENT ANALYTICS */}
-          {activeView === 'student' && studentData && (
-            <div className="space-y-6">
-              <div className="bg-[var(--surface-primary)] p-5 rounded-xl border border-[var(--border-subtle)] shadow-xs flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h2 className="text-lg font-bold text-[var(--text-primary)]">
-                      {studentData.studentName}
-                    </h2>
-                    <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-800">
-                      {studentData.masteryLevel}
-                    </Badge>
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)] mt-1">
-                    {t('analytics.studentView.group')}: <span className="font-semibold">{studentData.groupCode}</span> ({studentData.gradeLevel}) | ID: {studentData.studentIdNumber} | {t('analytics.studentView.mentor')}: {studentData.mentorName}
-                  </p>
-                </div>
-
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className="gap-2 bg-[var(--brand-primary)]"
-                  onClick={() => handleDownloadPdf('student')}
+          {/* Context Selectors & Date Range Presets */}
+          <div className="flex flex-wrap items-center gap-2">
+            {activeView === 'group' && (
+              <div className="flex items-center gap-1.5 animate-in fade-in-50 duration-150">
+                <Users className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <select
+                  aria-label={t('analytics.aria.selectGroup')}
+                  value={selectedGroupId}
+                  onChange={(e) => setSelectedGroupId(Number(e.target.value))}
+                  className="h-8 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 cursor-pointer transition-colors"
                 >
-                  <Download className="w-4 h-4" />
-                  {t('analytics.studentView.downloadProgressPdf')}
-                </Button>
+                  {groups.map((g) => (
+                    <option key={g.id} value={g.id}>
+                      {g.groupCode} ({g.gradeLevel})
+                    </option>
+                  ))}
+                </select>
               </div>
+            )}
 
-              {/* Individual Student Metrics Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.studentView.attendanceExactDenominator')}</span>
-                  <div className="text-2xl font-bold text-emerald-700 mt-1">{studentData.attendanceRate}%</div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                    {t('analytics.studentView.attendanceSummary', {
-                      present: studentData.presentCount,
-                      late: studentData.lateCount,
-                      excused: studentData.excusedCount,
-                    })}
-                  </div>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.studentView.midtermAssessments')}</span>
-                  <div className="text-2xl font-bold text-blue-700 mt-1">{studentData.averageAssessmentScore}%</div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                    {t('analytics.studentView.assessmentsSubmitted', {
-                      attempted: studentData.assessmentsAttempted,
-                      total: studentData.totalAssessmentsAssigned,
-                    })}
-                  </div>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.studentView.assignmentsResult')}</span>
-                  <div className="text-2xl font-bold text-purple-700 mt-1">{studentData.averageAssignmentScore}%</div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                    {t('analytics.studentView.assignmentsCompleted', {
-                      submitted: studentData.assignmentsSubmitted,
-                      total: studentData.totalAssignmentsAssigned,
-                    })}
-                  </div>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                  <span className="text-xs text-[var(--text-secondary)] font-medium">{t('analytics.studentView.overallMastery')}</span>
-                  <div className="text-2xl font-bold text-[var(--brand-primary)] mt-1">{studentData.overallAverageScore}%</div>
-                  <div className="text-[11px] text-[var(--text-secondary)] mt-1">
-                    {t('analytics.studentView.level')}: {studentData.masteryLevel}
-                  </div>
-                </div>
+            {activeView === 'student' && (
+              <div className="flex items-center gap-1.5 animate-in fade-in-50 duration-150">
+                <GraduationCap className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <select
+                  aria-label={t('analytics.aria.selectStudent')}
+                  value={selectedStudentId}
+                  onChange={(e) => setSelectedStudentId(Number(e.target.value))}
+                  className="h-8 rounded-lg border border-input bg-background px-2.5 py-1 text-xs font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1 cursor-pointer transition-colors"
+                >
+                  {students.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.fullName} ({s.gradeLevel})
+                    </option>
+                  ))}
+                </select>
               </div>
+            )}
 
-              {/* Attendance Breakdown Table */}
-              <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)]">
-                <h3 className="text-xs font-bold text-[var(--text-primary)] uppercase tracking-wider mb-3">
-                  {t('analytics.studentView.breakdownTitle')}
-                </h3>
-                <div className="grid grid-cols-5 gap-3 text-center">
-                  <div className="p-3 bg-[var(--surface-secondary)] rounded-lg">
-                    <div className="text-xs text-[var(--text-secondary)]">{t('analytics.studentView.scheduledSessions')}</div>
-                    <div className="text-base font-bold text-[var(--text-primary)] mt-0.5">{studentData.totalScheduledSessions}</div>
-                  </div>
-                  <div className="p-3 bg-emerald-50 rounded-lg border border-emerald-100">
-                    <div className="text-xs text-emerald-800">{t('analytics.studentView.present')}</div>
-                    <div className="text-base font-bold text-emerald-800 mt-0.5">{studentData.presentCount}</div>
-                  </div>
-                  <div className="p-3 bg-amber-50 rounded-lg border border-amber-100">
-                    <div className="text-xs text-amber-800">{t('analytics.studentView.late')}</div>
-                    <div className="text-base font-bold text-amber-800 mt-0.5">{studentData.lateCount}</div>
-                  </div>
-                  <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                    <div className="text-xs text-blue-800">{t('analytics.studentView.excused')}</div>
-                    <div className="text-base font-bold text-blue-800 mt-0.5">{studentData.excusedCount}</div>
-                  </div>
-                  <div className="p-3 bg-rose-50 rounded-lg border border-rose-100">
-                    <div className="text-xs text-rose-800">{t('analytics.studentView.absent')}</div>
-                    <div className="text-base font-bold text-rose-800 mt-0.5">{studentData.absentCount}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* VIEW 4: METRICS & RULES TRANSPARENCY */}
-          {activeView === 'rules' && rulesDoc && (
-            <div className="space-y-4">
-              <div className="bg-emerald-50/70 p-4 rounded-xl border border-emerald-200 text-emerald-900">
-                <div className="flex items-center gap-2 font-bold text-sm">
-                  <Info className="w-4 h-4 text-emerald-700" />
-                  {t('analytics.rulesView.bannerTitle')}
-                </div>
-                <p className="text-xs mt-1 text-emerald-800">
-                  {t('analytics.rulesView.bannerDesc')}
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] space-y-2">
-                  <span className="text-xs font-bold text-[var(--brand-primary)]">{t('analytics.rulesView.attendanceTitle')}</span>
-                  <div className="p-2.5 bg-[var(--surface-secondary)] font-mono text-[11px] rounded text-[var(--text-primary)]">
-                    {rulesDoc.attendanceFormula}
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    {rulesDoc.attendanceDenominatorPolicy}
-                  </p>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] space-y-2">
-                  <span className="text-xs font-bold text-[var(--brand-primary)]">{t('analytics.rulesView.lessonCompletionTitle')}</span>
-                  <div className="p-2.5 bg-[var(--surface-secondary)] font-mono text-[11px] rounded text-[var(--text-primary)]">
-                    {rulesDoc.lessonCompletionFormula}
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    {t('analytics.rulesView.lessonCompletionDesc')}
-                  </p>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] space-y-2">
-                  <span className="text-xs font-bold text-[var(--brand-primary)]">{t('analytics.rulesView.assessmentTitle')}</span>
-                  <div className="p-2.5 bg-[var(--surface-secondary)] font-mono text-[11px] rounded text-[var(--text-primary)]">
-                    {rulesDoc.assessmentCompletionFormula}
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    {t('analytics.rulesView.assessmentDesc')}
-                  </p>
-                </div>
-
-                <div className="bg-[var(--surface-primary)] p-4 rounded-xl border border-[var(--border-subtle)] space-y-2">
-                  <span className="text-xs font-bold text-[var(--brand-primary)]">{t('analytics.rulesView.averageScoreTitle')}</span>
-                  <div className="p-2.5 bg-[var(--surface-secondary)] font-mono text-[11px] rounded text-[var(--text-primary)]">
-                    {rulesDoc.averageScoreFormula}
-                  </div>
-                  <p className="text-xs text-[var(--text-secondary)]">
-                    {rulesDoc.auditDisclaimer}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-        </>
-      )}
-
-      {/* PDF EXPORT MODAL */}
-      {isPdfModalOpen && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-xs"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setIsPdfModalOpen(false);
-          }}
-        >
-          <div
-            className="bg-[var(--surface-primary)] rounded-2xl max-w-lg w-full border border-[var(--border-subtle)] shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="p-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[var(--brand-primary)]/10 text-[var(--brand-primary)] flex items-center justify-center">
-                  <FileDown className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-bold text-[var(--text-primary)]">{t('analytics.pdfModal.title')}</h3>
-                  <p className="text-[11px] text-[var(--text-secondary)]">{t('analytics.pdfModal.subtitle')}</p>
-                </div>
-              </div>
+            {/* Date Range Selector Pill Group */}
+            <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl text-xs font-medium">
+              <Calendar className="w-3.5 h-3.5 text-muted-foreground ml-1.5 shrink-0" />
               <button
-                onClick={() => setIsPdfModalOpen(false)}
-                className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] text-sm font-bold"
+                type="button"
+                onClick={() => setDateRangePreset('7d')}
+                className={cn(
+                  'px-2.5 py-1 rounded-lg transition-all text-xs font-medium cursor-pointer',
+                  dateRangePreset === '7d'
+                    ? 'bg-background font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-border/50'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
               >
-                ✕
+                {t('analytics.datePresets.sevenDays')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDateRangePreset('30d')}
+                className={cn(
+                  'px-2.5 py-1 rounded-lg transition-all text-xs font-medium cursor-pointer',
+                  dateRangePreset === '30d'
+                    ? 'bg-background font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-border/50'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {t('analytics.datePresets.thirtyDays')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDateRangePreset('semester')}
+                className={cn(
+                  'px-2.5 py-1 rounded-lg transition-all text-xs font-medium cursor-pointer',
+                  dateRangePreset === 'semester'
+                    ? 'bg-background font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-border/50'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {t('analytics.datePresets.semester')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setDateRangePreset('custom')}
+                className={cn(
+                  'px-2.5 py-1 rounded-lg transition-all text-xs font-medium cursor-pointer',
+                  dateRangePreset === 'custom'
+                    ? 'bg-background font-bold text-emerald-600 dark:text-emerald-400 shadow-xs border border-border/50'
+                    : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                {t('analytics.datePresets.custom')}
               </button>
             </div>
 
-            <div className="p-5 space-y-4">
+            {dateRangePreset === 'custom' && (
+              <div className="flex items-center gap-1.5 text-xs animate-in fade-in-50 duration-150">
+                <Input
+                  type="date"
+                  aria-label={t('analytics.aria.startDate')}
+                  value={customFrom}
+                  onChange={(e) => setCustomFrom(e.target.value)}
+                  className="h-8 text-xs bg-background w-32"
+                />
+                <span className="text-muted-foreground font-bold">-</span>
+                <Input
+                  type="date"
+                  aria-label={t('analytics.aria.endDate')}
+                  value={customTo}
+                  onChange={(e) => setCustomTo(e.target.value)}
+                  className="h-8 text-xs bg-background w-32"
+                />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* 3. Loading State (Shadcn Skeleton) */}
+        {loading && !overviewData ? (
+          <div className="space-y-6 animate-in fade-in-50 duration-200">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i} className="p-5 border-border/40 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-3 w-24" />
+                    <Skeleton className="h-8 w-8 rounded-xl" />
+                  </div>
+                  <Skeleton className="h-8 w-20" />
+                  <Skeleton className="h-2 w-full" />
+                  <Skeleton className="h-3 w-32" />
+                </Card>
+              ))}
+            </div>
+
+            <Card className="border-border/40">
+              <div className="p-5 border-b border-border/40 flex items-center justify-between">
+                <Skeleton className="h-5 w-64" />
+                <Skeleton className="h-6 w-28 rounded-md" />
+              </div>
+              <div className="p-6 space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center justify-between gap-4">
+                    <Skeleton className="h-4 w-20" />
+                    <Skeleton className="h-4 w-36" />
+                    <Skeleton className="h-4 w-28" />
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-4 w-12" />
+                    <Skeleton className="h-4 w-12" />
+                  </div>
+                ))}
+              </div>
+            </Card>
+
+            <div className="py-4 text-center">
+              <p className="text-xs text-muted-foreground font-medium animate-pulse">
+                {t('analytics.loadingReports')}
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {/* VIEW 1: OVERVIEW DASHBOARD */}
+            <TabsContent value="overview" className="mt-0 space-y-6">
+              {overviewData && (
+                <>
+                  {/* Primary KPI Metric Cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {/* KPI 1: Attendance */}
+                    <Card className="relative overflow-hidden border-border/40 shadow-xs hover:shadow-md transition-all group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+                      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {t('analytics.kpi.avgAttendance')}
+                        </span>
+                        <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                          <Percent className="w-4 h-4" />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-mono">
+                          {overviewData.systemWideAttendanceRate}%
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-1.5 w-full bg-emerald-500/15 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-emerald-600 dark:bg-emerald-400 rounded-full transition-all duration-500"
+                              style={{ width: `${Math.min(overviewData.systemWideAttendanceRate, 100)}%` }}
+                            />
+                          </div>
+                          <div className="text-[11px] text-muted-foreground flex items-center justify-between pt-1">
+                            <span className="text-emerald-700 dark:text-emerald-300 font-semibold">
+                              {t('analytics.kpi.denominatorLabel')}
+                            </span>
+                            <span className="truncate">{t('analytics.kpi.canceledExcluded')}</span>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* KPI 2: Average Score */}
+                    <Card className="relative overflow-hidden border-border/40 shadow-xs hover:shadow-md transition-all group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+                      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {t('analytics.kpi.avgScore')}
+                        </span>
+                        <div className="p-2 rounded-xl bg-blue-500/10 text-blue-600 dark:text-blue-400">
+                          <Award className="w-4 h-4" />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-mono">
+                          {overviewData.systemWideAverageScore}%
+                        </div>
+                        <div className="space-y-1">
+                          <div className="h-1.5 w-full bg-blue-500/15 rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-blue-600 dark:bg-blue-400 rounded-full transition-all duration-500"
+                              style={{ width: `${Math.min(overviewData.systemWideAverageScore, 100)}%` }}
+                            />
+                          </div>
+                          <div className="text-[11px] text-muted-foreground pt-1 truncate">
+                            {t('analytics.kpi.testsAndTasks')}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* KPI 3: Completed Lessons */}
+                    <Card className="relative overflow-hidden border-border/40 shadow-xs hover:shadow-md transition-all group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-indigo-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+                      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {t('analytics.kpi.completedLessons')}
+                        </span>
+                        <div className="p-2 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
+                          <CheckCircle2 className="w-4 h-4" />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-mono">
+                          {overviewData.totalCompletedLessons} {t('analytics.units.count')}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground pt-1 flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
+                          <span className="truncate">{t('analytics.kpi.eightyMinuteStandard')}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+
+                    {/* KPI 4: Active Groups & Students */}
+                    <Card className="relative overflow-hidden border-border/40 shadow-xs hover:shadow-md transition-all group">
+                      <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-bl-full pointer-events-none transition-transform group-hover:scale-110" />
+                      <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+                        <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                          {t('analytics.kpi.groupsStudents')}
+                        </span>
+                        <div className="p-2 rounded-xl bg-purple-500/10 text-purple-600 dark:text-purple-400">
+                          <Users className="w-4 h-4" />
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-3">
+                        <div className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground font-mono">
+                          {overviewData.activeGroups} / {overviewData.totalStudents}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground pt-1 flex items-center gap-1.5">
+                          <Activity className="w-3.5 h-3.5 text-purple-500 shrink-0" />
+                          <span className="truncate">{t('analytics.kpi.branchLocation')}</span>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </div>
+
+                  {/* Group Comparison Table Card */}
+                  <Card className="border-border/40 shadow-xs overflow-hidden">
+                    <CardHeader className="p-4 sm:p-5 border-b border-border/40 flex flex-row items-center justify-between space-y-0">
+                      <div className="flex items-center gap-2.5">
+                        <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                          <TrendingUp className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <CardTitle className="text-sm sm:text-base font-bold text-foreground">
+                            {t('analytics.overview.tableTitle')}
+                          </CardTitle>
+                        </div>
+                      </div>
+                      <Badge variant="outline" className="text-xs bg-muted/40 font-medium">
+                        {t('analytics.overview.realDataBadge')}
+                      </Badge>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-muted/30 hover:bg-muted/30">
+                            <TableHead className="font-semibold text-xs py-3 px-4">{t('analytics.overview.cols.groupCode')}</TableHead>
+                            <TableHead className="font-semibold text-xs py-3 px-4">{t('analytics.overview.cols.gradeSubject')}</TableHead>
+                            <TableHead className="font-semibold text-xs py-3 px-4">{t('analytics.overview.cols.mentor')}</TableHead>
+                            <TableHead className="font-semibold text-xs py-3 px-4 text-center">{t('analytics.overview.cols.students')}</TableHead>
+                            <TableHead className="font-semibold text-xs py-3 px-4 text-center">{t('analytics.overview.cols.attendancePct')}</TableHead>
+                            <TableHead className="font-semibold text-xs py-3 px-4 text-center">{t('analytics.overview.cols.avgScore')}</TableHead>
+                            <TableHead className="font-semibold text-xs py-3 px-4 text-center">{t('analytics.overview.cols.completedLessons')}</TableHead>
+                            <TableHead className="font-semibold text-xs py-3 px-4 text-right">{t('analytics.overview.cols.action')}</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {(overviewData.groupComparisons || []).map((gc) => (
+                            <TableRow key={gc.groupId} className="hover:bg-muted/40 transition-colors">
+                              <TableCell className="font-bold text-primary font-mono py-3.5 px-4">{gc.groupCode}</TableCell>
+                              <TableCell className="py-3.5 px-4">
+                                <div className="font-semibold text-foreground text-xs">{gc.gradeLevel}</div>
+                                <div className="text-[11px] text-muted-foreground">{gc.subject}</div>
+                              </TableCell>
+                              <TableCell className="py-3.5 px-4 text-foreground text-xs font-medium">{gc.mentorName}</TableCell>
+                              <TableCell className="py-3.5 px-4 text-center text-xs font-medium">{gc.studentCount} {t('analytics.units.persons')}</TableCell>
+                              <TableCell className="py-3.5 px-4 text-center">
+                                <Badge variant={gc.attendanceRate >= 90 ? 'success' : 'warning'} className="font-bold font-mono">
+                                  {gc.attendanceRate}%
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="py-3.5 px-4 text-center font-bold text-foreground text-xs font-mono">{gc.averageAssessmentScore}%</TableCell>
+                              <TableCell className="py-3.5 px-4 text-center text-xs font-medium">{gc.completedLessons} {t('analytics.units.count')}</TableCell>
+                              <TableCell className="py-3.5 px-4 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 gap-1 h-8"
+                                  onClick={() => {
+                                    setSelectedGroupId(gc.groupId);
+                                    setActiveView('group');
+                                  }}
+                                >
+                                  {t('analytics.overview.analyzeBtn')}
+                                  <ChevronRight className="w-3.5 h-3.5" />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </TabsContent>
+
+            {/* VIEW 2: GROUP PERFORMANCE */}
+            <TabsContent value="group" className="mt-0 space-y-6">
+              {groupData && (
+                <>
+                  {/* Group Banner Card */}
+                  <Card className="border-border/40 shadow-xs">
+                    <CardContent className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <h2 className="text-lg font-bold text-foreground tracking-tight">
+                            {t('analytics.groupView.group')}: {groupData.groupCode} ({groupData.gradeLevel})
+                          </h2>
+                          <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/20 font-semibold">
+                            {groupData.subject}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                          {t('analytics.groupView.responsibleMentor')}: <span className="font-semibold text-foreground">{groupData.mentorName}</span> | {t('analytics.groupView.branch')}: <span className="text-foreground">{groupData.branchLocation}</span> | {t('analytics.groupView.students')}: <span className="font-semibold text-foreground">{groupData.studentCount} {t('analytics.units.persons')}</span>
+                        </p>
+                      </div>
+
+                      <div className="flex items-center gap-2.5 shrink-0">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="gap-1.5 text-xs font-semibold"
+                          onClick={() => handleDownloadPdf('attendance')}
+                        >
+                          <Download className="w-3.5 h-3.5 text-muted-foreground" />
+                          {t('analytics.groupView.attendancePdf')}
+                        </Button>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          className="gap-1.5 text-xs font-semibold shadow-sm"
+                          onClick={() => handleDownloadPdf('group')}
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          {t('analytics.groupView.fullGroupPdf')}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Group KPI Cards */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.kpi.avgAttendance')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                        {groupData.averageAttendanceRate}%
+                      </div>
+                      <div className="h-1.5 w-full bg-emerald-500/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-600 dark:bg-emerald-400 rounded-full"
+                          style={{ width: `${Math.min(groupData.averageAttendanceRate, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">{t('analytics.groupView.excusedExcluded')}</div>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.kpi.avgScore')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-mono">
+                        {groupData.averageAssessmentScore}%
+                      </div>
+                      <div className="h-1.5 w-full bg-blue-500/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-600 dark:bg-blue-400 rounded-full"
+                          style={{ width: `${Math.min(groupData.averageAssessmentScore, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">{t('analytics.groupView.basedOnTests')}</div>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.kpi.completedLessons')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-foreground font-mono">
+                        {groupData.totalLessonsConducted} {t('analytics.units.count')}
+                      </div>
+                      <div className="h-1.5 w-full bg-indigo-500/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-indigo-600 dark:bg-indigo-400 rounded-full"
+                          style={{
+                            width: `${Math.min((groupData.totalLessonsConducted / (groupData.totalLessonsPlanned || 1)) * 100, 100)}%`,
+                          }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {t('analytics.groupView.plannedOutOf', { count: groupData.totalLessonsPlanned })}
+                      </div>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.groupView.assignmentCompletion')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-purple-600 dark:text-purple-400 font-mono">
+                        {groupData.averageAssignmentCompletionRate}%
+                      </div>
+                      <div className="h-1.5 w-full bg-purple-500/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-purple-600 dark:bg-purple-400 rounded-full"
+                          style={{ width: `${Math.min(groupData.averageAssignmentCompletionRate, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[10px] text-muted-foreground">
+                        {t('analytics.groupView.practicalWorksSubmitted')}
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Students in Group Table Card */}
+                  <Card className="border-border/40 shadow-xs overflow-hidden">
+                    <CardHeader className="p-4 sm:p-5 border-b border-border/40 flex flex-row items-center justify-between space-y-0">
+                      <CardTitle className="text-sm sm:text-base font-bold text-foreground">
+                        {t('analytics.groupView.studentsTableTitle')}
+                      </CardTitle>
+                      <Badge variant="secondary" className="text-xs font-semibold">
+                        {t('analytics.groupView.totalStudentsCount', { count: groupData.students.length })}
+                      </Badge>
+                    </CardHeader>
+
+                    <CardContent className="p-0">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className="bg-muted/30 hover:bg-muted/30">
+                            <TableHead className="py-3 px-4 font-semibold text-xs w-12">№</TableHead>
+                            <TableHead className="py-3 px-4 font-semibold text-xs">{t('analytics.groupView.cols.studentName')}</TableHead>
+                            <TableHead className="py-3 px-4 font-semibold text-xs">{t('analytics.groupView.cols.studentId')}</TableHead>
+                            <TableHead className="py-3 px-4 font-semibold text-xs text-center">{t('analytics.groupView.cols.attendance')}</TableHead>
+                            <TableHead className="py-3 px-4 font-semibold text-xs text-center">{t('analytics.groupView.cols.avgScore')}</TableHead>
+                            <TableHead className="py-3 px-4 font-semibold text-xs text-center">{t('analytics.groupView.cols.lessons')}</TableHead>
+                            <TableHead className="py-3 px-4 font-semibold text-xs text-center">{t('analytics.groupView.cols.masteryLevel')}</TableHead>
+                            <TableHead className="py-3 px-4 font-semibold text-xs text-right">{t('analytics.groupView.cols.individualPdf')}</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {(groupData.students || []).map((s, idx) => (
+                            <TableRow key={s.studentId} className="hover:bg-muted/40 transition-colors">
+                              <TableCell className="py-3 px-4 text-xs text-muted-foreground">{idx + 1}</TableCell>
+                              <TableCell className="py-3 px-4 font-bold text-foreground text-xs">{s.studentName}</TableCell>
+                              <TableCell className="py-3 px-4 text-xs text-muted-foreground font-mono">{s.studentIdNumber || '-'}</TableCell>
+                              <TableCell className="py-3 px-4 text-center font-bold text-xs text-emerald-600 dark:text-emerald-400 font-mono">
+                                {s.attendanceRate}%
+                              </TableCell>
+                              <TableCell className="py-3 px-4 text-center font-bold text-xs text-foreground font-mono">{s.averageScore}%</TableCell>
+                              <TableCell className="py-3 px-4 text-center text-xs font-medium">{s.completedLessons} {t('analytics.units.count')}</TableCell>
+                              <TableCell className="py-3 px-4 text-center">
+                                <Badge variant="outline" className="text-[11px] font-semibold bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30">
+                                  {s.masteryLevel}
+                                </Badge>
+                              </TableCell>
+                              <TableCell className="py-3 px-4 text-right">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-xs font-semibold text-primary hover:text-primary hover:bg-primary/10 h-8"
+                                  onClick={() => {
+                                    setSelectedStudentId(s.studentId);
+                                    setActiveView('student');
+                                  }}
+                                >
+                                  {t('analytics.groupView.viewBtn')}
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </TabsContent>
+
+            {/* VIEW 3: INDIVIDUAL STUDENT ANALYTICS */}
+            <TabsContent value="student" className="mt-0 space-y-6">
+              {studentData && (
+                <>
+                  {/* Student Banner Card */}
+                  <Card className="border-border/40 shadow-xs">
+                    <CardContent className="p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div>
+                        <div className="flex items-center gap-2.5 flex-wrap">
+                          <h2 className="text-lg font-bold text-foreground tracking-tight">
+                            {studentData.studentName}
+                          </h2>
+                          <Badge variant="outline" className="text-xs bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30 font-semibold">
+                            {studentData.masteryLevel}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">
+                          {t('analytics.studentView.group')}: <span className="font-semibold text-foreground">{studentData.groupCode}</span> ({studentData.gradeLevel}) | ID: <span className="font-mono text-foreground">{studentData.studentIdNumber}</span> | {t('analytics.studentView.mentor')}: <span className="font-semibold text-foreground">{studentData.mentorName}</span>
+                        </p>
+                      </div>
+
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="gap-2 text-xs font-semibold shadow-sm shrink-0"
+                        onClick={() => handleDownloadPdf('student')}
+                      >
+                        <Download className="w-4 h-4" />
+                        {t('analytics.studentView.downloadProgressPdf')}
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Individual Student Metrics Grid */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.studentView.attendanceExactDenominator')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-emerald-600 dark:text-emerald-400 font-mono">
+                        {studentData.attendanceRate}%
+                      </div>
+                      <div className="h-1.5 w-full bg-emerald-500/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-emerald-600 dark:bg-emerald-400 rounded-full"
+                          style={{ width: `${Math.min(studentData.attendanceRate, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {t('analytics.studentView.attendanceSummary', {
+                          present: studentData.presentCount,
+                          late: studentData.lateCount,
+                          excused: studentData.excusedCount,
+                        })}
+                      </div>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.studentView.midtermAssessments')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-blue-600 dark:text-blue-400 font-mono">
+                        {studentData.averageAssessmentScore}%
+                      </div>
+                      <div className="h-1.5 w-full bg-blue-500/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-blue-600 dark:bg-blue-400 rounded-full"
+                          style={{ width: `${Math.min(studentData.averageAssessmentScore, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {t('analytics.studentView.assessmentsSubmitted', {
+                          attempted: studentData.assessmentsAttempted,
+                          total: studentData.totalAssessmentsAssigned,
+                        })}
+                      </div>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.studentView.assignmentsResult')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-purple-600 dark:text-purple-400 font-mono">
+                        {studentData.averageAssignmentScore}%
+                      </div>
+                      <div className="h-1.5 w-full bg-purple-500/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-purple-600 dark:bg-purple-400 rounded-full"
+                          style={{ width: `${Math.min(studentData.averageAssignmentScore, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {t('analytics.studentView.assignmentsCompleted', {
+                          submitted: studentData.assignmentsSubmitted,
+                          total: studentData.totalAssignmentsAssigned,
+                        })}
+                      </div>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs p-4 space-y-2">
+                      <span className="text-xs text-muted-foreground font-semibold uppercase tracking-wider block">
+                        {t('analytics.studentView.overallMastery')}
+                      </span>
+                      <div className="text-2xl font-extrabold text-primary font-mono">
+                        {studentData.overallAverageScore}%
+                      </div>
+                      <div className="h-1.5 w-full bg-primary/15 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-primary rounded-full"
+                          style={{ width: `${Math.min(studentData.overallAverageScore, 100)}%` }}
+                        />
+                      </div>
+                      <div className="text-[11px] text-muted-foreground">
+                        {t('analytics.studentView.level')}: <span className="font-semibold text-foreground">{studentData.masteryLevel}</span>
+                      </div>
+                    </Card>
+                  </div>
+
+                  {/* Attendance Breakdown Grid */}
+                  <Card className="border-border/40 shadow-xs">
+                    <CardHeader className="p-4 sm:p-5 pb-3">
+                      <CardTitle className="text-xs font-bold text-foreground uppercase tracking-wider">
+                        {t('analytics.studentView.breakdownTitle')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="px-4 sm:px-5 pb-5">
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
+                        <div className="p-3.5 bg-muted/40 rounded-xl border border-border/40">
+                          <div className="text-xs text-muted-foreground">{t('analytics.studentView.scheduledSessions')}</div>
+                          <div className="text-lg font-bold text-foreground mt-1 font-mono">{studentData.totalScheduledSessions}</div>
+                        </div>
+                        <div className="p-3.5 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-emerald-800 dark:text-emerald-300">
+                          <div className="text-xs font-medium">{t('analytics.studentView.present')}</div>
+                          <div className="text-lg font-bold mt-1 font-mono">{studentData.presentCount}</div>
+                        </div>
+                        <div className="p-3.5 bg-amber-500/10 rounded-xl border border-amber-500/20 text-amber-800 dark:text-amber-300">
+                          <div className="text-xs font-medium">{t('analytics.studentView.late')}</div>
+                          <div className="text-lg font-bold mt-1 font-mono">{studentData.lateCount}</div>
+                        </div>
+                        <div className="p-3.5 bg-blue-500/10 rounded-xl border border-blue-500/20 text-blue-800 dark:text-blue-300">
+                          <div className="text-xs font-medium">{t('analytics.studentView.excused')}</div>
+                          <div className="text-lg font-bold mt-1 font-mono">{studentData.excusedCount}</div>
+                        </div>
+                        <div className="p-3.5 bg-rose-500/10 rounded-xl border border-rose-500/20 text-rose-800 dark:text-rose-300 col-span-2 sm:col-span-1">
+                          <div className="text-xs font-medium">{t('analytics.studentView.absent')}</div>
+                          <div className="text-lg font-bold mt-1 font-mono">{studentData.absentCount}</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </>
+              )}
+            </TabsContent>
+
+            {/* VIEW 4: METRICS & RULES TRANSPARENCY */}
+            <TabsContent value="rules" className="mt-0 space-y-4">
+              {rulesDoc && (
+                <>
+                  <Alert variant="default" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-950 dark:text-emerald-100">
+                    <Info className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <AlertTitle className="font-bold text-sm text-emerald-900 dark:text-emerald-200">
+                      {t('analytics.rulesView.bannerTitle')}
+                    </AlertTitle>
+                    <AlertDescription className="text-xs text-emerald-800 dark:text-emerald-300 mt-1">
+                      {t('analytics.rulesView.bannerDesc')}
+                    </AlertDescription>
+                  </Alert>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <Card className="border-border/40 shadow-xs">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xs font-bold text-primary">
+                          {t('analytics.rulesView.attendanceTitle')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2.5">
+                        <div className="p-3 bg-muted/60 font-mono text-[11px] rounded-xl text-foreground border border-border/40 select-all overflow-x-auto">
+                          {rulesDoc.attendanceFormula}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {rulesDoc.attendanceDenominatorPolicy}
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xs font-bold text-primary">
+                          {t('analytics.rulesView.lessonCompletionTitle')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2.5">
+                        <div className="p-3 bg-muted/60 font-mono text-[11px] rounded-xl text-foreground border border-border/40 select-all overflow-x-auto">
+                          {rulesDoc.lessonCompletionFormula}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {t('analytics.rulesView.lessonCompletionDesc')}
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xs font-bold text-primary">
+                          {t('analytics.rulesView.assessmentTitle')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2.5">
+                        <div className="p-3 bg-muted/60 font-mono text-[11px] rounded-xl text-foreground border border-border/40 select-all overflow-x-auto">
+                          {rulesDoc.assessmentCompletionFormula}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {t('analytics.rulesView.assessmentDesc')}
+                        </p>
+                      </CardContent>
+                    </Card>
+
+                    <Card className="border-border/40 shadow-xs">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xs font-bold text-primary">
+                          {t('analytics.rulesView.averageScoreTitle')}
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-2.5">
+                        <div className="p-3 bg-muted/60 font-mono text-[11px] rounded-xl text-foreground border border-border/40 select-all overflow-x-auto">
+                          {rulesDoc.averageScoreFormula}
+                        </div>
+                        <p className="text-xs text-muted-foreground leading-relaxed">
+                          {rulesDoc.auditDisclaimer}
+                        </p>
+                      </CardContent>
+                    </Card>
+                  </div>
+                </>
+              )}
+            </TabsContent>
+          </>
+        )}
+      </Tabs>
+
+      {/* 4. PDF Export Modal (Shadcn Dialog) */}
+      <Dialog open={isPdfModalOpen} onOpenChange={setIsPdfModalOpen}>
+        <DialogContent className="max-w-xl p-0 overflow-hidden bg-background border-border shadow-2xl">
+          <DialogHeader className="p-5 pb-4 border-b border-border/40 bg-muted/20">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 rounded-2xl bg-primary/10 text-primary">
+                <FileDown className="w-5 h-5" />
+              </div>
               <div>
-                <label className="block text-xs font-semibold text-[var(--text-secondary)] mb-2">
-                  {t('analytics.pdfModal.selectType')}
-                </label>
-                <div className="space-y-1.5 max-h-60 overflow-y-auto pr-1">
-                  {[
-                    { id: 'student', label: t('analytics.pdfModal.reports.student.label'), desc: t('analytics.pdfModal.reports.student.desc') },
-                    { id: 'group', label: t('analytics.pdfModal.reports.group.label'), desc: t('analytics.pdfModal.reports.group.desc') },
-                    { id: 'assessment', label: t('analytics.pdfModal.reports.assessment.label'), desc: t('analytics.pdfModal.reports.assessment.desc') },
-                    { id: 'attendance', label: t('analytics.pdfModal.reports.attendance.label'), desc: t('analytics.pdfModal.reports.attendance.desc') },
-                    { id: 'lesson-completion', label: t('analytics.pdfModal.reports.lessonCompletion.label'), desc: t('analytics.pdfModal.reports.lessonCompletion.desc') },
-                    { id: 'mentor', label: t('analytics.pdfModal.reports.mentor.label'), desc: t('analytics.pdfModal.reports.mentor.desc') },
-                    { id: 'subjects', label: t('analytics.pdfModal.reports.subjects.label'), desc: t('analytics.pdfModal.reports.subjects.desc') },
-                    { id: 'academic-period', label: t('analytics.pdfModal.reports.academicPeriod.label'), desc: t('analytics.pdfModal.reports.academicPeriod.desc') },
-                  ].map((r) => (
+                <DialogTitle className="text-base font-bold text-foreground">
+                  {t('analytics.pdfModal.title')}
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground mt-0.5">
+                  {t('analytics.pdfModal.subtitle')}
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="p-5 space-y-4">
+            <div>
+              <label className="block text-xs font-semibold text-muted-foreground mb-2">
+                {t('analytics.pdfModal.selectType')}
+              </label>
+              <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+                {reportTypes.map((r) => {
+                  const isSelected = selectedReportType === r.id;
+                  return (
                     <label
                       key={r.id}
                       onClick={() => setSelectedReportType(r.id)}
-                      className={`flex items-start gap-3 p-2.5 rounded-xl border cursor-pointer transition-all ${
-                        selectedReportType === r.id
-                          ? 'border-[var(--brand-primary)] bg-[var(--brand-primary)]/5 text-[var(--brand-primary)]'
-                          : 'border-[var(--border-subtle)] hover:bg-[var(--surface-secondary)] text-[var(--text-primary)]'
-                      }`}
+                      className={cn(
+                        'flex items-start gap-3 p-3 rounded-xl border cursor-pointer transition-all',
+                        isSelected
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary/30'
+                          : 'border-border/50 hover:bg-muted/40 hover:border-border'
+                      )}
                     >
                       <input
                         type="radio"
                         name="reportType"
-                        checked={selectedReportType === r.id}
+                        checked={isSelected}
                         onChange={() => setSelectedReportType(r.id)}
-                        className="mt-0.5 text-[var(--brand-primary)] focus:ring-0"
+                        className="mt-0.5 text-primary focus:ring-primary accent-primary"
                       />
                       <div>
-                        <div className="text-xs font-bold">{r.label}</div>
-                        <div className="text-[11px] text-[var(--text-secondary)]">{r.desc}</div>
+                        <div className={cn('text-xs font-bold', isSelected ? 'text-primary' : 'text-foreground')}>
+                          {r.label}
+                        </div>
+                        <div className="text-[11px] text-muted-foreground mt-0.5">{r.desc}</div>
                       </div>
                     </label>
-                  ))}
-                </div>
-              </div>
-
-              <div className="p-3 bg-[var(--surface-secondary)] rounded-xl text-xs space-y-1">
-                <div className="text-[var(--text-secondary)] flex items-center justify-between">
-                  <span>{t('analytics.pdfModal.languageLabel')}</span>
-                  <span className="font-semibold text-[var(--text-primary)]">
-                    {t('analytics.pdfModal.languageValue')}
-                  </span>
-                </div>
-                <div className="text-[var(--text-secondary)] flex items-center justify-between">
-                  <span>{t('analytics.pdfModal.formatLabel')}</span>
-                  <span className="font-semibold text-[var(--text-primary)]">{t('analytics.pdfModal.formatValue')}</span>
-                </div>
-                <div className="text-[var(--text-secondary)] flex items-center justify-between">
-                  <span>{t('analytics.pdfModal.securityLabel')}</span>
-                  <span className="font-semibold text-emerald-700">{t('analytics.pdfModal.securityValue')}</span>
-                </div>
+                  );
+                })}
               </div>
             </div>
 
-            <div className="p-4 bg-[var(--surface-secondary)] border-t border-[var(--border-subtle)] flex items-center justify-end gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="text-xs"
-                onClick={() => setIsPdfModalOpen(false)}
-                disabled={downloadingPdf}
-              >
-                {t('analytics.pdfModal.cancelBtn')}
-              </Button>
-              <Button
-                variant="primary"
-                size="sm"
-                className="text-xs gap-2 bg-[var(--brand-primary)]"
-                onClick={() => handleDownloadPdf(selectedReportType)}
-                disabled={downloadingPdf}
-              >
-                {downloadingPdf ? (
-                  <>
-                    <div className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                    {t('analytics.pdfModal.loadingBtn')}
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-3.5 h-3.5" />
-                    {t('analytics.pdfModal.downloadBtn')}
-                  </>
-                )}
-              </Button>
+            <div className="p-3.5 bg-muted/40 rounded-xl text-xs space-y-1.5 border border-border/40">
+              <div className="text-muted-foreground flex items-center justify-between">
+                <span>{t('analytics.pdfModal.languageLabel')}</span>
+                <span className="font-semibold text-foreground">
+                  {t('analytics.pdfModal.languageValue')}
+                </span>
+              </div>
+              <div className="text-muted-foreground flex items-center justify-between">
+                <span>{t('analytics.pdfModal.formatLabel')}</span>
+                <span className="font-semibold text-foreground">{t('analytics.pdfModal.formatValue')}</span>
+              </div>
+              <div className="text-muted-foreground flex items-center justify-between">
+                <span>{t('analytics.pdfModal.securityLabel')}</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">{t('analytics.pdfModal.securityValue')}</span>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+
+          <DialogFooter className="p-4 bg-muted/20 border-t border-border/40 flex items-center justify-end gap-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-xs font-semibold"
+              onClick={() => setIsPdfModalOpen(false)}
+              disabled={downloadingPdf}
+            >
+              {t('analytics.pdfModal.cancelBtn')}
+            </Button>
+            <Button
+              variant="default"
+              size="sm"
+              className="text-xs gap-2 font-semibold shadow-sm"
+              onClick={() => handleDownloadPdf(selectedReportType)}
+              disabled={downloadingPdf}
+            >
+              {downloadingPdf ? (
+                <>
+                  <div className="w-3.5 h-3.5 border-2 border-primary-foreground border-t-transparent rounded-full animate-spin" />
+                  {t('analytics.pdfModal.loadingBtn')}
+                </>
+              ) : (
+                <>
+                  <Download className="w-3.5 h-3.5" />
+                  {t('analytics.pdfModal.downloadBtn')}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
